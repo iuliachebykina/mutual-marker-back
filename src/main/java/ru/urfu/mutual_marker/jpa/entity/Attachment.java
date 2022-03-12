@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(schema = "mutual_marker")
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,6 +24,7 @@ public class Attachment {
     Extension extension;
     @ManyToMany(mappedBy = "attachments")
     Set<Project> projects;
+    @NotNull
     @ManyToOne
     Profile student;
     @Column(columnDefinition = "boolean default false")

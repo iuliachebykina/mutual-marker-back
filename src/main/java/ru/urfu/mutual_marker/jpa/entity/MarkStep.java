@@ -13,6 +13,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(schema = "mutual_marker")
 public class MarkStep {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

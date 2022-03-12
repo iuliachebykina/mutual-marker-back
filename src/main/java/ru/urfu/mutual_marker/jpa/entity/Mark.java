@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(schema = "mutual_marker")
 public class Mark {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,6 +25,7 @@ public class Mark {
     Profile student;
     @NotNull
     Integer markValue;
+    @NotNull
     @CreatedDate
     Date markTime;
     String comment;

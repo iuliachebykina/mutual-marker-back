@@ -4,14 +4,17 @@ spring:
     name: mutual-marker
     schema: mutual_marker
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password:
-    driverClassName: org.h2.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: admin
+    password: admin
+    driverClassName:
+  flyway:
+    baseline-on-migrate: true
+    schemas: ${spring.application.schema}
   jpa:
-    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
-  h2:
-    console.enabled: true
-    console.path: /h2-console
-    console.settings.trace: false
-    spring.h2.console.settings.web-allow-others: false
+      properties:
+        hibernate:
+          dialect=org:
+            hibernate:
+              dialect:
+                PostgreSQL10Dialect

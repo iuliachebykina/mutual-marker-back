@@ -14,7 +14,6 @@ public class Name {
     String firstName;
     @NotNull
     String lastName;
-    @NotNull
     String patronymic;
 
 }
