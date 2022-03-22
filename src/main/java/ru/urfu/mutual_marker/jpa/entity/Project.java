@@ -21,7 +21,7 @@ public class Project {
     @ManyToOne
     Profile student;
     @ManyToOne
-    Room room;
+    Task task;
     @OneToMany(mappedBy = "project")
     Set<Mark> mark;
     @ManyToMany

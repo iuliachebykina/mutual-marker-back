@@ -7,6 +7,7 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.Set;
 
 @Entity
@@ -20,6 +21,11 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
+    @Email
+    @NotNull
+    String email;
+    @NotNull
+    String password;
     @Enumerated(value = EnumType.STRING)
     @NotNull
     Role role;

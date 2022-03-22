@@ -34,12 +34,14 @@ CREATE TABLE mark_step
 CREATE TABLE profile
 (
     id            BIGINT NOT NULL,
-    role          VARCHAR(255) NOT NULL,
-    first_name    VARCHAR(255) NOT NULL,
-    last_name     VARCHAR(255) NOT NULL,
-    patronymic    VARCHAR(255),
-    student_group VARCHAR(255),
-    phone_number  VARCHAR(255),
+    email         varchar(255) NOT NULL,
+    password      varchar(255) NOT NULL,
+    role          VARCHAR(10) NOT NULL,
+    first_name    VARCHAR(50) NOT NULL,
+    last_name     VARCHAR(50) NOT NULL,
+    patronymic    VARCHAR(50),
+    student_group VARCHAR(20),
+    phone_number  VARCHAR(20),
     deleted       BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT pk_profile PRIMARY KEY (id)
 );
@@ -48,7 +50,7 @@ CREATE TABLE project
 (
     id          BIGINT NOT NULL,
     student_id  BIGINT NOT NULL,
-    room_id     BIGINT NOT NULL,
+    task_id     BIGINT NOT NULL,
     title       VARCHAR(100) NOT NULL,
     description VARCHAR(2000),
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
@@ -58,17 +60,28 @@ CREATE TABLE project
 CREATE TABLE room
 (
     id          BIGINT NOT NULL,
-    description VARCHAR(2000) NOT NULL,
-    open_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    close_date  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    title       VARCHAR(50),
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT pk_room PRIMARY KEY (id)
 );
 
-CREATE TABLE MARK_STEP_ROOMS
+CREATE TABLE task
+(
+    id          BIGINT NOT NULL,
+    title       VARCHAR(50)  not null ,
+    description varchar(2000),
+    open_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    close_date  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    room_id     BIGINT not null,
+    deleted     BOOLEAN DEFAULT FALSE NOT NULL,
+    CONSTRAINT pk_task PRIMARY KEY (id)
+);
+
+
+CREATE TABLE MARK_STEP_TASKS
 (
     MARK_STEPS_ID BIGINT NOT NULL,
-    ROOMS_ID BIGINT NOT NULL
+    TASKS_ID BIGINT NOT NULL
 );
 
 CREATE TABLE PROFILE_ROOMS
@@ -85,7 +98,7 @@ CREATE TABLE PROJECT_ATTACHMENTS
 
 
 ALTER TABLE project
-    ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (room_id) REFERENCES room (id);
+    ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (task_id) REFERENCES task (id);
 
 ALTER TABLE project
     ADD CONSTRAINT FK_PROJECT_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);

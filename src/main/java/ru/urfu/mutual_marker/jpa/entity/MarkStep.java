@@ -29,7 +29,7 @@ public class MarkStep {
     @NotNull
     Integer maxMark;
     @ManyToMany
-    Set<Room> rooms;
+    Set<Task> tasks;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 }

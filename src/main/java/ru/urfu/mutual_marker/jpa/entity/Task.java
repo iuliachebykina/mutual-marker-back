@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -14,19 +15,22 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-public class Room {
+public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
     @NotNull
     String title;
-    @ManyToMany(mappedBy = "rooms")
-    Set<Profile> teachers;
-    @ManyToMany(mappedBy = "rooms")
-    Set<Profile> students;
-    @OneToMany
-    Set<Task> tasks;
+    @Column(length = 2000)
+    String description;
+    @NotNull
+    Date openDate;
+    @NotNull
+    Date closeDate;
+    @OneToMany(mappedBy = "task")
+    Set<Project> project;
+    @ManyToMany(mappedBy = "tasks")
+    Set<MarkStep> markSteps;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
-
 }
