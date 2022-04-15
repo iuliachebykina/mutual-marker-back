@@ -3,13 +3,17 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -23,8 +27,10 @@ public class Project {
     @ManyToOne
     Task task;
     @OneToMany(mappedBy = "project")
+    @ToString.Exclude
     Set<Mark> mark;
     @ManyToMany
+    @ToString.Exclude
     Set<Attachment> attachments;
     @Column(length = 100)
     @NotNull
@@ -34,4 +40,17 @@ public class Project {
     String description;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Project project = (Project) o;
+        return id != null && Objects.equals(id, project.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

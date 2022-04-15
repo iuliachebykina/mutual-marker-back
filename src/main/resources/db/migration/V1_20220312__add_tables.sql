@@ -62,6 +62,7 @@ CREATE TABLE room
     id          BIGINT NOT NULL,
     title       VARCHAR(50),
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
+    code        VARCHAR(8) NOT NULL,
     CONSTRAINT pk_room PRIMARY KEY (id)
 );
 
