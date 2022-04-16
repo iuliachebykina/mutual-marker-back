@@ -1,6 +1,5 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,13 +31,11 @@ public class Task {
     LocalDateTime openDate;
     @NotNull
     LocalDateTime closeDate;
-    @JsonIgnore
     @OneToMany(mappedBy = "task")
     @ToString.Exclude
     List<Project> project;
     @ManyToOne
     Room room;
-    @JsonIgnore
     @ManyToMany(mappedBy = "tasks")
     @ToString.Exclude
     List<MarkStep> markSteps;

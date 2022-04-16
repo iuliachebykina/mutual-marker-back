@@ -1,6 +1,5 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -33,8 +32,12 @@ public class MarkStep {
     String description;
     @NotNull
     Integer maxMark;
-    @JsonIgnore
     @ManyToMany
+    @JoinTable(
+            name = "markstep_task",
+            schema = "mutual_marker",
+            joinColumns = @JoinColumn(name = "mark_step_id"),
+            inverseJoinColumns = @JoinColumn(name = "task_id"))
     @ToString.Exclude
     List<Task> tasks;
     @Column(columnDefinition = "boolean default false")

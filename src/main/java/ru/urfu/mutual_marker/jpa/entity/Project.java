@@ -1,6 +1,5 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,12 +26,15 @@ public class Project {
     Profile student;
     @ManyToOne
     Task task;
-    @JsonIgnore
     @OneToMany(mappedBy = "project")
     @ToString.Exclude
     List<Mark> mark;
-    @JsonIgnore
     @ManyToMany
+    @JoinTable(
+            name = "project_attachment",
+            schema = "mutual_marker",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     @ToString.Exclude
     List<Attachment> attachments;
     @Column(length = 100)
