@@ -1,4 +1,4 @@
-CREATE TABLE attachment
+CREATE TABLE mutual_marker.attachment
 (
     id         BIGINT NOT NULL,
     file_name  VARCHAR(255) NOT NULL,
@@ -8,7 +8,7 @@ CREATE TABLE attachment
     CONSTRAINT pk_attachment PRIMARY KEY (id)
 );
 
-CREATE TABLE mark
+CREATE TABLE mutual_marker.mark
 (
     id         BIGINT NOT NULL,
     project_id BIGINT NOT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE mark
     CONSTRAINT pk_mark PRIMARY KEY (id)
 );
 
-CREATE TABLE mark_step
+CREATE TABLE mutual_marker.mark_step
 (
     id          BIGINT NOT NULL,
     owner_id    BIGINT,
@@ -31,15 +31,15 @@ CREATE TABLE mark_step
     CONSTRAINT pk_markstep PRIMARY KEY (id)
 );
 
-CREATE TABLE profile
+CREATE TABLE mutual_marker.profile
 (
     id            BIGINT NOT NULL,
     username         varchar(255) NOT NULL unique,
     password      varchar(255) NOT NULL,
     email         varchar(255) NOT NULL unique ,
-    role          VARCHAR(20) NOT NULL,
     first_name    VARCHAR(100) NOT NULL,
     last_name     VARCHAR(100) NOT NULL,
+    role          VARCHAR(30) NOT NULL,
     patronymic    VARCHAR(100),
     student_group VARCHAR(100),
     phone_number  VARCHAR(100),
@@ -47,7 +47,7 @@ CREATE TABLE profile
     CONSTRAINT pk_profile PRIMARY KEY (id)
 );
 
-CREATE TABLE project
+CREATE TABLE mutual_marker.project
 (
     id          BIGINT NOT NULL,
     student_id  BIGINT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE project
     CONSTRAINT pk_project PRIMARY KEY (id)
 );
 
-CREATE TABLE room
+CREATE TABLE mutual_marker.room
 (
     id          BIGINT NOT NULL,
     title       VARCHAR(100),
@@ -67,7 +67,7 @@ CREATE TABLE room
     CONSTRAINT pk_room PRIMARY KEY (id)
 );
 
-CREATE TABLE task
+CREATE TABLE mutual_marker.task
 (
     id          BIGINT NOT NULL,
     title       VARCHAR(100)  not null ,
@@ -80,39 +80,39 @@ CREATE TABLE task
 );
 
 
-CREATE TABLE MARK_STEP_TASKS
+CREATE TABLE mutual_marker.mark_step_tasks
 (
     MARK_STEPS_ID BIGINT NOT NULL,
     TASKS_ID BIGINT NOT NULL
 );
 
-CREATE TABLE PROFILE_ROOMS
+CREATE TABLE mutual_marker.profile_rooms
 (
     TEACHERS_ID BIGINT NOT NULL,
     ROOMS_ID BIGINT NOT NULL
 );
 
-CREATE TABLE PROJECT_ATTACHMENTS
+CREATE TABLE mutual_marker.project_attachments
 (
     PROJECT_ID BIGINT NOT NULL,
     ATTACHMENT_ID BIGINT NOT NULL
 );
 
 
-ALTER TABLE project
+ALTER TABLE mutual_marker.project
     ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (task_id) REFERENCES task (id);
 
-ALTER TABLE project
+ALTER TABLE mutual_marker.project
     ADD CONSTRAINT FK_PROJECT_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);
 
-ALTER TABLE mark_step
+ALTER TABLE mutual_marker.mark_step
     ADD CONSTRAINT FK_MARKSTEP_ON_OWNER FOREIGN KEY (owner_id) REFERENCES profile (id);
 
-ALTER TABLE mark
+ALTER TABLE mutual_marker.mark
     ADD CONSTRAINT FK_MARK_ON_PROJECT FOREIGN KEY (project_id) REFERENCES project (id);
 
-ALTER TABLE mark
+ALTER TABLE mutual_marker.mark
     ADD CONSTRAINT FK_MARK_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);
 
-ALTER TABLE attachment
+ALTER TABLE mutual_marker.attachment
     ADD CONSTRAINT FK_ATTACHMENT_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);

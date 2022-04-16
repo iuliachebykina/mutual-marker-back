@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,6 +33,7 @@ public class MarkStep {
     String description;
     @NotNull
     Integer maxMark;
+    @JsonIgnore
     @ManyToMany
     @ToString.Exclude
     List<Task> tasks;

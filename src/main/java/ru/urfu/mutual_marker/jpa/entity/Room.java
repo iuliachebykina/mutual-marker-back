@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,9 +27,11 @@ public class Room {
     Long id;
     @NotNull
     String title;
+    @JsonIgnore
     @ManyToMany(mappedBy = "rooms")
     @ToString.Exclude
     List<Profile> teachers;
+    @JsonIgnore
     @ManyToMany(mappedBy = "rooms")
     @ToString.Exclude
     List<Profile> students;
@@ -36,6 +39,7 @@ public class Room {
     @NotBlank
     @NotNull
     String code;
+    @JsonIgnore
     @OneToMany(mappedBy = "room")
     @ToString.Exclude
     List<Task> tasks;

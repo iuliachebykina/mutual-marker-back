@@ -50,9 +50,4 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .httpBasic();
 
     }
-
-
-
-
-
 }

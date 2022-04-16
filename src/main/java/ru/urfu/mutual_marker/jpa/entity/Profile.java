@@ -41,12 +41,15 @@ public class Profile {
     Name name;
     String studentGroup;
     String phoneNumber;
+    @JsonIgnore
     @ManyToMany
     @ToString.Exclude
     List<Room> rooms;
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     @ToString.Exclude
     List<Mark> marks;
+    @JsonIgnore
     @OneToMany(mappedBy = "student")
     @ToString.Exclude
     List<Attachment> attachments;

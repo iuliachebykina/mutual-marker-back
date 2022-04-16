@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,9 +27,11 @@ public class Project {
     Profile student;
     @ManyToOne
     Task task;
+    @JsonIgnore
     @OneToMany(mappedBy = "project")
     @ToString.Exclude
     List<Mark> mark;
+    @JsonIgnore
     @ManyToMany
     @ToString.Exclude
     List<Attachment> attachments;
