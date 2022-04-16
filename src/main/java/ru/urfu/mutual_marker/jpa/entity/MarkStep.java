@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -34,7 +34,7 @@ public class MarkStep {
     Integer maxMark;
     @ManyToMany
     @ToString.Exclude
-    Set<Task> tasks;
+    List<Task> tasks;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 

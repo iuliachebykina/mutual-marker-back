@@ -6,8 +6,8 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -28,10 +28,10 @@ public class Project {
     Task task;
     @OneToMany(mappedBy = "project")
     @ToString.Exclude
-    Set<Mark> mark;
+    List<Mark> mark;
     @ManyToMany
     @ToString.Exclude
-    Set<Attachment> attachments;
+    List<Attachment> attachments;
     @Column(length = 100)
     @NotNull
     String title;

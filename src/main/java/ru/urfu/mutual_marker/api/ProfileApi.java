@@ -4,17 +4,22 @@ package ru.urfu.mutual_marker.api;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
-import ru.urfu.mutual_marker.dto.profile.Admin;
-import ru.urfu.mutual_marker.dto.profile.Student;
-import ru.urfu.mutual_marker.dto.profile.Teacher;
+import ru.urfu.mutual_marker.dto.RegistrationInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
+import ru.urfu.mutual_marker.service.ProfileService;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -22,60 +27,95 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class ProfileApi {
-    ProfileRepository profileRepository;
     ProfileMapper profileMapper;
+    ProfileService profileService;
 
+    @Secured({"ROLE_ADMIN"})
     @GetMapping("/admins/{id}")
-    Admin getAdmin(@PathVariable Long id){
-        Optional<Profile> admin = profileRepository.findByIdAndRole(id, Role.ADMIN);
-        return admin.map(profileMapper::profileEntityToAdminDto).orElse(null);
+    AdminInfo getAdmin(@PathVariable Long id ){
+        Profile admin = profileService.getProfileById(id);
+        if(admin.getRole().equals(Role.ROLE_ADMIN))
+            return profileMapper.profileEntityToAdminDto(admin);
+        return null;
     }
 
+    @Secured("ROLE_ADMIN")
     @GetMapping("/admins")
-    List<Admin> getAllAdmins(){
-        List<Profile> admins = profileRepository.findAllByRole( Role.ADMIN);
+    List<AdminInfo> getAllAdmins(){
+        List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN);
         return admins
                 .stream()
                 .map(profileMapper::profileEntityToAdminDto)
                 .collect(Collectors.toList());
     }
 
-
-    @GetMapping("/teachers/{id}")
-    Teacher getTeacher(@PathVariable Long id){
-        Optional<Profile> teacher = profileRepository.findByIdAndRole(id, Role.TEACHER);
-        return teacher.map(profileMapper::profileEntityToTeacherDto).orElse(null);
+    @Secured("ROLE_ADMIN")
+    @PostMapping ("/admins")
+    ResponseEntity<Profile> addAdmin(@RequestBody RegistrationInfo admin){
+        try {
+            return new ResponseEntity<>(profileService.saveProfile(admin), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+    @GetMapping("/teachers/{id}")
+    TeacherInfo getTeacher(@PathVariable Long id){
+        Profile teacher = profileService.getProfileById(id);
+        if(teacher.getRole().equals(Role.ROLE_TEACHER))
+            return profileMapper.profileEntityToTeacherDto(teacher);
+        return null;
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
     @GetMapping("/teachers")
-    List<Teacher> getAllTeachers(){
-        List<Profile> teachers = profileRepository.findAllByRole( Role.TEACHER);
+    List<TeacherInfo> getAllTeachers(){
+        List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER);
         return teachers
                 .stream()
                 .map(profileMapper::profileEntityToTeacherDto)
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/students/{id}")
-    Student getStudent(@PathVariable Long id){
-        Optional<Profile> student = profileRepository.findByIdAndRole(id, Role.STUDENT);
-        return student.map(profileMapper::profileEntityToStudentDto).orElse(null);
+    @RolesAllowed("ROLE_ADMIN")
+    @PostMapping ("/teachers")
+    ResponseEntity<Profile> addTeacher(@RequestBody RegistrationInfo teacher){
+        try {
+            return new ResponseEntity<>(profileService.saveProfile(teacher), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
+    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+    @GetMapping("/students/{id}")
+    StudentInfo getStudent(@PathVariable Long id){
+        Profile student = profileService.getProfileById(id);
+        if(student.getRole().equals(Role.ROLE_STUDENT))
+            return profileMapper.profileEntityToStudentDto(student);
+        return null;
+    }
+
+    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
     @GetMapping("/students")
-    List<Student> getAllStudents(){
-        List<Profile> students = profileRepository.findAllByRole( Role.STUDENT);
+    List<StudentInfo> getAllStudents(){
+        List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT);
         return students
                 .stream()
                 .map(profileMapper::profileEntityToStudentDto)
                 .collect(Collectors.toList());
     }
 
-
-
-
-
-    
-    
-
+    @PermitAll
+    @PostMapping ("/students")
+    ResponseEntity<Profile> addStudent(@RequestBody RegistrationInfo student){
+        try {
+            return new ResponseEntity<>(profileService.saveProfile(student), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

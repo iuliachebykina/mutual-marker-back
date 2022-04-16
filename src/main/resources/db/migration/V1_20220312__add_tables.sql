@@ -24,7 +24,7 @@ CREATE TABLE mark_step
 (
     id          BIGINT NOT NULL,
     owner_id    BIGINT,
-    title       VARCHAR(50) NOT NULL,
+    title       VARCHAR(100) NOT NULL,
     description VARCHAR(1000) NOT NULL,
     max_mark    INTEGER NOT NULL,
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
@@ -34,14 +34,15 @@ CREATE TABLE mark_step
 CREATE TABLE profile
 (
     id            BIGINT NOT NULL,
-    email         varchar(255) NOT NULL,
+    username         varchar(255) NOT NULL unique,
     password      varchar(255) NOT NULL,
-    role          VARCHAR(10) NOT NULL,
-    first_name    VARCHAR(50) NOT NULL,
-    last_name     VARCHAR(50) NOT NULL,
-    patronymic    VARCHAR(50),
-    student_group VARCHAR(20),
-    phone_number  VARCHAR(20),
+    email         varchar(255) NOT NULL unique ,
+    role          VARCHAR(20) NOT NULL,
+    first_name    VARCHAR(100) NOT NULL,
+    last_name     VARCHAR(100) NOT NULL,
+    patronymic    VARCHAR(100),
+    student_group VARCHAR(100),
+    phone_number  VARCHAR(100),
     deleted       BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT pk_profile PRIMARY KEY (id)
 );
@@ -60,16 +61,16 @@ CREATE TABLE project
 CREATE TABLE room
 (
     id          BIGINT NOT NULL,
-    title       VARCHAR(50),
+    title       VARCHAR(100),
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
-    code        VARCHAR(8) NOT NULL,
+    code        VARCHAR(50) NOT NULL,
     CONSTRAINT pk_room PRIMARY KEY (id)
 );
 
 CREATE TABLE task
 (
     id          BIGINT NOT NULL,
-    title       VARCHAR(50)  not null ,
+    title       VARCHAR(100)  not null ,
     description varchar(2000),
     open_date   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     close_date  TIMESTAMP WITHOUT TIME ZONE NOT NULL,

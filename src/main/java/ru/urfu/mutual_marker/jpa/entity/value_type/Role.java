@@ -1,7 +1,8 @@
 package ru.urfu.mutual_marker.jpa.entity.value_type;
 
 public enum Role {
-    ADMIN,
-    TEACHER,
+    ROLE_ADMIN,
+    ROLE_TEACHER,
     STUDENT
 }
+

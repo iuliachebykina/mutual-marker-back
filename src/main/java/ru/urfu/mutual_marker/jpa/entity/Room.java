@@ -8,8 +8,8 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -28,17 +28,17 @@ public class Room {
     String title;
     @ManyToMany(mappedBy = "rooms")
     @ToString.Exclude
-    Set<Profile> teachers;
+    List<Profile> teachers;
     @ManyToMany(mappedBy = "rooms")
     @ToString.Exclude
-    Set<Profile> students;
+    List<Profile> students;
     @Size(min = 8, max = 8)
     @NotBlank
     @NotNull
     String code;
-    @OneToMany
+    @OneToMany(mappedBy = "room")
     @ToString.Exclude
-    Set<Task> tasks;
+    List<Task> tasks;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 

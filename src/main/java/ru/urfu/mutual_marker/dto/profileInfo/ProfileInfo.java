@@ -1,12 +1,13 @@
-package ru.urfu.mutual_marker.dto.profile;
+package ru.urfu.mutual_marker.dto.profileInfo;
 
 import lombok.Data;
 
 @Data
-public class Profile {
+public class ProfileInfo {
     Long id;
-    String email;
+    String username;
     String phoneNumber;
+    String email;
     String firstName;
     String lastName;
     String patronymic;

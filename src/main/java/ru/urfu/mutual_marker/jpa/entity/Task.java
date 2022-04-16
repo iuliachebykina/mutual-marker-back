@@ -6,9 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -28,15 +28,17 @@ public class Task {
     @Column(length = 2000)
     String description;
     @NotNull
-    Date openDate;
+    LocalDateTime openDate;
     @NotNull
-    Date closeDate;
+    LocalDateTime closeDate;
     @OneToMany(mappedBy = "task")
     @ToString.Exclude
-    Set<Project> project;
+    List<Project> project;
+    @ManyToOne
+    Room room;
     @ManyToMany(mappedBy = "tasks")
     @ToString.Exclude
-    Set<MarkStep> markSteps;
+    List<MarkStep> markSteps;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 

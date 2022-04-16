@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,8 +10,8 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -25,13 +26,15 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
+    @NotNull
+    String username;
     @Email
     @NotNull
     String email;
+    @JsonIgnore
     @NotNull
     String password;
     @Enumerated(value = EnumType.STRING)
-    @NotNull
     Role role;
     @NotNull
     @Embedded
@@ -40,13 +43,13 @@ public class Profile {
     String phoneNumber;
     @ManyToMany
     @ToString.Exclude
-    Set<Room> rooms;
+    List<Room> rooms;
     @OneToMany(mappedBy = "student")
     @ToString.Exclude
-    Set<Mark> marks;
+    List<Mark> marks;
     @OneToMany(mappedBy = "student")
     @ToString.Exclude
-    Set<Attachment> attachments;
+    List<Attachment> attachments;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 
@@ -62,4 +65,6 @@ public class Profile {
     public int hashCode() {
         return getClass().hashCode();
     }
+
+
 }

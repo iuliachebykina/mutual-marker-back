@@ -7,7 +7,7 @@ import org.hibernate.Hibernate;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -31,7 +31,7 @@ public class Mark {
     Integer markValue;
     @NotNull
     @CreatedDate
-    Date markTime;
+    LocalDateTime markTime;
     String comment;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;

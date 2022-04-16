@@ -1,9 +1,9 @@
-package ru.urfu.mutual_marker.dto.profile;
+package ru.urfu.mutual_marker.dto.profileInfo;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class Admin  extends Profile {
+public class AdminInfo extends ProfileInfo {
 }

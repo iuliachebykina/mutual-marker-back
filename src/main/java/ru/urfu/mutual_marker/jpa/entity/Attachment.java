@@ -7,8 +7,8 @@ import org.hibernate.Hibernate;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Extension;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Getter
@@ -28,7 +28,7 @@ public class Attachment {
     Extension extension;
     @ManyToMany(mappedBy = "attachments")
     @ToString.Exclude
-    Set<Project> projects;
+    List<Project> projects;
     @NotNull
     @ManyToOne
     Profile student;
