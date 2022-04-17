@@ -69,9 +69,8 @@ public class TestController {
                     .firstName(firstName)
                     .email(email)
                     .lastName(lastName)
-                    .role(role.name())
                     .build();
-             profileService.saveProfile(registrationInfo);
+             profileService.saveProfile(registrationInfo, role);
 
 
 
