@@ -7,9 +7,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
-import ru.urfu.mutual_marker.dto.RegistrationInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
@@ -17,20 +17,19 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
-import javax.annotation.security.PermitAll;
-import javax.annotation.security.RolesAllowed;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/profile_api")
+@RequestMapping(value = "/profile")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
 public class ProfileApi {
     ProfileMapper profileMapper;
     ProfileService profileService;
 
-    @Secured({"ROLE_ADMIN"})
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins/{id}")
     AdminInfo getAdmin(@PathVariable Long id ){
         Profile admin = profileService.getProfileById(id);
@@ -39,7 +38,7 @@ public class ProfileApi {
         return null;
     }
 
-    @Secured("ROLE_ADMIN")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins")
     List<AdminInfo> getAllAdmins(){
         List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN);
@@ -49,18 +48,9 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-    @Secured("ROLE_ADMIN")
-    @PostMapping ("/admins")
-    ResponseEntity<Profile> addAdmin(@RequestBody RegistrationInfo admin){
-        try {
-            return new ResponseEntity<>(profileService.saveProfile(admin), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
-    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/teachers/{id}")
     TeacherInfo getTeacher(@PathVariable Long id){
         Profile teacher = profileService.getProfileById(id);
@@ -69,7 +59,7 @@ public class ProfileApi {
         return null;
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/teachers")
     List<TeacherInfo> getAllTeachers(){
         List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER);
@@ -79,18 +69,10 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-    @RolesAllowed("ROLE_ADMIN")
-    @PostMapping ("/teachers")
-    ResponseEntity<Profile> addTeacher(@RequestBody RegistrationInfo teacher){
-        try {
-            return new ResponseEntity<>(profileService.saveProfile(teacher), HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 
 
-    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students/{id}")
     StudentInfo getStudent(@PathVariable Long id){
         Profile student = profileService.getProfileById(id);
@@ -99,7 +81,7 @@ public class ProfileApi {
         return null;
     }
 
-    @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students")
     List<StudentInfo> getAllStudents(){
         List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT);
@@ -109,11 +91,35 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-    @PermitAll
-    @PostMapping ("/students")
-    ResponseEntity<Profile> addStudent(@RequestBody RegistrationInfo student){
+
+
+
+    @PutMapping("/students")
+    @PreAuthorize("#student.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
         try {
-            return new ResponseEntity<>(profileService.saveProfile(student), HttpStatus.CREATED);
+            return new ResponseEntity<>(profileService.updateProfile(student), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PutMapping("/teachers")
+    @PreAuthorize("#teacher.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
+        try {
+            return new ResponseEntity<>(profileService.updateProfile(teacher), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/admins")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
+        try {
+            return new ResponseEntity<>(profileService.updateProfile(admin), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }

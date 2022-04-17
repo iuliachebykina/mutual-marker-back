@@ -1,10 +1,12 @@
 package ru.urfu.mutual_marker.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RegistrationInfo {
     String username;
     String password;
@@ -13,6 +15,5 @@ public class RegistrationInfo {
     String firstName;
     String lastName;
     String patronymic;
-    String role;
     String studentGroup;
 }

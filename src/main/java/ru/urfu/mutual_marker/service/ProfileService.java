@@ -34,17 +34,24 @@ public class ProfileService {
         return profileRepository.findAllByRole(role);
     }
 
-    public Profile saveProfile(RegistrationInfo registrationInfo) {
+    public Profile saveProfile(RegistrationInfo registrationInfo, Role role) {
         Profile profile = profileRepository.findByUsername(registrationInfo.getUsername());
         if (profile != null){
             return null;
         }
         profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 
+        if(!role.equals(Role.ROLE_STUDENT)){
+            profile.setStudentGroup(null);
+        }
         profile.setPassword(passwordEncoder.encode(registrationInfo.getPassword()));
+        profile.setRole(role);
         profile.setDeleted(false);
         profileRepository.save(profile);
         return profile;
     }
 
+    public Profile updateProfile(Profile profile) {
+        return profileRepository.save(profile);
+    }
 }
