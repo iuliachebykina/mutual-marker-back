@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.api;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,15 +20,19 @@ import ru.urfu.mutual_marker.service.ProfileService;
 @RequestMapping(value = "/registration")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
+@Slf4j
 public class RegistrationApi {
     ProfileService profileService;
 
     @PostMapping("/student")
     @PreAuthorize("permitAll()")
-    ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo student){
+    ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
         try {
-            return new ResponseEntity<>(profileService.saveProfile(student, Role.ROLE_STUDENT), HttpStatus.CREATED);
+            Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+            log.info("Registration student (id: {})", student.getId());
+            return new ResponseEntity<>(student, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to registration student with username: {}", registrationInfo.getUsername());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -35,20 +40,26 @@ public class RegistrationApi {
     
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping ("/admin")
-    ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo admin){
+    ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
         try {
-            return new ResponseEntity<>(profileService.saveProfile(admin, Role.ROLE_ADMIN), HttpStatus.CREATED);
+            Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+            log.info("Registration admin (id: {})", admin.getId());
+            return new ResponseEntity<>(admin, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to registration admin with username: {}", registrationInfo.getUsername());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping ("/teacher")
-    ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo teacher){
+    ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
-            return new ResponseEntity<>(profileService.saveProfile(teacher, Role.ROLE_TEACHER), HttpStatus.CREATED);
+            Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+            log.info("Registration teacher (id: {})", teacher.getId());
+            return new ResponseEntity<>(teacher, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to registration teacher with username: {}", registrationInfo.getUsername());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

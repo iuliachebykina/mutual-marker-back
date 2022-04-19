@@ -4,10 +4,13 @@ package ru.urfu.mutual_marker.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.h2.engine.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
+import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
@@ -17,6 +20,7 @@ import java.util.List;
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
+@Slf4j
 public class ProfileService {
     PasswordEncoder passwordEncoder;
     ProfileRepository profileRepository;
@@ -34,10 +38,10 @@ public class ProfileService {
         return profileRepository.findAllByRole(role);
     }
 
-    public Profile saveProfile(RegistrationInfo registrationInfo, Role role) {
+    public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
         Profile profile = profileRepository.findByUsername(registrationInfo.getUsername());
         if (profile != null){
-            return null;
+            throw new UserExistingException();
         }
         profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 

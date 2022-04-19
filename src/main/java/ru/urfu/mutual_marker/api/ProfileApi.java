@@ -4,6 +4,7 @@ package ru.urfu.mutual_marker.api;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
+@Slf4j
 public class ProfileApi {
     ProfileMapper profileMapper;
     ProfileService profileService;
@@ -33,8 +35,10 @@ public class ProfileApi {
     @GetMapping("/admins/{id}")
     AdminInfo getAdmin(@PathVariable Long id ){
         Profile admin = profileService.getProfileById(id);
-        if(admin.getRole().equals(Role.ROLE_ADMIN))
+        if(admin.getRole().equals(Role.ROLE_ADMIN)) {
+            log.info("Got admin by id: {}", id);
             return profileMapper.profileEntityToAdminDto(admin);
+        }
         return null;
     }
 
@@ -42,6 +46,7 @@ public class ProfileApi {
     @GetMapping("/admins")
     List<AdminInfo> getAllAdmins(){
         List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN);
+        log.info("Got all admins");
         return admins
                 .stream()
                 .map(profileMapper::profileEntityToAdminDto)
@@ -54,8 +59,10 @@ public class ProfileApi {
     @GetMapping("/teachers/{id}")
     TeacherInfo getTeacher(@PathVariable Long id){
         Profile teacher = profileService.getProfileById(id);
-        if(teacher.getRole().equals(Role.ROLE_TEACHER))
+        if(teacher.getRole().equals(Role.ROLE_TEACHER)) {
+            log.info("Got teacher by id: {}", id);
             return profileMapper.profileEntityToTeacherDto(teacher);
+        }
         return null;
     }
 
@@ -63,6 +70,7 @@ public class ProfileApi {
     @GetMapping("/teachers")
     List<TeacherInfo> getAllTeachers(){
         List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER);
+        log.info("Got all teachers");
         return teachers
                 .stream()
                 .map(profileMapper::profileEntityToTeacherDto)
@@ -76,8 +84,10 @@ public class ProfileApi {
     @GetMapping("/students/{id}")
     StudentInfo getStudent(@PathVariable Long id){
         Profile student = profileService.getProfileById(id);
-        if(student.getRole().equals(Role.ROLE_STUDENT))
+        if(student.getRole().equals(Role.ROLE_STUDENT)) {
+            log.info("Got student by id: {}", id);
             return profileMapper.profileEntityToStudentDto(student);
+        }
         return null;
     }
 
@@ -85,6 +95,7 @@ public class ProfileApi {
     @GetMapping("/students")
     List<StudentInfo> getAllStudents(){
         List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT);
+        log.info("Got all students");
         return students
                 .stream()
                 .map(profileMapper::profileEntityToStudentDto)
@@ -98,8 +109,11 @@ public class ProfileApi {
     @PreAuthorize("#student.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
         try {
-            return new ResponseEntity<>(profileService.updateProfile(student), HttpStatus.CREATED);
+            Profile newStudent = profileService.updateProfile(student);
+            log.info("Updated student with id: {}", student.getId());
+            return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to update student with id: {}", student.getId());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -109,8 +123,11 @@ public class ProfileApi {
     @PreAuthorize("#teacher.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
         try {
-            return new ResponseEntity<>(profileService.updateProfile(teacher), HttpStatus.CREATED);
+            Profile newTeacher = profileService.updateProfile(teacher);
+            log.info("Updated teacher with id: {}", teacher.getId());
+            return new ResponseEntity<>(newTeacher, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to update teacher with id: {}", teacher.getId());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -119,8 +136,11 @@ public class ProfileApi {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
         try {
-            return new ResponseEntity<>(profileService.updateProfile(admin), HttpStatus.CREATED);
+            Profile newAdmin = profileService.updateProfile(admin);
+            log.info("Updated admin with id: {}", admin.getId());
+            return new ResponseEntity<>(newAdmin, HttpStatus.CREATED);
         } catch (Exception e) {
+            log.info("Failed to update admin with id: {}", admin.getId());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

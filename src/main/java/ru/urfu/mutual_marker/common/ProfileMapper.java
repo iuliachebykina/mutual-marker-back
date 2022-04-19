@@ -19,8 +19,6 @@ public interface ProfileMapper {
     })
     AdminInfo profileEntityToAdminDto(Profile profile);
 
-
-
     @Mappings({
             @Mapping(target = "firstName", source = "name.firstName"),
             @Mapping(target = "lastName", source = "name.lastName"),
@@ -40,9 +38,6 @@ public interface ProfileMapper {
             @Mapping(target = "name.firstName", source = "firstName"),
             @Mapping(target = "name.lastName", source = "lastName"),
             @Mapping(target = "name.patronymic", source = "patronymic")
-
-
-
     })
     Profile registrationInfoToProfileEntity(RegistrationInfo registrationInfo);
 }

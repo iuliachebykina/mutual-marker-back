@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
+import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Room;
@@ -41,7 +42,7 @@ public class TestController {
 
     @GetMapping("/test")
     @PermitAll
-    String  test(){
+    String  test() throws UserExistingException {
         addProfiles();
 //        addRooms();
 //        addTasks();
@@ -52,7 +53,7 @@ public class TestController {
 
 
 
-    void addProfiles(){
+    void addProfiles() throws UserExistingException {
 
         for (int i = 0; i < 100; i++) {
             String username = generateString(20);
@@ -177,14 +178,14 @@ public class TestController {
 
 
     String generateString( int top){
-        char data = ' ';
-        String dat = "";
+        char data;
+        StringBuilder dat = new StringBuilder();
 
         for (int i=0; i<=top; i++) {
             data = (char)(rand.nextInt(25)+97);
-            dat = data + dat;
+            dat.insert(0, data);
         }
-        return dat;
+        return dat.toString();
 
     }
 }
