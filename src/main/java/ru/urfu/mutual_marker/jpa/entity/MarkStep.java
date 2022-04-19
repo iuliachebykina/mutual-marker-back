@@ -6,8 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -32,6 +33,10 @@ public class MarkStep {
     String description;
     @NotNull
     Integer maxMark;
+    @Column(columnDefinition = "boolean default false")
+    Boolean deleted;
+
+
     @ManyToMany
     @JoinTable(
             name = "markstep_task",
@@ -39,9 +44,19 @@ public class MarkStep {
             joinColumns = @JoinColumn(name = "mark_step_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id"))
     @ToString.Exclude
-    List<Task> tasks;
-    @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    Set<Task> tasks = new HashSet<>();
+
+
+    public void addTask(Task task) {
+        if(tasks == null)
+            tasks = new HashSet<>();
+        tasks.add(task);
+    }
+
+    public void removeTask(long taskId){
+        this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
+    }
+
 
     @Override
     public boolean equals(Object o) {

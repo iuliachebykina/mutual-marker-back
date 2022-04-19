@@ -6,8 +6,9 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,17 +27,6 @@ public class Project {
     Profile student;
     @ManyToOne
     Task task;
-    @OneToMany(mappedBy = "project")
-    @ToString.Exclude
-    List<Mark> mark;
-    @ManyToMany
-    @JoinTable(
-            name = "project_attachment",
-            schema = "mutual_marker",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
-    @ToString.Exclude
-    List<Attachment> attachments;
     @Column(length = 100)
     @NotNull
     String title;
@@ -45,6 +35,44 @@ public class Project {
     String description;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
+
+
+    @OneToMany(mappedBy = "project")
+    @ToString.Exclude
+    Set<Mark> marks = new HashSet<>();
+    @ManyToMany
+    @JoinTable(
+            name = "project_attachment",
+            schema = "mutual_marker",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    @ToString.Exclude
+    Set<Attachment> attachments = new HashSet<>();
+
+
+    public void addMark(Mark mark){
+        if(marks == null)
+            marks = new HashSet<>();
+        marks.add(mark);
+    }
+
+    public void removeMark(long markId){
+        this.marks.stream().filter(a -> a.getId() == markId).findFirst().ifPresent(mark -> this.marks.remove(mark));
+    }
+
+    public void addAttachment(Attachment attachment){
+        getAttachments().add(attachment);
+        attachment.getProjects().add(this);
+    }
+
+    public void removeAttachment(long attachmentId) {
+        Attachment attachment = this.attachments.stream().filter(a -> a.getId() == attachmentId).findFirst().orElse(null);
+        if (attachment != null) {
+            this.attachments.remove(attachment);
+            attachment.getProjects().remove(this);
+        }
+    }
+
 
     @Override
     public boolean equals(Object o) {

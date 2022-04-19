@@ -44,9 +44,10 @@ public class TestController {
     @PermitAll
     String  test() throws UserExistingException {
         addProfiles();
-//        addRooms();
-//        addTasks();
- //       addProjects();
+             addRooms();
+        addTasks();
+        addProjects();
+
         return "ok";
     }
 
@@ -57,7 +58,6 @@ public class TestController {
 
         for (int i = 0; i < 100; i++) {
             String username = generateString(20);
-            String password = generateString(20);
             String email = generateString(10) + "@mail.com";
             int roleID = rand.nextInt() % 3;
             Role role = Role.values()[roleID < 0? -1 * roleID: roleID ];
@@ -66,7 +66,7 @@ public class TestController {
 
             RegistrationInfo registrationInfo = RegistrationInfo.builder()
                     .username(username)
-                    .password(password)
+                    .password(username)
                     .firstName(firstName)
                     .email(email)
                     .lastName(lastName)
@@ -82,29 +82,45 @@ public class TestController {
     void addRooms(){
         for (int i = 0; i < 100; i++) {
             String title = generateString(10);
-            int teachersCount = rand.nextInt() % 3;
+            int teachersCount = 3;
             List<Profile> teachers = profileRepository
                     .findAllByRole(Role.ROLE_TEACHER)
                     .stream()
-                    .limit(teachersCount < 0? -1 * teachersCount: teachersCount)
+                    .limit(teachersCount)
                     .collect(Collectors.toList());
 
-            int studentsCount = rand.nextInt() % 30;
+            int studentsCount =10;
             List<Profile> students = profileRepository
                     .findAllByRole(Role.ROLE_STUDENT)
                     .stream()
-                    .limit(studentsCount < 0? -1 * studentsCount: studentsCount)
+                    .limit(studentsCount)
                     .collect(Collectors.toList());
 
             String code = generateString(8);
 
             Room room = Room.builder()
                     .title(title)
-                    .teachers(teachers)
-                    .students(students)
                     .code(code)
                     .deleted(false)
                     .build();
+
+
+            room.getTasks().add(taskRepository.findAll().stream().findAny().get());
+
+            for (Profile t:
+                    students) {
+                if(t != null)
+                    room.addStudent(t);
+
+            }
+
+            for (Profile t:
+                 teachers) {
+                if(t != null)
+                    room.addTeacher(t);
+
+            }
+
 
             roomRepository.save(room);
 
@@ -150,7 +166,7 @@ public class TestController {
                 Room room = task.getRoom();
 
                 long studentId = rand.nextInt() % room.getStudents().size();
-                Profile student = room.getStudents().get(getPositiveNumber(studentId));
+                Profile student = room.getStudents().iterator().next();
 
                 String title = generateString(10);
 

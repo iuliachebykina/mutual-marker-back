@@ -9,8 +9,9 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -39,6 +40,13 @@ public class Profile {
     Name name;
     String studentGroup;
     String phoneNumber;
+    @Column(columnDefinition = "boolean default false")
+    Boolean deleted;
+
+
+    @OneToMany(mappedBy = "student")
+    @ToString.Exclude
+    Set<Attachment> attachments = new HashSet<>();
     @ManyToMany
     @JoinTable(
             name = "profile_room",
@@ -46,15 +54,29 @@ public class Profile {
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
     @ToString.Exclude
-    List<Room> rooms;
-    @OneToMany(mappedBy = "student")
-    @ToString.Exclude
-    List<Mark> marks;
-    @OneToMany(mappedBy = "student")
-    @ToString.Exclude
-    List<Attachment> attachments;
-    @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    Set<Room> rooms = new HashSet<>();
+
+
+    public void addAttachment(Attachment attachment){
+        if(attachments == null)
+            attachments = new HashSet<>();
+        attachments.add(attachment);
+    }
+
+    public void addRoom(Room room){
+        if(rooms == null)
+            rooms = new HashSet<>();
+        rooms.add(room);
+    }
+
+    public void removeAttachment(long attachmentId){
+        this.attachments.stream().filter(a -> a.getId() == attachmentId).findFirst().ifPresent(attachment -> this.attachments.remove(attachment));
+    }
+
+    public void removeRoom(long roomId){
+        this.rooms.stream().filter(a -> a.getId() == roomId).findFirst().ifPresent(room -> this.rooms.remove(room));
+    }
+
 
     @Override
     public boolean equals(Object o) {

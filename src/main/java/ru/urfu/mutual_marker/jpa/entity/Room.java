@@ -8,7 +8,8 @@ import org.hibernate.Hibernate;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Objects;
 
 @Entity
@@ -26,21 +27,65 @@ public class Room {
     Long id;
     @NotNull
     String title;
-    @ManyToMany(mappedBy = "rooms")
-    @ToString.Exclude
-    List<Profile> teachers;
-    @ManyToMany(mappedBy = "rooms")
-    @ToString.Exclude
-    List<Profile> students;
     @Size(min = 8, max = 8)
     @NotBlank
     @NotNull
     String code;
-    @OneToMany(mappedBy = "room")
-    @ToString.Exclude
-    List<Task> tasks;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
+
+
+    @ManyToMany(mappedBy = "rooms")
+    @ToString.Exclude
+    Set<Profile> teachers = new HashSet<>();
+    @ManyToMany(mappedBy = "rooms")
+    @ToString.Exclude
+    Set<Profile> students = new HashSet<>();
+    @OneToMany(mappedBy = "room")
+    @ToString.Exclude
+    Set<Task> tasks = new HashSet<>();
+
+
+    public void addTeacher(Profile teacher){
+        if(teachers == null)
+            teachers = new HashSet<>();
+        teachers.add(teacher);
+        teacher.getRooms().add(this);
+    }
+
+    public void addStudent(Profile student){
+        if(students == null)
+            students = new HashSet<>();
+        students.add(student);
+        student.getRooms().add(this);
+    }
+
+    public void addTask(Task task){
+        if(tasks == null)
+            tasks = new HashSet<>();
+        tasks.add(task);
+    }
+
+    public void removeTeacher(long teacherId) {
+        Profile teacher = this.teachers.stream().filter(m -> m.getId() == teacherId).findFirst().orElse(null);
+        if (teacher != null) {
+            this.teachers.remove(teacher);
+            teacher.getRooms().remove(this);
+        }
+    }
+
+
+    public void removeStudent(long studentId) {
+        Profile student = this.students.stream().filter(m -> m.getId() == studentId).findFirst().orElse(null);
+        if (student != null) {
+            this.students.remove(student);
+            student.getRooms().remove(this);
+        }
+    }
+
+    public void removeTask(long taskId){
+        this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
+    }
 
     @Override
     public boolean equals(Object o) {

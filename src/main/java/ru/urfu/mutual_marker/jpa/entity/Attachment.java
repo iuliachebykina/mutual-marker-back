@@ -7,8 +7,9 @@ import org.hibernate.Hibernate;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Extension;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,14 +27,28 @@ public class Attachment {
     @NotNull
     String fileName;
     Extension extension;
-    @ManyToMany(mappedBy = "attachments")
-    @ToString.Exclude
-    List<Project> projects;
     @NotNull
     @ManyToOne
     Profile student;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
+
+
+    @ManyToMany(mappedBy = "attachments")
+    @ToString.Exclude
+    Set<Project> projects = new HashSet<>();
+
+
+    public void addProject(Project project){
+        if(projects == null) //  не понимаю, почему, но инициализация выше не работает (везде не работает)
+            projects = new HashSet<>();
+        projects.add(project);
+    }
+
+    public void removeProject(long projectId){
+        this.projects.stream().filter(a -> a.getId() == projectId).findFirst().ifPresent(project -> this.projects.remove(project));
+    }
+
 
     @Override
     public boolean equals(Object o) {
