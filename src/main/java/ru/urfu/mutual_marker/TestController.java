@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.service.ProfileService;
 
 import javax.annotation.security.PermitAll;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -43,10 +44,10 @@ public class TestController {
     @GetMapping("/test")
     @PermitAll
     String  test() throws UserExistingException {
-        addProfiles();
+ //       addProfiles();
              addRooms();
-        addTasks();
-        addProjects();
+  //      addTasks();
+ //       addProjects();
 
         return "ok";
     }
@@ -98,14 +99,24 @@ public class TestController {
 
             String code = generateString(8);
 
+//            Room room = new Room();
+//            room.setTitle(title);
+//            room.setCode(code);
+//            room.setDeleted(false);
+
             Room room = Room.builder()
                     .title(title)
                     .code(code)
                     .deleted(false)
+                    .teachers(new HashSet<>())
+                    .students(new HashSet<>())
                     .build();
 
 
-            room.getTasks().add(taskRepository.findAll().stream().findAny().get());
+
+
+
+            room.addTask(taskRepository.findAll().get(0));
 
             for (Profile t:
                     students) {

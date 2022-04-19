@@ -40,7 +40,7 @@ public class Attachment {
 
 
     public void addProject(Project project){
-        if(projects == null) //  не понимаю, почему, но инициализация выше не работает (везде не работает)
+        if(projects == null) //  если собирать с помощью билдера, сеты остаются не инициализированными, пусть на всякий случай эта проверка остается
             projects = new HashSet<>();
         projects.add(project);
     }
