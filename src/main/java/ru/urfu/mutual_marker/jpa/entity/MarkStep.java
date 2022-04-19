@@ -39,7 +39,7 @@ public class MarkStep {
 
     @ManyToMany
     @JoinTable(
-            name = "markstep_task",
+            name = "markstep_tasks",
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "mark_step_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id"))

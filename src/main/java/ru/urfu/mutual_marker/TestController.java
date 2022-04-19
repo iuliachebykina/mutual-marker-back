@@ -44,7 +44,7 @@ public class TestController {
     @GetMapping("/test")
     @PermitAll
     String  test() throws UserExistingException {
- //       addProfiles();
+        addProfiles();
              addRooms();
   //      addTasks();
  //       addProjects();
@@ -116,7 +116,7 @@ public class TestController {
 
 
 
-            room.addTask(taskRepository.findAll().get(0));
+         //   room.addTask(taskRepository.findAll().get(0));
 
             for (Profile t:
                     students) {

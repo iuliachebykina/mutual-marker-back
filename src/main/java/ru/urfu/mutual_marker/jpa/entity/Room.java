@@ -50,14 +50,14 @@ public class Room {
         if(teachers == null)
             teachers = new HashSet<>();
         teachers.add(teacher);
-        teacher.getRooms().add(this);
+        teacher.addRoom(this);
     }
 
     public void addStudent(Profile student){
         if(students == null)
             students = new HashSet<>();
         students.add(student);
-        student.getRooms().add(this);
+        student.addRoom(this);
     }
 
     public void addTask(Task task){

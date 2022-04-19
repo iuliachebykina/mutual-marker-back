@@ -49,7 +49,7 @@ public class Profile {
     Set<Attachment> attachments = new HashSet<>();
     @ManyToMany
     @JoinTable(
-            name = "profile_room",
+            name = "profile_rooms",
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))

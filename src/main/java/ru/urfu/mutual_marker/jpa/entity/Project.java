@@ -42,7 +42,7 @@ public class Project {
     Set<Mark> marks = new HashSet<>();
     @ManyToMany
     @JoinTable(
-            name = "project_attachment",
+            name = "project_attachments",
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
@@ -61,8 +61,10 @@ public class Project {
     }
 
     public void addAttachment(Attachment attachment){
-        getAttachments().add(attachment);
-        attachment.getProjects().add(this);
+        if(attachments == null)
+            attachments = new HashSet<>();
+        attachments.add(attachment);
+        attachment.addProject(this);
     }
 
     public void removeAttachment(long attachmentId) {

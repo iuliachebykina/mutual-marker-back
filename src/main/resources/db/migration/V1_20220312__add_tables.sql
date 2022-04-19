@@ -80,19 +80,19 @@ CREATE TABLE mutual_marker.task
 );
 
 
-CREATE TABLE mutual_marker.markstep_task
+CREATE TABLE mutual_marker.markstep_tasks
 (
     MARK_STEP_ID BIGINT NOT NULL,
     TASK_ID BIGINT NOT NULL
 );
 
-CREATE TABLE mutual_marker.profile_room
+CREATE TABLE mutual_marker.profile_rooms
 (
     PROFILE_ID BIGINT NOT NULL,
     ROOM_ID BIGINT NOT NULL
 );
 
-CREATE TABLE mutual_marker.project_attachment
+CREATE TABLE mutual_marker.project_attachments
 (
     PROJECT_ID BIGINT NOT NULL,
     ATTACHMENT_ID BIGINT NOT NULL

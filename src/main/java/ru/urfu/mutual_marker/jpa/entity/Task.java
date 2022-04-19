@@ -60,7 +60,7 @@ public class Task {
         if(markSteps == null)
             markSteps = new HashSet<>();
         markSteps.add(markStep);
-        markStep.getTasks().add(this);
+        markStep.addTask(this);
     }
 
     public void removeMarkStep(long markStepId) {
