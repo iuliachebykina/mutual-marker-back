@@ -5,16 +5,19 @@ spring:
     schema: mutual_marker
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username: admin
-    password: admin
+    username: postgres
+    password: postgres
     driverClassName:
   flyway:
     baseline-on-migrate: true
     schemas: ${spring.application.schema}
   jpa:
-      properties:
+    properties:
         hibernate:
+          ddl-auto: update
           dialect=org:
             hibernate:
               dialect:
                 PostgreSQL10Dialect
+    hibernate:
+      ddl-auto: create
