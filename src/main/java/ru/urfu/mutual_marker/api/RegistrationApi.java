@@ -42,7 +42,7 @@ public class RegistrationApi {
     @PostMapping ("/admin")
     ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
         try {
-            Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+            Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_ADMIN);
             log.info("Registration admin (id: {})", admin.getId());
             return new ResponseEntity<>(admin, HttpStatus.CREATED);
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class RegistrationApi {
     @PostMapping ("/teacher")
     ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
-            Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+            Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_TEACHER);
             log.info("Registration teacher (id: {})", teacher.getId());
             return new ResponseEntity<>(teacher, HttpStatus.CREATED);
         } catch (Exception e) {
