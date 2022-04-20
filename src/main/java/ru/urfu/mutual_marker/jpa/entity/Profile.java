@@ -1,8 +1,10 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.Hibernate;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
@@ -31,6 +33,7 @@ public class Profile {
     @Email
     @NotNull
     String email;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @NotNull
     String password;
     @Enumerated(value = EnumType.STRING)
