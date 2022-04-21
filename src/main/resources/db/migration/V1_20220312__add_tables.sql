@@ -98,6 +98,15 @@ CREATE TABLE mutual_marker.project_attachments
     ATTACHMENT_ID BIGINT NOT NULL
 );
 
+CREATE TABLE mutual_marker.mark_step_value
+(
+     id BIGINT NOT NULL,
+     value BIGINT NOT NULL,
+     mark_step_id BIGINT NOT NULL,
+     deleted BOOLEAN DEFAULT FALSE NOT NULL,
+     CONSTRAINT pk_value PRIMARY KEY (id)
+);
+
 
 ALTER TABLE mutual_marker.project
     ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (task_id) REFERENCES task (id);
@@ -116,3 +125,6 @@ ALTER TABLE mutual_marker.mark
 
 ALTER TABLE mutual_marker.attachment
     ADD CONSTRAINT FK_ATTACHMENT_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);
+
+ALTER TABLE mutual_marker.mark_step_value
+    ADD CONSTRAINT FK_VALUE_ON_STEP FOREIGN KEY (mark_step_id) REFERENCES mark_step (id);
