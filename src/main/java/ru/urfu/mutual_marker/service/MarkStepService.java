@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.service;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
@@ -10,34 +11,61 @@ import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.MarkStepRepository;
+import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
+import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Data
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class MarkStepService {
+public class MarkStepService { //TODO add error handling for repository methods
     MarkStepRepository markStepRepository;
+    EntityManager entityManager;
 
-    public void addMarkStep(List<Integer> values, Task task, String desc, Profile owner, String title){
+    public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder().build();
-        values.forEach(value -> {
-            toAdd.getValues().add(MarkStepValue.builder().markStep(toAdd).value(value).build());
-        });
-        toAdd.addTask(task);
-        toAdd.setDescription(desc);
-        toAdd.setOwner(owner);
-        toAdd.setTitle(title);
-        markStepRepository.save(toAdd);
+        addMarkStepDto.getValues().forEach(value ->
+                toAdd.getValues().add(MarkStepValue.builder().markStep(toAdd).value(value).build()));
+        toAdd.addTask(entityManager.getReference(Task.class, addMarkStepDto.getTaskId()));
+        toAdd.setDescription(addMarkStepDto.getDescription());
+        toAdd.setOwner(entityManager.getReference(Profile.class, addMarkStepDto.getProfileId()));
+        toAdd.setTitle(addMarkStepDto.getTitle());
+        return markStepRepository.save(toAdd);
     }
 
-    public void addMarkSteps(List<AddMarkStepDto> addMarkStepDtos){
-        addMarkStepDtos.forEach(dto -> {
-            addMarkStep(dto.getValues(),
-                    Task.builder().id(dto.getTaskId()).build(),
-                    dto.getDescription(),
-                    Profile.builder().id(dto.getProfileId()).build(),
-                    dto.getTitle());
-        });
+    public List<MarkStep> addMarkSteps(List<AddMarkStepDto> addMarkStepDtos){
+        List<MarkStep> toReturn = new ArrayList<>();
+        addMarkStepDtos.forEach(dto -> toReturn.add(addMarkStep(dto)));
+        return toReturn;
+    }
+
+    public MarkStep updateMarkStep(MarkStep markStep){
+        return markStepRepository.save(markStep);
+    }
+
+    public MarkStep deleteMarkStep(Long markStepId){
+        MarkStep toDelete = markStepRepository.findById(markStepId).orElse(null);
+        if (toDelete == null){
+            log.error("Failed to find markStep for deletion");
+            throw new MarkStepServiceException("Failed to find markStep for deletion");
+        }
+        toDelete.setDeleted(true);
+        return markStepRepository.save(toDelete);
+    }
+
+    public MarkStep deleteMarkStepForTask(Long markStepId, Long taskId){
+        MarkStep toDelete = markStepRepository.findById(markStepId).orElse(null);
+        if (toDelete == null){
+            log.error("Failed to find markStep for deletion");
+            throw new MarkStepServiceException("Failed to find markStep for deletion");
+        }
+        toDelete.setTasks(toDelete.getTasks().stream().filter(task ->
+                !Objects.equals(task.getId(), taskId)).collect(Collectors.toSet()));
+        return markStepRepository.save(toDelete);
     }
 }

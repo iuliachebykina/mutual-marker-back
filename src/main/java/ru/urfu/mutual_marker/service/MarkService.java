@@ -5,11 +5,10 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
-import ru.urfu.mutual_marker.jpa.repository.MarkStepRepository;
+import ru.urfu.mutual_marker.service.exception.MarkServiceException;
+import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -42,14 +41,15 @@ public class MarkService {
         Mark mark = markRepository.findByProjectIdAndStudentId(projectId, studentId).orElse(null);
         if (mark == null){
             log.error("Failed to find mark for project with id {}", projectId);
-            throw new RuntimeException("Failed to find mark"); //TODO write custom exception
+            throw new MarkServiceException("Failed to find mark");
         }
         return mark;
     }
 
-    public void deleteMarkOnProjectForStudent(Long projectId, Long studentId){
+    public Mark deleteMarkOnProjectForStudent(Long projectId, Long studentId){
         Mark toDelete = findMarkByProjectAndStudentIds(projectId, studentId);
         toDelete.setDeleted(true);
         markRepository.save(toDelete);
+        return toDelete;
     }
 }
