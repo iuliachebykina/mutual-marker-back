@@ -1,7 +1,5 @@
 create schema if not exists mutual_marker;
 
-CREATE SEQUENCE if not exists mutual_marker.sequence start 100;
-
 CREATE TABLE mutual_marker.attachment
 (
     id         BIGINT NOT NULL,

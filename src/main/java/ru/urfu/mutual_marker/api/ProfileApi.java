@@ -45,6 +45,7 @@ public class ProfileApi {
 
         }
         catch (Exception e){
+            log.error("cause: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -75,6 +76,7 @@ public class ProfileApi {
 
         }
         catch (Exception e){
+            log.error("cause: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -105,6 +107,7 @@ public class ProfileApi {
 
         }
         catch (Exception e){
+            log.error("cause: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -128,7 +131,7 @@ public class ProfileApi {
             log.info("Updated student with id: {}", student.getId());
             return new ResponseEntity<>(newStudent, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to update student with id: {}", student.getId());
+            log.error("Failed to update student with id: {} \ncause: {}", student.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -141,7 +144,7 @@ public class ProfileApi {
             log.info("Updated teacher with id: {}", teacher.getId());
             return new ResponseEntity<>(newTeacher, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to update teacher with id: {}", teacher.getId());
+            log.error("Failed to update teacher with id: {}\ncause: {}", teacher.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -154,7 +157,7 @@ public class ProfileApi {
             log.info("Updated admin with id: {}", admin.getId());
             return new ResponseEntity<>(newAdmin, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to update admin with id: {}", admin.getId());
+            log.error("Failed to update admin with id: {}\ncause: {}", admin.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

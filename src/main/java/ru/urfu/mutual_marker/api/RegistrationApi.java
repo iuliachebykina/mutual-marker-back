@@ -29,10 +29,10 @@ public class RegistrationApi {
     public ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
-            log.info("Registration student (id: {})", student.getId());
+            log.info("Registration student (username: {})", student.getUsername());
             return new ResponseEntity<>(student, HttpStatus.CREATED);
         } catch (Exception e) {
-            log.info("Failed to registration student with username: {}", registrationInfo.getUsername());
+            log.info("Failed to registration student with username: {}\ncause: {}", registrationInfo.getUsername(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -43,10 +43,10 @@ public class RegistrationApi {
     public ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_ADMIN);
-            log.info("Registration admin (id: {})", admin.getId());
+            log.info("Registration admin (username: {})", admin.getUsername());
             return new ResponseEntity<>(admin, HttpStatus.CREATED);
         } catch (Exception e) {
-            log.info("Failed to registration admin with username: {}", registrationInfo.getUsername());
+            log.info("Failed to registration admin with username: {}\ncause: {}", registrationInfo.getUsername(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -56,10 +56,10 @@ public class RegistrationApi {
     public ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_TEACHER);
-            log.info("Registration teacher (id: {})", teacher.getId());
+            log.info("Registration teacher (username: {})", teacher.getUsername());
             return new ResponseEntity<>(teacher, HttpStatus.CREATED);
         } catch (Exception e) {
-            log.info("Failed to registration teacher with username: {}", registrationInfo.getUsername());
+            log.info("Failed to registration teacher with username: {}\ncause: {}", registrationInfo.getUsername(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

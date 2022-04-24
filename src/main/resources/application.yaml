@@ -14,10 +14,8 @@ spring:
   jpa:
     properties:
         hibernate:
-          ddl-auto: update
           dialect=org:
             hibernate:
               dialect:
                 PostgreSQL10Dialect
-    hibernate:
-      ddl-auto: create
+
