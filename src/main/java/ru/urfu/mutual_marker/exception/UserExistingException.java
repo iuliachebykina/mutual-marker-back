@@ -1,4 +1,4 @@
 package ru.urfu.mutual_marker.exception;
 
-public class UserExistingException extends Exception{
+public class UserExistingException extends RuntimeException{
 }

@@ -19,7 +19,6 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
         prePostEnabled = true,
-        securedEnabled = true,
         jsr250Enabled = true)
 public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
@@ -49,7 +48,6 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic()
                 .and().sessionManagement().disable();
-
     }
 
 }

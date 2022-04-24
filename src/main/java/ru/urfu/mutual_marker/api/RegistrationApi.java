@@ -26,7 +26,7 @@ public class RegistrationApi {
 
     @PostMapping("/student")
     @PreAuthorize("permitAll()")
-    ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
             log.info("Registration student (id: {})", student.getId());
@@ -40,7 +40,7 @@ public class RegistrationApi {
     
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping ("/admin")
-    ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_ADMIN);
             log.info("Registration admin (id: {})", admin.getId());
@@ -53,7 +53,7 @@ public class RegistrationApi {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping ("/teacher")
-    ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_TEACHER);
             log.info("Registration teacher (id: {})", teacher.getId());
