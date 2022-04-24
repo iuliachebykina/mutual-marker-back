@@ -1,6 +1,8 @@
 package ru.urfu.mutual_marker.security;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,10 +20,9 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProfileDetailsService implements UserDetailsService {
-
-
-    private final ProfileService profileService;
+    ProfileService profileService;
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Profile user = profileService.getProfileByUsername(username);
