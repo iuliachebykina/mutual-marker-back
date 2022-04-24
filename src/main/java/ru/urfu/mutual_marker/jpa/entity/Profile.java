@@ -47,6 +47,7 @@ public class Profile {
 
 
     @OneToMany(mappedBy = "student")
+    @Builder.Default
     @ToString.Exclude
     Set<Attachment> attachments = new HashSet<>();
     @ManyToMany
@@ -55,6 +56,7 @@ public class Profile {
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
+    @Builder.Default
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
 

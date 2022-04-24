@@ -43,6 +43,7 @@ public class MarkStep {
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "mark_step_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id"))
+    @Builder.Default
     @ToString.Exclude
     Set<Task> tasks = new HashSet<>();
 

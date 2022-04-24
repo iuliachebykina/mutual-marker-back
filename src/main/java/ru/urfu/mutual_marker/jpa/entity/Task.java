@@ -38,9 +38,11 @@ public class Task {
     Boolean deleted;
 
     @OneToMany(mappedBy = "task")
+    @Builder.Default
     @ToString.Exclude
     Set<Project> projects = new HashSet<>();
     @ManyToMany(mappedBy = "tasks")
+    @Builder.Default
     @ToString.Exclude
     Set<MarkStep> markSteps = new HashSet<>();
 

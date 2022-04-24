@@ -36,12 +36,15 @@ public class Room {
 
 
     @ManyToMany(mappedBy = "rooms")
+    @Builder.Default
     @ToString.Exclude
     Set<Profile> teachers = new HashSet<>();
     @ManyToMany(mappedBy = "rooms")
+    @Builder.Default
     @ToString.Exclude
     Set<Profile> students = new HashSet<>();
     @OneToMany(mappedBy = "room")
+    @Builder.Default
     @ToString.Exclude
     Set<Task> tasks = new HashSet<>();
 

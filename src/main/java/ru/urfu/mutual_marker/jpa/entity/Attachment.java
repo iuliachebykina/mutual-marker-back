@@ -35,6 +35,7 @@ public class Attachment {
 
 
     @ManyToMany(mappedBy = "attachments")
+    @Builder.Default
     @ToString.Exclude
     Set<Project> projects = new HashSet<>();
 

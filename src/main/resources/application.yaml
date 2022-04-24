@@ -5,8 +5,8 @@ spring:
     schema: mutual_marker
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
-    username:
-    password:
+    username: ${POSTGES_USERNAME}
+    password: ${POSTGES_PASSWORD}
     driverClassName:
   flyway:
     baseline-on-migrate: true
