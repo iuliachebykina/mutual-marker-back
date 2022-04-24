@@ -37,6 +37,8 @@ public class Task {
     Room room;
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
+    @Column(name = "min_graded")
+    Integer minNumberOfGraded;
 
     @OneToMany(mappedBy = "task")
     @ToString.Exclude

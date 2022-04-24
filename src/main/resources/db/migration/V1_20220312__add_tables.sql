@@ -76,6 +76,7 @@ CREATE TABLE mutual_marker.task
     close_date  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     room_id     BIGINT not null,
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
+    min_graded  INTEGER DEFAULT 0 NOT NULL,
     CONSTRAINT pk_task PRIMARY KEY (id)
 );
 
@@ -112,7 +113,7 @@ CREATE TABLE mutual_marker.number_of_graded
     id BIGINT NOT NULL,
     task_id BIGINT NOT NULL,
     profile_id BIGINT NOT NULL,
-    graded INTEGER NOT NULL,
+    graded INTEGER DEFAULT 0 NOT NULL,
     CONSTRAINT pk_graded PRIMARY KEY (id)
 )
 

@@ -28,7 +28,8 @@ public class MarkService {
     public void calculateAndSaveFinalMark(Mark mark, List<Integer> markComponents){
         Double res = markComponents.stream().mapToInt(m -> m).average().orElse(Double.NaN);
         if (res.equals(Double.NaN)){
-            throw new RuntimeException("Failed to process markComponents"); //TODO продумать ошибку или убрать проверку
+            log.error("Failed to process components to calculate final mark");
+            throw new MarkServiceException("Failed to process markComponents"); //TODO продумать ошибку или убрать проверку
         }
 
         BigDecimal truncation = new BigDecimal(res);
