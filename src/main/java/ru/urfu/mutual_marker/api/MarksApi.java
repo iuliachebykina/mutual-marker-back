@@ -39,7 +39,7 @@ public class MarksApi {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @GetMapping("/marks/delete/{projectId}/{studentId}")
+    @DeleteMapping("/marks/{projectId}/{studentId}")
     public ResponseEntity<Mark> deleteMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId){
         try{
             Mark deleted = markService.deleteMarkOnProjectForStudent(projectId, studentId);
@@ -69,7 +69,7 @@ public class MarksApi {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @GetMapping("marks/deleteMarkStep/{markStepId}")
+    @DeleteMapping("marks/{markStepId}")
     public ResponseEntity<MarkStep> deleteMarkStep(@PathVariable Long markStepId){
         try{
             MarkStep deleted = markStepService.deleteMarkStep(markStepId);

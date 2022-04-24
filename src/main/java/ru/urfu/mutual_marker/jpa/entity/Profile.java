@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.minidev.json.annotate.JsonIgnore;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
@@ -58,6 +59,9 @@ public class Profile {
             inverseJoinColumns = @JoinColumn(name = "room_id"))
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
+    @OneToMany
+    @ToStringExclude
+    Set<NumberOfGraded> numberOfGraded;
 
 
     public void addAttachment(Attachment attachment){

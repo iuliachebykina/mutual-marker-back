@@ -107,6 +107,15 @@ CREATE TABLE mutual_marker.mark_step_value
      CONSTRAINT pk_value PRIMARY KEY (id)
 );
 
+CREATE TABLE mutual_marker.number_of_graded
+(
+    id BIGINT NOT NULL,
+    task_id BIGINT NOT NULL,
+    profile_id BIGINT NOT NULL,
+    graded INTEGER NOT NULL,
+    CONSTRAINT pk_graded PRIMARY KEY (id)
+)
+
 
 ALTER TABLE mutual_marker.project
     ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (task_id) REFERENCES task (id);
@@ -128,3 +137,9 @@ ALTER TABLE mutual_marker.attachment
 
 ALTER TABLE mutual_marker.mark_step_value
     ADD CONSTRAINT FK_VALUE_ON_STEP FOREIGN KEY (mark_step_id) REFERENCES mark_step (id);
+
+ALTER TABLE mutual_marker.number_of_graded
+    ADD CONSTRAINT FK_GRADED_ON_STUDENT FOREIGN KEY (profile_id) REFERENCES profile (id);
+
+ALTER TABLE mutual_marker.number_of_graded
+    ADD CONSTRAINT FK_GRADED_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);

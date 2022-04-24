@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -43,7 +44,9 @@ public class Task {
     @ManyToMany(mappedBy = "tasks")
     @ToString.Exclude
     Set<MarkStep> markSteps = new HashSet<>();
-
+    @OneToMany(mappedBy = "task")
+    @ToStringExclude
+    Set<NumberOfGraded> numberOfGraded;
 
     public void addProject(Project project){
         if(projects == null)
