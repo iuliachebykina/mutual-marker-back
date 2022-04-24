@@ -8,12 +8,11 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
 import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.MarkStepRepository;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
+import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,16 +25,17 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MarkStepService { //TODO add error handling for repository methods
     MarkStepRepository markStepRepository;
-    EntityManager entityManager;
+    TaskRepository taskRepository;
+    ProfileRepository profileRepository;
 
     @Transactional
     public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder().build();
         addMarkStepDto.getValues().forEach(value ->
                 toAdd.getValues().add(MarkStepValue.builder().markStep(toAdd).value(value).build()));
-        toAdd.addTask(entityManager.getReference(Task.class, addMarkStepDto.getTaskId()));
+        toAdd.addTask(taskRepository.getById(addMarkStepDto.getTaskId()));
         toAdd.setDescription(addMarkStepDto.getDescription());
-        toAdd.setOwner(entityManager.getReference(Profile.class, addMarkStepDto.getProfileId()));
+        toAdd.setOwner(profileRepository.getById(addMarkStepDto.getProfileId()));
         toAdd.setTitle(addMarkStepDto.getTitle());
         return markStepRepository.save(toAdd);
     }
