@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Table(schema = "mutual_marker")
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @Getter
 @Setter
 @AllArgsConstructor

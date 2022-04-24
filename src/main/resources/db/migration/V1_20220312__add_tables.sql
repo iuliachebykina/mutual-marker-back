@@ -115,7 +115,7 @@ CREATE TABLE mutual_marker.number_of_graded
     profile_id BIGINT NOT NULL,
     graded INTEGER DEFAULT 0 NOT NULL,
     CONSTRAINT pk_graded PRIMARY KEY (id)
-)
+);
 
 
 ALTER TABLE mutual_marker.project

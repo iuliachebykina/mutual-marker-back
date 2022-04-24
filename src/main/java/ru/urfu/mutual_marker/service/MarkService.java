@@ -10,6 +10,7 @@ import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -21,11 +22,13 @@ import java.util.List;
 public class MarkService {
     MarkRepository markRepository;
 
-    public void saveMark(Mark mark){
-        markRepository.save(mark);
+    @Transactional
+    public Mark saveMark(Mark mark){
+        return markRepository.save(mark);
     }
 
-    public void calculateAndSaveFinalMark(Mark mark, List<Integer> markComponents){
+    @Transactional
+    public Mark calculateAndSaveFinalMark(Mark mark, List<Integer> markComponents){
         Double res = markComponents.stream().mapToInt(m -> m).average().orElse(Double.NaN);
         if (res.equals(Double.NaN)){
             log.error("Failed to process components to calculate final mark");
@@ -35,9 +38,10 @@ public class MarkService {
         BigDecimal truncation = new BigDecimal(res);
         truncation = truncation.setScale(0, RoundingMode.HALF_UP);
         mark.setMarkValue(truncation.intValue());
-        markRepository.save(mark);
+        return markRepository.save(mark);
     }
 
+    @Transactional
     public Mark findMarkByProjectAndStudentIds(Long projectId, Long studentId){
         Mark mark = markRepository.findByProjectIdAndStudentId(projectId, studentId).orElse(null);
         if (mark == null){
@@ -47,6 +51,7 @@ public class MarkService {
         return mark;
     }
 
+    @Transactional
     public Mark deleteMarkOnProjectForStudent(Long projectId, Long studentId){
         Mark toDelete = findMarkByProjectAndStudentIds(projectId, studentId);
         toDelete.setDeleted(true);

@@ -14,6 +14,7 @@ import ru.urfu.mutual_marker.jpa.repository.MarkStepRepository;
 import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,7 @@ public class MarkStepService { //TODO add error handling for repository methods
     MarkStepRepository markStepRepository;
     EntityManager entityManager;
 
+    @Transactional
     public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder().build();
         addMarkStepDto.getValues().forEach(value ->
@@ -38,16 +40,19 @@ public class MarkStepService { //TODO add error handling for repository methods
         return markStepRepository.save(toAdd);
     }
 
+    @Transactional
     public List<MarkStep> addMarkSteps(List<AddMarkStepDto> addMarkStepDtos){
         List<MarkStep> toReturn = new ArrayList<>();
         addMarkStepDtos.forEach(dto -> toReturn.add(addMarkStep(dto)));
         return toReturn;
     }
 
+    @Transactional
     public MarkStep updateMarkStep(MarkStep markStep){
         return markStepRepository.save(markStep);
     }
 
+    @Transactional
     public MarkStep deleteMarkStep(Long markStepId){
         MarkStep toDelete = markStepRepository.findById(markStepId).orElse(null);
         if (toDelete == null){
@@ -58,6 +63,7 @@ public class MarkStepService { //TODO add error handling for repository methods
         return markStepRepository.save(toDelete);
     }
 
+    @Transactional
     public MarkStep deleteMarkStepForTask(Long markStepId, Long taskId){
         MarkStep toDelete = markStepRepository.findById(markStepId).orElse(null);
         if (toDelete == null){
