@@ -1,0 +1,23 @@
+version: '2'
+services:
+  mutual-marker-back:
+    container_name: mutual-marker-back
+    build:
+      context: .
+    image: mutual-marker-back:latest
+    ports:
+      - "8090:8080"
+    depends_on:
+      - psql
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+  psql:
+    image: 'postgres'
+    container_name: psql
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
