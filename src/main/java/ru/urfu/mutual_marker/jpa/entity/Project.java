@@ -57,7 +57,10 @@ public class Project {
     }
 
     public void removeMark(long markId){
+        if(marks == null)
+            return;
         this.marks.stream().filter(a -> a.getId() == markId).findFirst().ifPresent(mark -> this.marks.remove(mark));
+
     }
 
     public void addAttachment(Attachment attachment){
@@ -68,6 +71,8 @@ public class Project {
     }
 
     public void removeAttachment(long attachmentId) {
+        if(attachments == null)
+            return;
         Attachment attachment = this.attachments.stream().filter(a -> a.getId() == attachmentId).findFirst().orElse(null);
         if (attachment != null) {
             this.attachments.remove(attachment);

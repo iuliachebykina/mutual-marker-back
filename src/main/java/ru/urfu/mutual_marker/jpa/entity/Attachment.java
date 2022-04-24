@@ -46,6 +46,8 @@ public class Attachment {
     }
 
     public void removeProject(long projectId){
+        if(projects == null)
+            return;
         this.projects.stream().filter(a -> a.getId() == projectId).findFirst().ifPresent(project -> this.projects.remove(project));
     }
 

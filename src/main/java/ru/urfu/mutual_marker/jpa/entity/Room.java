@@ -67,6 +67,8 @@ public class Room {
     }
 
     public void removeTeacher(long teacherId) {
+        if(teachers == null)
+            return;
         Profile teacher = this.teachers.stream().filter(m -> m.getId() == teacherId).findFirst().orElse(null);
         if (teacher != null) {
             this.teachers.remove(teacher);
@@ -76,6 +78,8 @@ public class Room {
 
 
     public void removeStudent(long studentId) {
+        if(students == null)
+            return;
         Profile student = this.students.stream().filter(m -> m.getId() == studentId).findFirst().orElse(null);
         if (student != null) {
             this.students.remove(student);
@@ -84,6 +88,8 @@ public class Room {
     }
 
     public void removeTask(long taskId){
+        if(tasks == null)
+            return;
         this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
     }
 

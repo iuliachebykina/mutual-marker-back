@@ -52,6 +52,8 @@ public class Task {
     }
 
     public void removeProject(long projectId){
+        if(projects == null)
+            return;
         this.projects.stream().filter(a -> a.getId() == projectId).findFirst().ifPresent(project -> this.projects.remove(project));
     }
 
@@ -64,6 +66,8 @@ public class Task {
     }
 
     public void removeMarkStep(long markStepId) {
+        if(markSteps == null)
+            return;
         MarkStep markStep = this.markSteps.stream().filter(m -> m.getId() == markStepId).findFirst().orElse(null);
         if (markStep != null) {
             this.markSteps.remove(markStep);

@@ -54,6 +54,8 @@ public class MarkStep {
     }
 
     public void removeTask(long taskId){
+        if(tasks == null)
+            return;
         this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
     }
 
