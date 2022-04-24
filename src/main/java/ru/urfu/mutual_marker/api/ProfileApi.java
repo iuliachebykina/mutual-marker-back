@@ -39,7 +39,7 @@ public class ProfileApi {
             Profile admin = profileService.getProfileById(id);
             if(!(admin.getRole().equals(Role.ROLE_ADMIN))) {
                 log.error("Wrong id: {} to get ADMIN", id);
-                throw new InvalidRoleException();
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the ADMIN role", id));
             }
             log.info("Got admin by id: {}", id);
             AdminInfo adminInfo = profileMapper.profileEntityToAdminDto(admin);
@@ -67,9 +67,9 @@ public class ProfileApi {
     public ResponseEntity<TeacherInfo> getTeacher(@PathVariable Long id){
         try {
             Profile teacher = profileService.getProfileById(id);
-            if(!(teacher.getRole().equals(Role.ROLE_ADMIN))) {
+            if(!(teacher.getRole().equals(Role.ROLE_TEACHER))) {
                 log.error("Wrong id: {} to get TEACHER", id);
-                throw new InvalidRoleException();
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the TEACHER role", id));
             }
             log.info("Got teacher by id: {}", id);
             TeacherInfo teacherInfo = profileMapper.profileEntityToTeacherDto(teacher);
@@ -97,9 +97,9 @@ public class ProfileApi {
     public ResponseEntity<StudentInfo> getStudent(@PathVariable Long id){
         try {
             Profile student = profileService.getProfileById(id);
-            if(!(student.getRole().equals(Role.ROLE_ADMIN))) {
+            if(!(student.getRole().equals(Role.ROLE_STUDENT))) {
                 log.error("Wrong id: {} to get STUDENT", id);
-                throw new InvalidRoleException();
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the STUDENT role", id));
             }
             log.info("Got student by id: {}", id);
             StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(student);

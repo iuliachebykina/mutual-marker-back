@@ -45,7 +45,7 @@ public class ProfileService {
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
         Profile profile = profileRepository.findByUsername(registrationInfo.getUsername());
         if (profile != null){
-            throw new UserExistingException();
+            throw new UserExistingException(String.format("User with username: %s already existing", registrationInfo.getUsername()));
         }
         profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 
