@@ -19,3 +19,6 @@ spring:
               dialect:
                 PostgreSQL10Dialect
 
+springdoc:
+  api-docs:
+    path: /api-docs
