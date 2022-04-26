@@ -46,6 +46,7 @@ public class MarkStep {
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "mark_step_id"),
             inverseJoinColumns = @JoinColumn(name = "task_id"))
+    @Builder.Default
     @ToString.Exclude
     Set<Task> tasks = new HashSet<>();
 
@@ -57,6 +58,8 @@ public class MarkStep {
     }
 
     public void removeTask(long taskId){
+        if(tasks == null)
+            return;
         this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
     }
 

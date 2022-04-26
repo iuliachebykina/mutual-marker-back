@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.h2.engine.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProfileMapper;
@@ -15,6 +14,7 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -26,22 +26,26 @@ public class ProfileService {
     ProfileRepository profileRepository;
     ProfileMapper  profileMapper;
 
+    @Transactional
     public Profile getProfileById(Long id){
         return profileRepository.findById(id).orElse(null);
     }
 
+    @Transactional
     public Profile getProfileByUsername(String username){
         return profileRepository.findByUsername(username);
     }
 
+    @Transactional
     public List<Profile> getAllProfilesByRole(Role role){
         return profileRepository.findAllByRole(role);
     }
 
+    @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
         Profile profile = profileRepository.findByUsername(registrationInfo.getUsername());
         if (profile != null){
-            throw new UserExistingException();
+            throw new UserExistingException(String.format("User with username: %s already existing", registrationInfo.getUsername()));
         }
         profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 
@@ -55,6 +59,7 @@ public class ProfileService {
         return profile;
     }
 
+    @Transactional
     public Profile updateProfile(Profile profile) {
         return profileRepository.save(profile);
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import net.minidev.json.annotate.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
@@ -49,6 +48,7 @@ public class Profile {
 
 
     @OneToMany(mappedBy = "student")
+    @Builder.Default
     @ToString.Exclude
     Set<Attachment> attachments = new HashSet<>();
     @ManyToMany
@@ -57,6 +57,7 @@ public class Profile {
             schema = "mutual_marker",
             joinColumns = @JoinColumn(name = "profile_id"),
             inverseJoinColumns = @JoinColumn(name = "room_id"))
+    @Builder.Default
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
     @OneToMany
@@ -77,10 +78,14 @@ public class Profile {
     }
 
     public void removeAttachment(long attachmentId){
+        if(attachments == null)
+            return;
         this.attachments.stream().filter(a -> a.getId() == attachmentId).findFirst().ifPresent(attachment -> this.attachments.remove(attachment));
     }
 
     public void removeRoom(long roomId){
+        if(rooms == null)
+            return;
         this.rooms.stream().filter(a -> a.getId() == roomId).findFirst().ifPresent(room -> this.rooms.remove(room));
     }
 

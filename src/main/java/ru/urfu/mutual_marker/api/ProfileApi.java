@@ -7,13 +7,13 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
+import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/profile")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-@Secured({"ROLE_ADMIN", "ROLE_STUDENT", "ROLE_TEACHER"})
 @Slf4j
 public class ProfileApi {
     ProfileMapper profileMapper;
@@ -33,18 +32,27 @@ public class ProfileApi {
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins/{id}")
-    AdminInfo getAdmin(@PathVariable Long id ){
-        Profile admin = profileService.getProfileById(id);
-        if(admin.getRole().equals(Role.ROLE_ADMIN)) {
+    public ResponseEntity<AdminInfo> getAdmin(@PathVariable Long id ){
+        try {
+            Profile admin = profileService.getProfileById(id);
+            if(!(admin.getRole().equals(Role.ROLE_ADMIN))) {
+                log.error("Wrong id: {} to get ADMIN", id);
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the ADMIN role", id));
+            }
             log.info("Got admin by id: {}", id);
-            return profileMapper.profileEntityToAdminDto(admin);
+            AdminInfo adminInfo = profileMapper.profileEntityToAdminDto(admin);
+            return new ResponseEntity<>(adminInfo, HttpStatus.OK);
+
         }
-        return null;
+        catch (Exception e){
+            log.error("cause: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins")
-    List<AdminInfo> getAllAdmins(){
+    public List<AdminInfo> getAllAdmins(){
         List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN);
         log.info("Got all admins");
         return admins
@@ -53,22 +61,29 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-
-
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/teachers/{id}")
-    TeacherInfo getTeacher(@PathVariable Long id){
-        Profile teacher = profileService.getProfileById(id);
-        if(teacher.getRole().equals(Role.ROLE_TEACHER)) {
+    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable Long id){
+        try {
+            Profile teacher = profileService.getProfileById(id);
+            if(!(teacher.getRole().equals(Role.ROLE_TEACHER))) {
+                log.error("Wrong id: {} to get TEACHER", id);
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the TEACHER role", id));
+            }
             log.info("Got teacher by id: {}", id);
-            return profileMapper.profileEntityToTeacherDto(teacher);
+            TeacherInfo teacherInfo = profileMapper.profileEntityToTeacherDto(teacher);
+            return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
+
         }
-        return null;
+        catch (Exception e){
+            log.error("cause: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/teachers")
-    List<TeacherInfo> getAllTeachers(){
+    public List<TeacherInfo> getAllTeachers(){
         List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER);
         log.info("Got all teachers");
         return teachers
@@ -77,23 +92,29 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-
-
-
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students/{id}")
-    StudentInfo getStudent(@PathVariable Long id){
-        Profile student = profileService.getProfileById(id);
-        if(student.getRole().equals(Role.ROLE_STUDENT)) {
+    public ResponseEntity<StudentInfo> getStudent(@PathVariable Long id){
+        try {
+            Profile student = profileService.getProfileById(id);
+            if(!(student.getRole().equals(Role.ROLE_STUDENT))) {
+                log.error("Wrong id: {} to get STUDENT", id);
+                throw new InvalidRoleException(String.format("Profile with id: %d does not have the STUDENT role", id));
+            }
             log.info("Got student by id: {}", id);
-            return profileMapper.profileEntityToStudentDto(student);
+            StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(student);
+            return new ResponseEntity<>(studentInfo, HttpStatus.OK);
+
         }
-        return null;
+        catch (Exception e){
+            log.error("cause: {}", e.getMessage());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students")
-    List<StudentInfo> getAllStudents(){
+    public List<StudentInfo> getAllStudents(){
         List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT);
         log.info("Got all students");
         return students
@@ -102,45 +123,41 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-
-
-
     @PutMapping("/students")
     @PreAuthorize("#student.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
+    public ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
         try {
             Profile newStudent = profileService.updateProfile(student);
             log.info("Updated student with id: {}", student.getId());
-            return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
+            return new ResponseEntity<>(newStudent, HttpStatus.OK);
         } catch (Exception e) {
-            log.info("Failed to update student with id: {}", student.getId());
+            log.error("Failed to update student with id: {} \ncause: {}", student.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
     @PutMapping("/teachers")
     @PreAuthorize("#teacher.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
+    public ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
         try {
             Profile newTeacher = profileService.updateProfile(teacher);
             log.info("Updated teacher with id: {}", teacher.getId());
-            return new ResponseEntity<>(newTeacher, HttpStatus.CREATED);
+            return new ResponseEntity<>(newTeacher, HttpStatus.OK);
         } catch (Exception e) {
-            log.info("Failed to update teacher with id: {}", teacher.getId());
+            log.error("Failed to update teacher with id: {}\ncause: {}", teacher.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/admins")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
+    public ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
         try {
             Profile newAdmin = profileService.updateProfile(admin);
             log.info("Updated admin with id: {}", admin.getId());
-            return new ResponseEntity<>(newAdmin, HttpStatus.CREATED);
+            return new ResponseEntity<>(newAdmin, HttpStatus.OK);
         } catch (Exception e) {
-            log.info("Failed to update admin with id: {}", admin.getId());
+            log.error("Failed to update admin with id: {}\ncause: {}", admin.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
