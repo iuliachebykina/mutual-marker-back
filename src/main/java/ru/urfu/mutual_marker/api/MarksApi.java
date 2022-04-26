@@ -28,7 +28,7 @@ public class MarksApi {
     MarkStepService markStepService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_STUDENT' or 'ROLE_TEACHER')")
-    @GetMapping("/marks/{projectId}/{studentId}")
+    @GetMapping("/{projectId}/{studentId}")
     public ResponseEntity<Mark> getStudentMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId){
         try {
             Mark mark = markService.findMarkByProjectAndStudentIds(projectId, studentId);
@@ -39,7 +39,7 @@ public class MarksApi {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @DeleteMapping("/marks/{projectId}/{studentId}")
+    @DeleteMapping("/{projectId}/{studentId}")
     public ResponseEntity<Mark> deleteMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId){
         try{
             Mark deleted = markService.deleteMarkOnProjectForStudent(projectId, studentId);
@@ -51,25 +51,25 @@ public class MarksApi {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @PostMapping("marks/addMarkSteps")
+    @PostMapping("/markSteps")
     public ResponseEntity<List<MarkStep>> addMarkStepsForProject(@RequestBody List<AddMarkStepDto> addMarkStepDtoList){
         return new ResponseEntity<>(markStepService.addMarkSteps(addMarkStepDtoList), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @PostMapping("marks/addMarkStepExisting")
+    @PostMapping("/markStepExisting")
     public ResponseEntity<MarkStep> addMarkStepForExistingProject(@RequestBody AddMarkStepDto addMarkStepDto){
         return new ResponseEntity<>(markStepService.addMarkStep(addMarkStepDto), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @PutMapping("marks/updateMarkStep")
+    @PutMapping("/markStep")
     public ResponseEntity<MarkStep> updateMarkStep(@RequestBody MarkStep markStep){
         return new ResponseEntity<>(markStepService.updateMarkStep(markStep), HttpStatus.OK);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
-    @DeleteMapping("marks/{markStepId}")
+    @DeleteMapping("/{markStepId}")
     public ResponseEntity<MarkStep> deleteMarkStep(@PathVariable Long markStepId){
         try{
             MarkStep deleted = markStepService.deleteMarkStep(markStepId);
