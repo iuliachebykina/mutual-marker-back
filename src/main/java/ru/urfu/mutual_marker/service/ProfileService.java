@@ -32,8 +32,8 @@ public class ProfileService {
     }
 
     @Transactional
-    public Profile getProfileByUsername(String username){
-        return profileRepository.findByUsername(username);
+    public Profile getProfileByEmail(String email){
+        return profileRepository.findByEmail(email);
     }
 
     @Transactional
@@ -43,15 +43,21 @@ public class ProfileService {
 
     @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
-        Profile profile = profileRepository.findByUsername(registrationInfo.getUsername());
+        Profile profile = profileRepository.findByEmail(registrationInfo.getEmail());
         if (profile != null){
-            throw new UserExistingException(String.format("User with username: %s already existing", registrationInfo.getUsername()));
+            throw new UserExistingException(String.format("User with username: %s already existing", registrationInfo.getEmail()));
         }
         profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 
         if(!role.equals(Role.ROLE_STUDENT)){
             profile.setStudentGroup(null);
+
         }
+
+        if(!role.equals(Role.ROLE_TEACHER)){
+            profile.setSubject(null);
+        }
+
         profile.setPassword(passwordEncoder.encode(registrationInfo.getPassword()));
         profile.setRole(role);
         profile.setDeleted(false);

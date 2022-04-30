@@ -11,8 +11,8 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -27,8 +27,6 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @NotNull
-    String username;
     @Email
     @NotNull
     String email;
@@ -40,10 +38,15 @@ public class Profile {
     @NotNull
     @Embedded
     Name name;
+    String subject;
+    String university;
+    String institute;
     String studentGroup;
     String phoneNumber;
+    String socialNetwork;
     @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+        Boolean deleted;
 
 
     @OneToMany(mappedBy = "student")

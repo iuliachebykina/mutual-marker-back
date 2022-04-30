@@ -7,4 +7,6 @@ import lombok.EqualsAndHashCode;
 @Data
 public class StudentInfo extends ProfileInfo {
     String studentGroup;
+    String university;
+    String institute;
 }

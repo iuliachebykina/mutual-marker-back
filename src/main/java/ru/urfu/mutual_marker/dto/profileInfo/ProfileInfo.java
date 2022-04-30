@@ -11,4 +11,6 @@ public class ProfileInfo {
     String firstName;
     String lastName;
     String patronymic;
+    String socialNetwork;
+
 }

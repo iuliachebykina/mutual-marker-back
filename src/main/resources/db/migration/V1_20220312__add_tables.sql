@@ -36,15 +36,18 @@ CREATE TABLE mutual_marker.mark_step
 CREATE TABLE mutual_marker.profile
 (
     id            BIGINT NOT NULL,
-    username         varchar(255) NOT NULL unique,
     password      varchar(255) NOT NULL,
     email         varchar(255) NOT NULL unique ,
     first_name    VARCHAR(100) NOT NULL,
     last_name     VARCHAR(100) NOT NULL,
     role          VARCHAR(30) NOT NULL,
     patronymic    VARCHAR(100),
+    university    VARCHAR(300),
+    institute     VARCHAR(300),
+    subject       varchar(300),
     student_group VARCHAR(100),
     phone_number  VARCHAR(100),
+    social_network varchar(300),
     deleted       BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT pk_profile PRIMARY KEY (id)
 );

@@ -24,10 +24,10 @@ import java.util.List;
 public class ProfileDetailsService implements UserDetailsService {
     ProfileService profileService;
 
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Profile user = profileService.getProfileByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        Profile user = profileService.getProfileByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException("No user found with username: " + username);
+            throw new UsernameNotFoundException("No user found with email: " + email);
         }
         boolean enabled = true;
         boolean accountNonExpired = true;

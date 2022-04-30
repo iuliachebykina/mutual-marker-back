@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
     List<Profile> findAllByRole(Role role);
-    Profile findByUsername(String username);
+    Profile findByEmail(String email);
 }

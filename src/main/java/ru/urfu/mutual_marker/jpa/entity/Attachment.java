@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -31,6 +32,7 @@ public class Attachment {
     @ManyToOne
     Profile student;
     @Column(columnDefinition = "boolean default false")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     Boolean deleted;
 
 
