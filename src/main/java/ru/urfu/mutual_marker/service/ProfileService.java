@@ -8,9 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProfileMapper;
+import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
+import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.exception.WrongPasswordException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
@@ -35,7 +38,7 @@ public class ProfileService {
 
     @Transactional
     public Profile getProfileByEmail(String email){
-        return profileRepository.findByEmail(email);
+        return profileRepository.findByEmail(email).orElse(null);
     }
 
     @Transactional
@@ -45,11 +48,11 @@ public class ProfileService {
 
     @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
-        Profile profile = profileRepository.findByEmail(registrationInfo.getEmail());
-        if (profile != null){
+        Optional<Profile> opt = profileRepository.findByEmail(registrationInfo.getEmail());
+        if (opt.isEmpty()){
             throw new UserExistingException(String.format("User with email: %s already existing", registrationInfo.getEmail()));
         }
-        profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
+        Profile profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
 
         if(!role.equals(Role.ROLE_STUDENT)){
             profile.setStudentGroup(null);
@@ -67,16 +70,36 @@ public class ProfileService {
         return profile;
     }
 
-    @Transactional
-    public Profile updateProfile(Profile updatedProfile) {
-        Optional<Profile> opt = profileRepository.findById(updatedProfile.getId());
+    private Profile checkProfileAndRole(String email, Role role){
+        Optional<Profile> opt = profileRepository.findByEmail(email);
         if(opt.isEmpty()){
-            log.error("Failed to update profile with id: {}", updatedProfile.getId());
-            throw new UserNotExistingException(String.format("User with id: %s does not existing", updatedProfile.getId()));
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
         }
-        Profile oldProfile = opt.get();
-        Profile newProfile = profileMapper.updateProfile(updatedProfile, oldProfile);
-        log.info("Successful updated profile with id: {}", updatedProfile.getId());
-        return newProfile;
+        Profile profile = opt.get();
+        if(!profile.getRole().equals(role)){
+            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", profile.getRole()));
+        }
+        return profile;
+    }
+
+    @Transactional
+    public void updatePassword(ChangePassword changePassword, Role role){
+        Profile profile = checkProfileAndRole(changePassword.getEmail(), role);
+        if(profile.getPassword().equals(passwordEncoder.encode(changePassword.getOldPassword()))){
+            profile.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
+            profileRepository.save(profile);
+        }
+        else {
+            throw new WrongPasswordException(String.format("Wrong old password for user with email: %s", changePassword.getEmail()));
+        }
+    }
+
+    @Transactional
+    public Profile updateProfile(Profile updatedProfile, Role role) {
+        Profile oldProfile = checkProfileAndRole(updatedProfile.getEmail(), role);
+        if(updatedProfile.getPassword() != null){
+            log.warn("In this method not allowed update password. Look at the method updatePassword");
+        }
+        return profileMapper.updateProfile(updatedProfile, oldProfile);
     }
 }

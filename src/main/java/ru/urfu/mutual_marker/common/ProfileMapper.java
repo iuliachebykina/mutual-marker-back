@@ -42,7 +42,8 @@ public interface ProfileMapper {
     @Mappings({
             @Mapping(target = "name.firstName", source = "name.firstName"),
             @Mapping(target = "name.lastName", source = "name.lastName"),
-            @Mapping(target = "name.patronymic", source = "name.patronymic")
+            @Mapping(target = "name.patronymic", source = "name.patronymic"),
+            @Mapping(target = "password", ignore = true)
     })
     Profile updateProfile( Profile updatedProfile, @MappingTarget Profile oldProfile);
 }
