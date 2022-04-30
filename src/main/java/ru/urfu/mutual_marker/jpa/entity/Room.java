@@ -1,6 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -33,7 +33,7 @@ public class Room {
     @NotNull
     String code;
     @Column(columnDefinition = "boolean default false")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     Boolean deleted;
 
 

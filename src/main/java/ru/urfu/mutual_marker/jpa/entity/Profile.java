@@ -1,6 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,8 +11,8 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,7 +30,7 @@ public class Profile {
     @Email
     @NotNull
     String email;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     @NotNull
     String password;
     @Enumerated(value = EnumType.STRING)
@@ -45,15 +45,18 @@ public class Profile {
     String phoneNumber;
     String socialNetwork;
     @Column(columnDefinition = "boolean default false")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     Boolean deleted;
 
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     @Builder.Default
     @ToString.Exclude
     Set<Attachment> attachments = new HashSet<>();
+
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "profile_rooms",
             schema = "mutual_marker",

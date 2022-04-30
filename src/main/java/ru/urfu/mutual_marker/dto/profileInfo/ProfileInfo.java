@@ -5,9 +5,8 @@ import lombok.Data;
 @Data
 public class ProfileInfo {
     Long id;
-    String username;
-    String phoneNumber;
     String email;
+    String phoneNumber;
     String firstName;
     String lastName;
     String patronymic;
