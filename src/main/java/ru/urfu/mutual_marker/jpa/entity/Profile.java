@@ -46,7 +46,7 @@ public class Profile {
     String socialNetwork;
     @Column(columnDefinition = "boolean default false")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-        Boolean deleted;
+    Boolean deleted;
 
 
     @OneToMany(mappedBy = "student")
