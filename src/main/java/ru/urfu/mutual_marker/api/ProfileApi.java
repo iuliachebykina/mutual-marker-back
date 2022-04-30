@@ -124,7 +124,7 @@ public class ProfileApi {
     }
 
     @PutMapping("/students")
-    @PreAuthorize("#student.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#student.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
         try {
             Profile newStudent = profileService.updateProfile(student);
@@ -137,7 +137,7 @@ public class ProfileApi {
     }
 
     @PutMapping("/teachers")
-    @PreAuthorize("#teacher.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#teacher.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
         try {
             Profile newTeacher = profileService.updateProfile(teacher);
