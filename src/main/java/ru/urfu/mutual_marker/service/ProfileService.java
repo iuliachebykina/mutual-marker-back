@@ -70,21 +70,18 @@ public class ProfileService {
         return profile;
     }
 
-    private Profile checkProfileAndRole(String email, Role role){
-        Optional<Profile> opt = profileRepository.findByEmail(email);
+
+    @Transactional
+    public void updatePassword(ChangePassword changePassword, Role role){
+        Optional<Profile> opt = profileRepository.findByEmail(changePassword.getEmail());
         if(opt.isEmpty()){
-            throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", changePassword.getEmail()));
         }
         Profile profile = opt.get();
         if(!profile.getRole().equals(role)){
             throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", profile.getRole()));
         }
-        return profile;
-    }
 
-    @Transactional
-    public void updatePassword(ChangePassword changePassword, Role role){
-        Profile profile = checkProfileAndRole(changePassword.getEmail(), role);
         if(passwordEncoder.matches(changePassword.getOldPassword(), profile.getPassword())){
             profile.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             profileRepository.save(profile);
@@ -96,7 +93,15 @@ public class ProfileService {
 
     @Transactional
     public Profile updateProfile(Profile updatedProfile, Role role) {
-        Profile oldProfile = checkProfileAndRole(updatedProfile.getEmail(), role);
+        Optional<Profile> opt = profileRepository.findById(updatedProfile.getId());
+        if(opt.isEmpty()){
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", updatedProfile.getId()));
+        }
+        Profile oldProfile = opt.get();
+        if(!oldProfile.getRole().equals(role)){
+            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", oldProfile.getRole()));
+        }
+
         if(updatedProfile.getPassword() != null){
             log.warn("In this method not allowed update password. Look at the method updatePassword");
         }
