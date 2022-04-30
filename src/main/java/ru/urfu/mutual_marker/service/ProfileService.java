@@ -70,6 +70,11 @@ public class ProfileService {
         return profile;
     }
 
+    private void checkRole(Role actual, Role expected){
+        if(!actual.equals(expected)){
+            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", actual));
+        }
+    }
 
     @Transactional
     public void updatePassword(ChangePassword changePassword, Role role){
@@ -78,9 +83,7 @@ public class ProfileService {
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changePassword.getEmail()));
         }
         Profile profile = opt.get();
-        if(!profile.getRole().equals(role)){
-            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", profile.getRole()));
-        }
+        checkRole(profile.getRole(), role);
 
         if(passwordEncoder.matches(changePassword.getOldPassword(), profile.getPassword())){
             profile.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
@@ -98,10 +101,7 @@ public class ProfileService {
             throw new UserNotExistingException(String.format("User with email: %s does not existing", updatedProfile.getId()));
         }
         Profile oldProfile = opt.get();
-        if(!oldProfile.getRole().equals(role)){
-            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", oldProfile.getRole()));
-        }
-
+        checkRole(oldProfile.getRole(), role);
         if(updatedProfile.getPassword() != null){
             log.warn("In this method not allowed update password. Look at the method updatePassword");
         }
