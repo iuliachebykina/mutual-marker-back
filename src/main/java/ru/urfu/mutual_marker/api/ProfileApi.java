@@ -166,19 +166,19 @@ public class ProfileApi {
 
 
 
-    @PatchMapping("/students/password")
+    @PostMapping("/students/password")
     @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Boolean> updateStudent(@RequestBody ChangePassword changePassword){
+    public ResponseEntity<Boolean> updateStudentsPassword(@RequestBody ChangePassword changePassword){
         return updatePassword(changePassword, Role.ROLE_STUDENT);
     }
 
-    @PatchMapping("/teachers/password")
+    @PostMapping("/teachers/password")
     @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Boolean> updateTeacher(@RequestBody ChangePassword changePassword){
+    public ResponseEntity<Boolean> updateTeachersPassword(@RequestBody ChangePassword changePassword){
         return updatePassword(changePassword, Role.ROLE_TEACHER);
     }
 
-    @PatchMapping("/admins/password")
+    @PostMapping("/admins/password")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Boolean> updateAdminsPassword(@RequestBody ChangePassword changePassword){
         return updatePassword(changePassword, Role.ROLE_ADMIN);
@@ -186,7 +186,7 @@ public class ProfileApi {
 
     private ResponseEntity<Boolean> updatePassword(ChangePassword changePassword, Role role){
         try {
-            profileService.updatePassword(changePassword, Role.ROLE_ADMIN);
+            profileService.updatePassword(changePassword, role);
             log.info("Updated user's password with email: {}", changePassword.getEmail());
             return new ResponseEntity<>(true, HttpStatus.OK);
         } catch (Exception e) {

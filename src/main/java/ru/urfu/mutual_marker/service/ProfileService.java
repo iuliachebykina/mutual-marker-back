@@ -49,7 +49,7 @@ public class ProfileService {
     @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
         Optional<Profile> opt = profileRepository.findByEmail(registrationInfo.getEmail());
-        if (opt.isEmpty()){
+        if (opt.isPresent()){
             throw new UserExistingException(String.format("User with email: %s already existing", registrationInfo.getEmail()));
         }
         Profile profile = profileMapper.registrationInfoToProfileEntity(registrationInfo);
@@ -85,7 +85,7 @@ public class ProfileService {
     @Transactional
     public void updatePassword(ChangePassword changePassword, Role role){
         Profile profile = checkProfileAndRole(changePassword.getEmail(), role);
-        if(profile.getPassword().equals(passwordEncoder.encode(changePassword.getOldPassword()))){
+        if(passwordEncoder.matches(changePassword.getOldPassword(), profile.getPassword())){
             profile.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             profileRepository.save(profile);
         }
