@@ -14,7 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
   psql:
-    image: 'postgres'
+    image: 'postgres:12.9'
     container_name: psql
     environment:
       - POSTGRES_USER=postgres

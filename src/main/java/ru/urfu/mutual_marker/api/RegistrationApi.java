@@ -17,7 +17,7 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 @RestController
-@RequestMapping(value = "/registration")
+@RequestMapping(value = "/api/registration")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
