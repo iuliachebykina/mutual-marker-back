@@ -71,10 +71,10 @@ public class ProfileService {
     }
 
     @Transactional
-    public void deleteProfile(Long id, Role role){
-        Optional<Profile> opt = profileRepository.findById(id);
+    public void deleteProfile(String email, Role role){
+        Optional<Profile> opt = profileRepository.findByEmail(email);
         if(opt.isEmpty()){
-            throw new UserNotExistingException(String.format("User with email: %s does not existing", id));
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
         }
         Profile profile = opt.get();
         checkRole(profile.getRole(), role);

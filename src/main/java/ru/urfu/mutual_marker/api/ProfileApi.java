@@ -194,31 +194,31 @@ public class ProfileApi {
     }
 
 
-    @DeleteMapping("/students/{id}")
-    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long id){
-        return deleteProfile(id, Role.ROLE_STUDENT);
+    @DeleteMapping("/students/{email}")
+    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteStudent(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_STUDENT);
     }
 
-    @DeleteMapping("/teachers/{id}")
-    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id){
-        return deleteProfile(id, Role.ROLE_TEACHER);
+    @DeleteMapping("/teachers/{email}")
+    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteTeacher(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_TEACHER);
     }
 
-    @DeleteMapping("/admins/{id}")
+    @DeleteMapping("/admins/{email}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteAdmin(@PathVariable Long id){
-        return deleteProfile(id, Role.ROLE_ADMIN);
+    public ResponseEntity<Void> deleteAdmin(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_ADMIN);
     }
 
-    private ResponseEntity<Void> deleteProfile(Long id, Role role) {
+    private ResponseEntity<Void> deleteProfile(String email, Role role) {
         try {
-            profileService.deleteProfile(id, role);
-            log.info("Deleted user with id: {}", id);
+            profileService.deleteProfile(email, role);
+            log.info("Deleted user with email: {}", email);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to delete user with id : {}\ncause: {}", id, e.getMessage());
+            log.error("Failed to delete user with email : {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
