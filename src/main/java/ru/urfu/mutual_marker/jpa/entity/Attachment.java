@@ -31,9 +31,10 @@ public class Attachment {
     @NotNull
     @ManyToOne
     Profile student;
-    @Column(columnDefinition = "boolean default false")
+
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @ManyToMany(mappedBy = "attachments")

@@ -32,9 +32,9 @@ public class Room {
     @NotBlank
     @NotNull
     String code;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @ManyToMany(mappedBy = "rooms")

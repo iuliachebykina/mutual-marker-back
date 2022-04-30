@@ -34,9 +34,9 @@ public class Mark {
     @CreatedDate
     LocalDateTime markTime;
     String comment;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
     @Override
     public boolean equals(Object o) {

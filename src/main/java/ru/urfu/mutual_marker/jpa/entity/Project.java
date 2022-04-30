@@ -34,9 +34,9 @@ public class Project {
     @Column(length = 2000)
     @NotNull
     String description;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @OneToMany(mappedBy = "project")

@@ -35,9 +35,9 @@ public class Task {
     LocalDateTime closeDate;
     @ManyToOne
     Room room;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;;
 
     @OneToMany(mappedBy = "task")
     @Builder.Default

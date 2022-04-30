@@ -34,9 +34,9 @@ public class MarkStep {
     String description;
     @NotNull
     Integer maxMark;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @ManyToMany

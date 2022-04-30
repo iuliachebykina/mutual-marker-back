@@ -70,6 +70,18 @@ public class ProfileService {
         return profile;
     }
 
+    @Transactional
+    public void deleteProfile(Long id, Role role){
+        Optional<Profile> opt = profileRepository.findById(id);
+        if(opt.isEmpty()){
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", id));
+        }
+        Profile profile = opt.get();
+        checkRole(profile.getRole(), role);
+        profile.setDeleted(true);
+        profileRepository.save(profile);
+    }
+
     private void checkRole(Role actual, Role expected){
         if(!actual.equals(expected)){
             throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", actual));

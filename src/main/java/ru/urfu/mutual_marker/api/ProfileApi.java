@@ -192,4 +192,34 @@ public class ProfileApi {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @DeleteMapping("/students/{id}")
+    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id){
+        return deleteProfile(id, Role.ROLE_STUDENT);
+    }
+
+    @DeleteMapping("/teachers/{id}")
+    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id){
+        return deleteProfile(id, Role.ROLE_TEACHER);
+    }
+
+    @DeleteMapping("/admins/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteAdmin(@PathVariable Long id){
+        return deleteProfile(id, Role.ROLE_ADMIN);
+    }
+
+    private ResponseEntity<Void> deleteProfile(Long id, Role role) {
+        try {
+            profileService.deleteProfile(id, role);
+            log.info("Deleted user with id: {}", id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Failed to delete user with id : {}\ncause: {}", id, e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
@@ -23,6 +24,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,9 +46,9 @@ public class Profile {
     String studentGroup;
     String phoneNumber;
     String socialNetwork;
-    @Column(columnDefinition = "boolean default false")
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @OneToMany(mappedBy = "student")
