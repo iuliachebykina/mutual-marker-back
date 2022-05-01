@@ -50,7 +50,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .httpBasic()
                 .and().sessionManagement().disable()
-                .formLogin(withDefaults());
+                .formLogin(withDefaults()).logout(withDefaults());
     }
 
 }
