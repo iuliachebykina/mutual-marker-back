@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,7 +39,7 @@ public class Task {
     Room room;
     @JsonIgnore
     @Builder.Default
-    Boolean deleted = Boolean.FALSE;;
+    Boolean deleted = Boolean.FALSE;
 
     @OneToMany(mappedBy = "task")
     @Builder.Default

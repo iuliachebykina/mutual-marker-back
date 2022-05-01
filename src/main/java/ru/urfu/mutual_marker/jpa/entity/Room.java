@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
