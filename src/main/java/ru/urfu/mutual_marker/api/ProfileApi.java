@@ -14,7 +14,6 @@ import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
-import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
@@ -35,15 +34,10 @@ public class ProfileApi {
     @GetMapping("/admins/{id}")
     public ResponseEntity<AdminInfo> getAdmin(@PathVariable Long id ){
         try {
-            Profile admin = profileService.getProfileById(id);
-            if(!(admin.getRole().equals(Role.ROLE_ADMIN))) {
-                log.error("Wrong id: {} to get ADMIN", id);
-                throw new InvalidRoleException(String.format("Profile with id: %d does not have the ADMIN role", id));
-            }
+            Profile admin = profileService.getProfileById(id, Role.ROLE_ADMIN);
             log.info("Got admin by id: {}", id);
             AdminInfo adminInfo = profileMapper.profileEntityToAdminDto(admin);
             return new ResponseEntity<>(adminInfo, HttpStatus.OK);
-
         }
         catch (Exception e){
             log.error("cause: {}", e.getMessage());
@@ -66,15 +60,10 @@ public class ProfileApi {
     @GetMapping("/teachers/{id}")
     public ResponseEntity<TeacherInfo> getTeacher(@PathVariable Long id){
         try {
-            Profile teacher = profileService.getProfileById(id);
-            if(!(teacher.getRole().equals(Role.ROLE_TEACHER))) {
-                log.error("Wrong id: {} to get TEACHER", id);
-                throw new InvalidRoleException(String.format("Profile with id: %d does not have the TEACHER role", id));
-            }
+            Profile teacher = profileService.getProfileById(id, Role.ROLE_TEACHER);
             log.info("Got teacher by id: {}", id);
             TeacherInfo teacherInfo = profileMapper.profileEntityToTeacherDto(teacher);
             return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
-
         }
         catch (Exception e){
             log.error("cause: {}", e.getMessage());
@@ -97,21 +86,17 @@ public class ProfileApi {
     @GetMapping("/students/{id}")
     public ResponseEntity<StudentInfo> getStudent(@PathVariable Long id){
         try {
-            Profile student = profileService.getProfileById(id);
-            if(!(student.getRole().equals(Role.ROLE_STUDENT))) {
-                log.error("Wrong id: {} to get STUDENT", id);
-                throw new InvalidRoleException(String.format("Profile with id: %d does not have the STUDENT role", id));
-            }
+            Profile student = profileService.getProfileById(id, Role.ROLE_STUDENT);
             log.info("Got student by id: {}", id);
             StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(student);
             return new ResponseEntity<>(studentInfo, HttpStatus.OK);
-
         }
         catch (Exception e){
             log.error("cause: {}", e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students")
@@ -127,38 +112,28 @@ public class ProfileApi {
     @PatchMapping("/students")
     @PreAuthorize("#student.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
-        try {
-            Profile newStudent = profileService.updateProfile(student, Role.ROLE_STUDENT);
-            log.info("Updated student with id: {}", student.getId());
-            return new ResponseEntity<>(newStudent, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Failed to update student with id: {} \ncause: {}", student.getId(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return updateProfile(student, Role.ROLE_STUDENT);
     }
 
     @PatchMapping("/teachers")
     @PreAuthorize("#teacher.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
-        try {
-            Profile newTeacher = profileService.updateProfile(teacher, Role.ROLE_TEACHER);
-            log.info("Updated teacher with id: {}", teacher.getId());
-            return new ResponseEntity<>(newTeacher, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Failed to update teacher with id: {}\ncause: {}", teacher.getId(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return updateProfile(teacher, Role.ROLE_TEACHER);
     }
 
     @PatchMapping("/admins")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
+        return updateProfile(admin, Role.ROLE_ADMIN);
+    }
+
+    private ResponseEntity<Profile> updateProfile(Profile profile, Role role){
         try {
-            Profile newAdmin = profileService.updateProfile(admin, Role.ROLE_ADMIN);
-            log.info("Updated admin with id: {}", admin.getId());
+            Profile newAdmin = profileService.updateProfile(profile, role);
+            log.info("Updated profile with id: {}", profile.getId());
             return new ResponseEntity<>(newAdmin, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to update admin with id: {}\ncause: {}", admin.getId(), e.getMessage());
+            log.error("Failed to update profile with id: {}\ncause: {}", profile.getId(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

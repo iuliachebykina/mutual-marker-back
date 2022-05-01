@@ -32,8 +32,10 @@ public class ProfileService {
     ProfileMapper  profileMapper;
 
     @Transactional
-    public Profile getProfileById(Long id){
-        return profileRepository.findById(id).orElse(null);
+    public Profile getProfileById(Long id, Role role){
+        Optional<Profile> profile = profileRepository.findById(id);
+        profile.ifPresent(value -> checkRole(value.getRole(), role));
+        return profile.orElse(null);
     }
 
     @Transactional
@@ -47,7 +49,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public Profile saveProfile(RegistrationInfo registrationInfo, Role role) throws UserExistingException {
+    public Profile saveProfile(RegistrationInfo registrationInfo, Role role){
         Optional<Profile> opt = profileRepository.findByEmail(registrationInfo.getEmail());
         if (opt.isPresent()){
             throw new UserExistingException(String.format("User with email: %s already existing", registrationInfo.getEmail()));
@@ -56,7 +58,6 @@ public class ProfileService {
 
         if(!role.equals(Role.ROLE_STUDENT)){
             profile.setStudentGroup(null);
-
         }
 
         if(!role.equals(Role.ROLE_TEACHER)){
@@ -65,7 +66,6 @@ public class ProfileService {
 
         profile.setPassword(passwordEncoder.encode(registrationInfo.getPassword()));
         profile.setRole(role);
-        profile.setDeleted(false);
         profileRepository.save(profile);
         return profile;
     }
@@ -84,7 +84,7 @@ public class ProfileService {
 
     private void checkRole(Role actual, Role expected){
         if(!actual.equals(expected)){
-            throw new InvalidRoleException(String.format("User with role: %s cannot be updated in this method", actual));
+            throw new InvalidRoleException(String.format("User with role: %s cannot be updated or gotten in this method", actual));
         }
     }
 
