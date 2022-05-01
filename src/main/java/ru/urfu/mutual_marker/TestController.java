@@ -57,7 +57,7 @@ public class TestController {
 
     void addProfiles() throws UserExistingException {
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             String username = generateString(20);
             String email = generateString(10) + "@mail.com";
             int roleID = rand.nextInt() % 3;
@@ -66,7 +66,6 @@ public class TestController {
             String lastName = generateString(10);
 
             RegistrationInfo registrationInfo = RegistrationInfo.builder()
-                    .username(username)
                     .password(username)
                     .firstName(firstName)
                     .email(email)
@@ -100,9 +99,9 @@ public class TestController {
             String code = generateString(8);
 
 //            Room room = new Room();
-//            room.setTitle(title);
-//            room.setCode(code);
-//            room.setDeleted(false);
+//            room.SetTitle(title);
+//            room.SetCode(code);
+//            room.SetDeleted(false);
 
             Room room = Room.builder()
                     .title(title)

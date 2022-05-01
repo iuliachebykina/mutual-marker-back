@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,8 +10,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
-import java.util.Set;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -31,8 +32,9 @@ public class Room {
     @NotBlank
     @NotNull
     String code;
-    @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    @JsonIgnore
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @ManyToMany(mappedBy = "rooms")

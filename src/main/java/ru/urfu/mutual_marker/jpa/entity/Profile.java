@@ -1,11 +1,12 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
@@ -24,16 +25,15 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @NotNull
-    String username;
     @Email
     @NotNull
     String email;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     @NotNull
     String password;
     @Enumerated(value = EnumType.STRING)
@@ -41,17 +41,25 @@ public class Profile {
     @NotNull
     @Embedded
     Name name;
+    String subject;
+    String university;
+    String institute;
     String studentGroup;
     String phoneNumber;
-    @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    String socialNetwork;
+    @JsonIgnore
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
 
     @OneToMany(mappedBy = "student")
+    @JsonIgnore
     @Builder.Default
     @ToString.Exclude
     Set<Attachment> attachments = new HashSet<>();
+
     @ManyToMany
+    @JsonIgnore
     @JoinTable(
             name = "profile_rooms",
             schema = "mutual_marker",

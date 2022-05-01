@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
+import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
@@ -22,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/profile")
+@RequestMapping(value = "/api/profile")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 @Slf4j
@@ -123,11 +124,11 @@ public class ProfileApi {
                 .collect(Collectors.toList());
     }
 
-    @PutMapping("/students")
-    @PreAuthorize("#student.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PatchMapping("/students")
+    @PreAuthorize("#student.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
         try {
-            Profile newStudent = profileService.updateProfile(student);
+            Profile newStudent = profileService.updateProfile(student, Role.ROLE_STUDENT);
             log.info("Updated student with id: {}", student.getId());
             return new ResponseEntity<>(newStudent, HttpStatus.OK);
         } catch (Exception e) {
@@ -136,11 +137,11 @@ public class ProfileApi {
         }
     }
 
-    @PutMapping("/teachers")
-    @PreAuthorize("#teacher.getUsername() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PatchMapping("/teachers")
+    @PreAuthorize("#teacher.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
         try {
-            Profile newTeacher = profileService.updateProfile(teacher);
+            Profile newTeacher = profileService.updateProfile(teacher, Role.ROLE_TEACHER);
             log.info("Updated teacher with id: {}", teacher.getId());
             return new ResponseEntity<>(newTeacher, HttpStatus.OK);
         } catch (Exception e) {
@@ -149,15 +150,75 @@ public class ProfileApi {
         }
     }
 
-    @PutMapping("/admins")
+    @PatchMapping("/admins")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
         try {
-            Profile newAdmin = profileService.updateProfile(admin);
+            Profile newAdmin = profileService.updateProfile(admin, Role.ROLE_ADMIN);
             log.info("Updated admin with id: {}", admin.getId());
             return new ResponseEntity<>(newAdmin, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to update admin with id: {}\ncause: {}", admin.getId(), e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @PostMapping("/students/password")
+    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateStudentsPassword(@RequestBody ChangePassword changePassword){
+        return updatePassword(changePassword, Role.ROLE_STUDENT);
+    }
+
+    @PostMapping("/teachers/password")
+    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateTeachersPassword(@RequestBody ChangePassword changePassword){
+        return updatePassword(changePassword, Role.ROLE_TEACHER);
+    }
+
+    @PostMapping("/admins/password")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> updateAdminsPassword(@RequestBody ChangePassword changePassword){
+        return updatePassword(changePassword, Role.ROLE_ADMIN);
+    }
+
+    private ResponseEntity<Void> updatePassword(ChangePassword changePassword, Role role){
+        try {
+            profileService.updatePassword(changePassword, role);
+            log.info("Updated user's password with email: {}", changePassword.getEmail());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Failed to user's password with email: {}\ncause: {}", changePassword.getEmail(), e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @DeleteMapping("/students/{email}")
+    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteStudent(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_STUDENT);
+    }
+
+    @DeleteMapping("/teachers/{email}")
+    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteTeacher(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_TEACHER);
+    }
+
+    @DeleteMapping("/admins/{email}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Void> deleteAdmin(@PathVariable String email){
+        return deleteProfile(email, Role.ROLE_ADMIN);
+    }
+
+    private ResponseEntity<Void> deleteProfile(String email, Role role) {
+        try {
+            profileService.deleteProfile(email, role);
+            log.info("Deleted user with email: {}", email);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Failed to delete user with email : {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

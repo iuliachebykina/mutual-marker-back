@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -33,8 +34,9 @@ public class Mark {
     @CreatedDate
     LocalDateTime markTime;
     String comment;
-    @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    @JsonIgnore
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
 
     @Override
     public boolean equals(Object o) {
