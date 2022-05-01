@@ -18,7 +18,7 @@ import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
 import java.util.List;
 
-@RequestMapping("/marks")
+@RequestMapping("api/marks")
 @RestController
 @Data
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)

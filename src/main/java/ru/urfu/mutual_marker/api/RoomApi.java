@@ -18,7 +18,7 @@ import java.util.List;
 import static ru.urfu.mutual_marker.service.enums.EntityPassedToRoom.*;
 
 @RestController
-@RequestMapping("/rooms")
+@RequestMapping("api/rooms")
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RoomApi {
