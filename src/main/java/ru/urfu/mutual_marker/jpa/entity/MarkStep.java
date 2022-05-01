@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -36,6 +37,7 @@ public class MarkStep {
     @OneToMany(mappedBy = "markStep")
     List<MarkStepValue> values;
 
+    @JsonIgnore
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 

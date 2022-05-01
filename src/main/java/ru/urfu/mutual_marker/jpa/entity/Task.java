@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import net.minidev.json.annotate.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 
@@ -35,6 +36,7 @@ public class Task {
     LocalDateTime closeDate;
     @ManyToOne
     Room room;
+    @JsonIgnore
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
     @Column(name = "min_graded")

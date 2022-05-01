@@ -2,6 +2,7 @@ package ru.urfu.mutual_marker.jpa.entity;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -25,6 +26,7 @@ public class MarkStepValue {
     @JoinColumn(name = "mark_step_id")
     MarkStep markStep;
 
+    @JsonIgnore
     @Column(columnDefinition = "boolean default false")
     Boolean deleted;
 }
