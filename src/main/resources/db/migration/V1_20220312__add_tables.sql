@@ -81,6 +81,7 @@ CREATE TABLE mutual_marker.task
     close_date  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     room_id     BIGINT not null,
     deleted     BOOLEAN DEFAULT FALSE NOT NULL,
+    min_graded  INTEGER DEFAULT 0 NOT NULL,
     CONSTRAINT pk_task PRIMARY KEY (id)
 );
 
@@ -103,6 +104,25 @@ CREATE TABLE mutual_marker.project_attachments
     ATTACHMENT_ID BIGINT NOT NULL
 );
 
+CREATE TABLE mutual_marker.mark_step_value
+(
+     id BIGINT NOT NULL,
+     value BIGINT NOT NULL,
+     mark_step_id BIGINT NOT NULL,
+     deleted BOOLEAN DEFAULT FALSE NOT NULL,
+     CONSTRAINT pk_value PRIMARY KEY (id)
+);
+
+CREATE TABLE mutual_marker.number_of_graded
+(
+    id BIGINT NOT NULL,
+    task_id BIGINT NOT NULL,
+    profile_id BIGINT NOT NULL,
+    graded INTEGER DEFAULT 0 NOT NULL,
+    deleted BOOLEAN DEFAULT FALSE NOT NULL,
+    CONSTRAINT pk_graded PRIMARY KEY (id)
+);
+
 
 ALTER TABLE mutual_marker.project
     ADD CONSTRAINT FK_PROJECT_ON_ROOM FOREIGN KEY (task_id) REFERENCES task (id);
@@ -121,3 +141,12 @@ ALTER TABLE mutual_marker.mark
 
 ALTER TABLE mutual_marker.attachment
     ADD CONSTRAINT FK_ATTACHMENT_ON_STUDENT FOREIGN KEY (student_id) REFERENCES profile (id);
+
+ALTER TABLE mutual_marker.mark_step_value
+    ADD CONSTRAINT FK_VALUE_ON_STEP FOREIGN KEY (mark_step_id) REFERENCES mark_step (id);
+
+ALTER TABLE mutual_marker.number_of_graded
+    ADD CONSTRAINT FK_GRADED_ON_STUDENT FOREIGN KEY (profile_id) REFERENCES profile (id);
+
+ALTER TABLE mutual_marker.number_of_graded
+    ADD CONSTRAINT FK_GRADED_ON_TASK FOREIGN KEY (task_id) REFERENCES task (id);

@@ -18,6 +18,8 @@ spring:
             hibernate:
               dialect:
                 PostgreSQL10Dialect
+  main:
+    allow-bean-definition-overriding: true
 
 springdoc:
   api-docs:

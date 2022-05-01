@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
@@ -67,6 +68,9 @@ public class Profile {
     @Builder.Default
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
+    @OneToMany
+    @ToStringExclude
+    Set<NumberOfGraded> numberOfGraded;
 
 
     public void addAttachment(Attachment attachment){

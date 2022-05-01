@@ -1,9 +1,10 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import net.minidev.json.annotate.JsonIgnore;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
@@ -38,8 +39,9 @@ public class Task {
     @ManyToOne
     Room room;
     @JsonIgnore
-    @Builder.Default
-    Boolean deleted = Boolean.FALSE;
+    Boolean deleted;
+    @Column(name = "min_graded")
+    Integer minNumberOfGraded;
 
     @OneToMany(mappedBy = "task")
     @Builder.Default
@@ -49,7 +51,9 @@ public class Task {
     @Builder.Default
     @ToString.Exclude
     Set<MarkStep> markSteps = new HashSet<>();
-
+    @OneToMany(mappedBy = "task")
+    @ToStringExclude
+    Set<NumberOfGraded> numberOfGraded;
 
     public void addProject(Project project){
         if(projects == null)
