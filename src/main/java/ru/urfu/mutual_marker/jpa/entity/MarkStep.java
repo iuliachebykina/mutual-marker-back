@@ -40,8 +40,9 @@ public class MarkStep {
     List<MarkStepValue> values;
 
     @JsonIgnore
+    @Builder.Default
     @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    Boolean deleted = Boolean.FALSE;
 
 
     @ManyToMany

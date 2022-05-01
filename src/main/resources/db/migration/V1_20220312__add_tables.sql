@@ -119,6 +119,7 @@ CREATE TABLE mutual_marker.number_of_graded
     task_id BIGINT NOT NULL,
     profile_id BIGINT NOT NULL,
     graded INTEGER DEFAULT 0 NOT NULL,
+    deleted BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT pk_graded PRIMARY KEY (id)
 );
 

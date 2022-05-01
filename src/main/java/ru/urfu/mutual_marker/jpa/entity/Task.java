@@ -39,7 +39,6 @@ public class Task {
     @ManyToOne
     Room room;
     @JsonIgnore
-    @Column(columnDefinition = "boolean default false")
     Boolean deleted;
     @Column(name = "min_graded")
     Integer minNumberOfGraded;
