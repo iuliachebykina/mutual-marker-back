@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import net.minidev.json.annotate.JsonIgnore;
 import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

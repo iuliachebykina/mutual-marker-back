@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
+import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Extension;
 
 import javax.persistence.*;
@@ -21,6 +22,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
+@Where(clause="deleted=false")
 public class Attachment {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
