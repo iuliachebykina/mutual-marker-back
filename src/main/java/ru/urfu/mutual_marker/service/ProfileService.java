@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProfileMapper;
+import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
 import ru.urfu.mutual_marker.exception.InvalidRoleException;
@@ -37,8 +38,8 @@ public class ProfileService {
     ProfileMapper  profileMapper;
 
     @Transactional
-    public Profile getProfileById(Long id, Role role){
-        Optional<Profile> profile = profileRepository.findById(id);
+    public Profile getProfileByEmail(String email, Role role){
+        Optional<Profile> profile = profileRepository.findByEmail(email);
         profile.ifPresent(value -> checkRole(value.getRole(), role));
         return profile.orElse(null);
     }
@@ -94,14 +95,12 @@ public class ProfileService {
     }
 
     @Transactional
-    public void updatePassword(ChangePassword changePassword, Role role){
+    public void updatePassword(ChangePassword changePassword){
         Optional<Profile> opt = profileRepository.findByEmail(changePassword.getEmail());
         if(opt.isEmpty()){
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changePassword.getEmail()));
         }
         Profile profile = opt.get();
-        checkRole(profile.getRole(), role);
-
         if(passwordEncoder.matches(changePassword.getOldPassword(), profile.getPassword())){
             profile.setPassword(passwordEncoder.encode(changePassword.getNewPassword()));
             profileRepository.save(profile);
@@ -109,6 +108,22 @@ public class ProfileService {
         else {
             throw new WrongPasswordException(String.format("Wrong old password for user with email: %s", changePassword.getEmail()));
         }
+    }
+
+    @Transactional
+    public void updateEmail(ChangeEmail changeEmail){
+        if(profileRepository.findByEmail(changeEmail.getNewEmail()).isPresent()){
+            throw new UserExistingException(String.format("User with email: %s already existing", changeEmail.getNewEmail()));
+        }
+
+        Optional<Profile> opt = profileRepository.findByEmail(changeEmail.getOldEmail());
+        if(opt.isEmpty()){
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", changeEmail.getOldEmail()));
+        }
+        Profile profile = opt.get();
+        profile.setEmail(changeEmail.getNewEmail());
+        profileRepository.save(profile);
+
     }
 
     @Transactional
@@ -122,7 +137,13 @@ public class ProfileService {
         if(updatedProfile.getPassword() != null){
             log.warn("In this method not allowed update password. Look at the method updatePassword");
         }
-        return profileMapper.updateProfile(updatedProfile, oldProfile);
+        if(!updatedProfile.getEmail().equals(oldProfile.getEmail())){
+            log.warn("In this method not allowed update email. Look at the method updateEmail");
+            updatedProfile.setEmail(oldProfile.getEmail());
+        }
+        Profile newProfile = profileMapper.updateProfile(updatedProfile, oldProfile);
+        profileRepository.save(newProfile);
+        return newProfile;
     }
 
     @Transactional

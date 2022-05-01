@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
+import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
@@ -36,11 +37,11 @@ public class ProfileApi {
     ProfileService profileService;
 
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @GetMapping("/admins/{id}")
-    public ResponseEntity<AdminInfo> getAdmin(@PathVariable Long id ){
+    @GetMapping("/admins/{email}")
+    public ResponseEntity<AdminInfo> getAdmin(@PathVariable String email ){
         try {
-            Profile admin = profileService.getProfileById(id, Role.ROLE_ADMIN);
-            log.info("Got admin by id: {}", id);
+            Profile admin = profileService.getProfileByEmail(email, Role.ROLE_ADMIN);
+            log.info("Got admin by id: {}", email);
             AdminInfo adminInfo = profileMapper.profileEntityToAdminDto(admin);
             return new ResponseEntity<>(adminInfo, HttpStatus.OK);
         }
@@ -64,11 +65,11 @@ public class ProfileApi {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
-    @GetMapping("/teachers/{id}")
-    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable Long id){
+    @GetMapping("/teachers/{email}")
+    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable String email){
         try {
-            Profile teacher = profileService.getProfileById(id, Role.ROLE_TEACHER);
-            log.info("Got teacher by id: {}", id);
+            Profile teacher = profileService.getProfileByEmail(email, Role.ROLE_TEACHER);
+            log.info("Got teacher by email: {}", email);
             TeacherInfo teacherInfo = profileMapper.profileEntityToTeacherDto(teacher);
             return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
         }
@@ -92,11 +93,11 @@ public class ProfileApi {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
-    @GetMapping("/students/{id}")
-    public ResponseEntity<StudentInfo> getStudent(@PathVariable Long id){
+    @GetMapping("/students/{email}")
+    public ResponseEntity<StudentInfo> getStudent(@PathVariable String email){
         try {
-            Profile student = profileService.getProfileById(id, Role.ROLE_STUDENT);
-            log.info("Got student by id: {}", id);
+            Profile student = profileService.getProfileByEmail(email, Role.ROLE_STUDENT);
+            log.info("Got student by email: {}", email);
             StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(student);
             return new ResponseEntity<>(studentInfo, HttpStatus.OK);
         }
@@ -150,31 +151,28 @@ public class ProfileApi {
     }
 
 
-    @PostMapping("/students/password")
+    @PostMapping("/password")
     @PreAuthorize("#changePassword.email == authentication.principal.username")
-    public ResponseEntity<Void> updateStudentsPassword(@RequestBody ChangePassword changePassword){
-        return updatePassword(changePassword, Role.ROLE_STUDENT);
-    }
-
-    @PostMapping("/teachers/password")
-    @PreAuthorize("#changePassword.email == authentication.principal.username")
-    public ResponseEntity<Void> updateTeachersPassword(@RequestBody ChangePassword changePassword){
-        return updatePassword(changePassword, Role.ROLE_TEACHER);
-    }
-
-    @PostMapping("/admins/password")
-    @PreAuthorize("#changePassword.email == authentication.principal.username")
-    public ResponseEntity<Void> updateAdminsPassword(@RequestBody ChangePassword changePassword){
-        return updatePassword(changePassword, Role.ROLE_ADMIN);
-    }
-
-    private ResponseEntity<Void> updatePassword(ChangePassword changePassword, Role role){
+    private ResponseEntity<Void> updatePassword(@RequestBody ChangePassword changePassword){
         try {
-            profileService.updatePassword(changePassword, role);
+            profileService.updatePassword(changePassword);
             log.info("Updated user's password with email: {}", changePassword.getEmail());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Failed to user's password with email: {}\ncause: {}", changePassword.getEmail(), e.getMessage());
+            log.error("Failed to update user's password with email: {}\ncause: {}", changePassword.getEmail(), e.getMessage());
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/email")
+    @PreAuthorize("#changeEmail.oldEmail == authentication.principal.username")
+    private ResponseEntity<Void> updateEmail(@RequestBody ChangeEmail changeEmail){
+        try {
+            profileService.updateEmail(changeEmail);
+            log.info("Updated user's email: {}", changeEmail.getOldEmail());
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Failed to update user's email: {}\ncause: {}", changeEmail.getOldEmail(), e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

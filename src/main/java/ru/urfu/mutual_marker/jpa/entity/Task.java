@@ -4,7 +4,6 @@ import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import net.minidev.json.annotate.JsonIgnore;
-import org.apache.commons.lang3.builder.ToStringExclude;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
@@ -54,9 +53,9 @@ public class Task {
     @JsonIgnore
     Set<MarkStep> markSteps = new HashSet<>();
     @OneToMany(mappedBy = "task")
-    @ToStringExclude
     @JsonIgnore
-    Set<NumberOfGraded> numberOfGraded;
+    @ToString.Exclude
+    Set<NumberOfGraded> numberOfGraded = new HashSet<>();
 
     public void addProject(Project project){
         if(projects == null)
@@ -69,7 +68,6 @@ public class Task {
             return;
         this.projects.stream().filter(a -> a.getId() == projectId).findFirst().ifPresent(project -> this.projects.remove(project));
     }
-
 
     public void addMarkStep(MarkStep markStep){
         if(markSteps == null)
