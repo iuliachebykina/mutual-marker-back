@@ -40,7 +40,7 @@ public class RoomApi {
     }
 
     @PostMapping("/room")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_TEACHER', 'ROLE_ADMIN')")
     public ResponseEntity<Room> addRoom(@RequestBody AddRoomDto addRoomDto) {
         try {
             return new ResponseEntity<>(roomService.addNewRoom(addRoomDto), HttpStatus.OK);
