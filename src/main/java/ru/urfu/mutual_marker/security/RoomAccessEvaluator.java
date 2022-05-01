@@ -19,7 +19,7 @@ public class RoomAccessEvaluator {
 
     public boolean isMemberOfRoom(Long roomId, Authentication authentication) {
         Room room = roomService.getRoomById(roomId);
-        Profile checked = profileService.getProfileByUsername(authentication.getPrincipal().toString());
+        Profile checked = profileService.getProfileByEmail(authentication.getPrincipal().toString());
         return checked.getRooms().contains(room);
     }
 }
