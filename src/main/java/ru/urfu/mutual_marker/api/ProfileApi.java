@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,9 +48,11 @@ public class ProfileApi {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
-    @GetMapping("/admins")
-    public List<AdminInfo> getAllAdmins(){
-        List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN);
+    @GetMapping(value = "/admins", params = { "page", "size" })
+    public List<AdminInfo> getAllAdmins(@RequestParam("page") int page,
+                                        @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN, pageable);
         log.info("Got all admins");
         return admins
                 .stream()
@@ -72,9 +76,11 @@ public class ProfileApi {
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
-    @GetMapping("/teachers")
-    public List<TeacherInfo> getAllTeachers(){
-        List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER);
+    @GetMapping(value = "/teachers", params = { "page", "size" })
+    public List<TeacherInfo> getAllTeachers(@RequestParam("page") int page,
+                                            @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER, pageable);
         log.info("Got all teachers");
         return teachers
                 .stream()
@@ -100,8 +106,10 @@ public class ProfileApi {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
     @GetMapping("/students")
-    public List<StudentInfo> getAllStudents(){
-        List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT);
+    public List<StudentInfo> getAllStudents(@RequestParam("page") int page,
+                                            @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT,pageable);
         log.info("Got all students");
         return students
                 .stream()

@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Pageable;
+
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
@@ -44,8 +46,8 @@ public class ProfileService {
     }
 
     @Transactional
-    public List<Profile> getAllProfilesByRole(Role role){
-        return profileRepository.findAllByRole(role);
+    public List<Profile> getAllProfilesByRole(Role role, Pageable pageable){
+        return profileRepository.findAllByRole(role, pageable);
     }
 
     @Transactional

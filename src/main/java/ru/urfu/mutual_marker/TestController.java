@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
@@ -84,14 +85,14 @@ public class TestController {
             String title = generateString(10);
             int teachersCount = 3;
             List<Profile> teachers = profileRepository
-                    .findAllByRole(Role.ROLE_TEACHER)
+                    .findAllByRole(Role.ROLE_TEACHER,  PageRequest.of(0, 10))
                     .stream()
                     .limit(teachersCount)
                     .collect(Collectors.toList());
 
             int studentsCount =10;
             List<Profile> students = profileRepository
-                    .findAllByRole(Role.ROLE_STUDENT)
+                    .findAllByRole(Role.ROLE_STUDENT,  PageRequest.of(0, 10))
                     .stream()
                     .limit(studentsCount)
                     .collect(Collectors.toList());
