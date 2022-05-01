@@ -53,6 +53,7 @@ public class MarkStep {
             inverseJoinColumns = @JoinColumn(name = "task_id"))
     @Builder.Default
     @ToString.Exclude
+ @JsonIgnore
     Set<Task> tasks = new HashSet<>();
 
 

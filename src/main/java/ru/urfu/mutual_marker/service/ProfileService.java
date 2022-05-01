@@ -5,10 +5,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
-
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
@@ -16,11 +15,15 @@ import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.exception.WrongPasswordException;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
+import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,5 +123,23 @@ public class ProfileService {
             log.warn("In this method not allowed update password. Look at the method updatePassword");
         }
         return profileMapper.updateProfile(updatedProfile, oldProfile);
+    }
+
+    @Transactional
+    public List<Room> getRooms(String email) {
+        Optional<Profile> optional = profileRepository.findByEmail(email);
+        return optional.map(profile -> new ArrayList<>(profile.getRooms())).orElseGet(ArrayList::new);
+    }
+
+    @Transactional
+    public List<Attachment> getAttachments(String email) {
+        Optional<Profile> optional = profileRepository.findByEmail(email);
+        return optional.map(profile -> new ArrayList<>(profile.getAttachments())).orElseGet(ArrayList::new);
+    }
+
+    @Transactional
+    public List<NumberOfGraded> getNumberOfGradedSet(String email) {
+        Optional<Profile> optional = profileRepository.findByEmail(email);
+        return optional.map(profile -> new ArrayList<>(profile.getNumberOfGradedSet())).orElseGet(ArrayList::new);
     }
 }

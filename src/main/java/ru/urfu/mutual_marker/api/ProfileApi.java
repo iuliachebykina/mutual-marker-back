@@ -16,7 +16,10 @@ import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
+import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
@@ -204,5 +207,26 @@ public class ProfileApi {
             log.error("Failed to delete user with email : {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/rooms/{email}")
+    @PreAuthorize("#email == authentication.principal.username")
+    public List<Room> getRooms(@PathVariable String email){
+        log.info("Got rooms by user with email: {}", email);
+        return profileService.getRooms(email);
+    }
+
+    @GetMapping("/attachments/{email}")
+    @PreAuthorize("#email == authentication.principal.username")
+    public List<Attachment> getAttachments(@PathVariable String email){
+        log.info("Got attachments by user with email: {}", email);
+        return profileService.getAttachments(email);
+    }
+
+    @GetMapping("/number-of-graded-set/{email}")
+    @PreAuthorize("#email == authentication.principal.username")
+    public List<NumberOfGraded> getNumberOfGradedSet(@PathVariable String email){
+        log.info("Got number of graded set by user with email: {}", email);
+        return profileService.getNumberOfGradedSet(email);
     }
 }

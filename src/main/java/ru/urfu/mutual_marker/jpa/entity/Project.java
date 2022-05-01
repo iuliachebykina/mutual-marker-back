@@ -44,7 +44,9 @@ public class Project {
     @OneToMany(mappedBy = "project")
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     Set<Mark> marks = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "project_attachments",
@@ -53,6 +55,7 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     @Builder.Default
     @ToString.Exclude
+    @JsonIgnore
     Set<Attachment> attachments = new HashSet<>();
 
 
