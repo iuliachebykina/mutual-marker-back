@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 import javax.annotation.security.PermitAll;
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -47,7 +48,7 @@ public class TestController {
     String  test() throws UserExistingException {
         addProfiles();
         addRooms();
-  //      addTasks();
+        addTasks();
  //       addProjects();
 
         return "ok";
@@ -56,6 +57,7 @@ public class TestController {
 
 
 
+    @Transactional
     void addProfiles() throws UserExistingException {
 
         for (int i = 0; i < 100; i++) {
@@ -80,6 +82,7 @@ public class TestController {
 
     }
 
+    @Transactional
     void addRooms(){
         for (int i = 0; i < 100; i++) {
             String title = generateString(10);
@@ -135,9 +138,12 @@ public class TestController {
     }
 
 
+    @Transactional
     void addTasks() {
         for (int i = 0; i < 30; i++) {
             long roomId = rand.nextLong() % roomRepository.count();
+            if(roomId == 0)
+                roomId = 1;
             Room room = roomRepository.findAll().get((int) (roomId < 0 ? -1* roomId : roomId));
             for (int j = 0; j < 40; j++) {
                 String title = generateString(10);
@@ -147,6 +153,7 @@ public class TestController {
 
                 Boolean deleted = false;
 
+
                 Task task = Task.builder()
                         .title(title)
                         .description(description)
@@ -154,14 +161,18 @@ public class TestController {
                         .closeDate(closeDate)
                         .room(room)
                         .deleted(deleted)
+                        .minNumberOfGraded(4)
                         .build();
                 taskRepository.save(task);
+                room.addTask(task);
+                roomRepository.save(room);
 
             }
         }
 
     }
 
+    @Transactional
     void addProjects() {
         for (int i = 0; i < 40; i++) {
 

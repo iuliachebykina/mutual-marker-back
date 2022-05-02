@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
@@ -207,23 +208,20 @@ public class ProfileApi {
         }
     }
 
-    @GetMapping("/rooms/{email}")
-    @PreAuthorize("#email == authentication.principal.username")
-    public List<Room> getRooms(@PathVariable String email){
+    @GetMapping("/rooms")
+    public List<Room> getRooms(@CurrentSecurityContext(expression="authentication.principal.username") String email){
         log.info("Got rooms by user with email: {}", email);
         return profileService.getRooms(email);
     }
 
-    @GetMapping("/attachments/{email}")
-    @PreAuthorize("#email == authentication.principal.username")
-    public List<Attachment> getAttachments(@PathVariable String email){
+    @GetMapping("/attachments")
+    public List<Attachment> getAttachments(@CurrentSecurityContext(expression="authentication.principal.username") String email){
         log.info("Got attachments by user with email: {}", email);
         return profileService.getAttachments(email);
     }
 
-    @GetMapping("/number-of-graded-set/{email}")
-    @PreAuthorize("#email == authentication.principal.username")
-    public List<NumberOfGraded> getNumberOfGradedSet(@PathVariable String email){
+    @GetMapping("/number-of-graded-set")
+    public List<NumberOfGraded> getNumberOfGradedSet(@CurrentSecurityContext(expression="authentication.principal.username") String email){
         log.info("Got number of graded set by user with email: {}", email);
         return profileService.getNumberOfGradedSet(email);
     }
