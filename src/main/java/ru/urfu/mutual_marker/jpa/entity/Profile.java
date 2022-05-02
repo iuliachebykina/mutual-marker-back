@@ -69,7 +69,7 @@ public class Profile {
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "profile")
     @JsonIgnore
     @ToStringExclude
     Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();
