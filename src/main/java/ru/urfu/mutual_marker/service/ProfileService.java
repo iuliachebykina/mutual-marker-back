@@ -112,7 +112,7 @@ public class ProfileService {
 
     @Transactional
     public void updateEmail(ChangeEmail changeEmail){
-        if(profileRepository.findByEmail(changeEmail.getNewEmail()).isPresent()){
+        if(profileRepository.getByEmail(changeEmail.getNewEmail()).isPresent()){
             throw new UserExistingException(String.format("User with email: %s already existing", changeEmail.getNewEmail()));
         }
 
