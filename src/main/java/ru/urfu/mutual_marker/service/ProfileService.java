@@ -130,14 +130,15 @@ public class ProfileService {
     public Profile updateProfile(Profile updatedProfile, Role role) {
         Optional<Profile> opt = profileRepository.findById(updatedProfile.getId());
         if(opt.isEmpty()){
-            throw new UserNotExistingException(String.format("User with email: %s does not existing", updatedProfile.getId()));
+            throw new UserNotExistingException(String.format("User with id: %s does not existing", updatedProfile.getId()));
         }
         Profile oldProfile = opt.get();
         checkRole(oldProfile.getRole(), role);
-        if(updatedProfile.getPassword() != null){
+        if(updatedProfile.getPassword() != null && !updatedProfile.getPassword().equals(oldProfile.getPassword())){
             log.warn("In this method not allowed update password. Look at the method updatePassword");
+            updatedProfile.setPassword(oldProfile.getPassword());
         }
-        if(!updatedProfile.getEmail().equals(oldProfile.getEmail())){
+        if(updatedProfile.getEmail() != null && !updatedProfile.getEmail().equals(oldProfile.getEmail())){
             log.warn("In this method not allowed update email. Look at the method updateEmail");
             updatedProfile.setEmail(oldProfile.getEmail());
         }

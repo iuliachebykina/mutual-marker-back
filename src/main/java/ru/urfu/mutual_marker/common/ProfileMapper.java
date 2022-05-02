@@ -40,9 +40,6 @@ public interface ProfileMapper {
     Profile registrationInfoToProfileEntity(RegistrationInfo registrationInfo);
 
     @Mappings({
-            @Mapping(target = "name.firstName", source = "name.firstName"),
-            @Mapping(target = "name.lastName", source = "name.lastName"),
-            @Mapping(target = "name.patronymic", source = "name.patronymic"),
             @Mapping(target = "password", ignore = true),
             @Mapping(target = "deleted", ignore = true),
             @Mapping(target = "attachments", ignore = true),
