@@ -16,15 +16,11 @@ import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.exception.WrongPasswordException;
-import ru.urfu.mutual_marker.jpa.entity.Attachment;
-import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.Room;
+вудууе import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -147,21 +143,4 @@ public class ProfileService {
         return newProfile;
     }
 
-    @Transactional
-    public List<Room> getRooms(String email) {
-        Optional<Profile> optional = profileRepository.findByEmail(email);
-        return optional.map(profile -> new ArrayList<>(profile.getRooms())).orElseGet(ArrayList::new);
-    }
-
-    @Transactional
-    public List<Attachment> getAttachments(String email) {
-        Optional<Profile> optional = profileRepository.findByEmail(email);
-        return optional.map(profile -> new ArrayList<>(profile.getAttachments())).orElseGet(ArrayList::new);
-    }
-
-    @Transactional
-    public List<NumberOfGraded> getNumberOfGradedSet(String email) {
-        Optional<Profile> optional = profileRepository.findByEmail(email);
-        return optional.map(profile -> new ArrayList<>(profile.getNumberOfGradedSet())).orElseGet(ArrayList::new);
-    }
 }

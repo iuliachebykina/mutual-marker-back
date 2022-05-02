@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
@@ -18,10 +17,7 @@ import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
-import ru.urfu.mutual_marker.jpa.entity.Attachment;
-import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
@@ -208,21 +204,4 @@ public class ProfileApi {
         }
     }
 
-    @GetMapping("/rooms")
-    public List<Room> getRooms(@CurrentSecurityContext(expression="authentication.principal.username") String email){
-        log.info("Got rooms by user with email: {}", email);
-        return profileService.getRooms(email);
-    }
-
-    @GetMapping("/attachments")
-    public List<Attachment> getAttachments(@CurrentSecurityContext(expression="authentication.principal.username") String email){
-        log.info("Got attachments by user with email: {}", email);
-        return profileService.getAttachments(email);
-    }
-
-    @GetMapping("/number-of-graded-set")
-    public List<NumberOfGraded> getNumberOfGradedSet(@CurrentSecurityContext(expression="authentication.principal.username") String email){
-        log.info("Got number of graded set by user with email: {}", email);
-        return profileService.getNumberOfGradedSet(email);
-    }
 }
