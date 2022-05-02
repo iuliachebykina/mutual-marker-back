@@ -16,7 +16,7 @@ import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.exception.WrongPasswordException;
-вудууе import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
