@@ -55,19 +55,24 @@ public class RoomService {
 
     @Transactional
     public Room updateRoom(Room room){
-        try {
+        try{
             return roomRepository.save(room);
         } catch (Exception e){
-            log.error("Failed to update room, exception message: {}, stacktrace: {}",
-                    e.getLocalizedMessage(), e.getStackTrace());
-            throw new RoomServiceException("Failed to update");
+            log.error("Error while updating room with id {}, error message {}, stacktrace {}", room.getId(), e.getLocalizedMessage(),
+                    e.getStackTrace());
+            throw new RoomServiceException("Failed to update room");
         }
     }
 
     @Transactional
-    public Room deleteRoom(Room room){
+    public Room deleteRoom(Long roomId){
+        Room room = roomRepository.findById(roomId).orElse(null);
+        if (room == null){
+            log.error("Failed to delete room with id {}", roomId);
+            throw new RoomServiceException("Failed to delete room with id" + roomId);
+        }
         room.setDeleted(true);
-        return this.updateRoom(room);
+        return roomRepository.save(room);
     }
 
     @Transactional
