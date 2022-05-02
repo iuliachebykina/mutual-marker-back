@@ -59,9 +59,9 @@ public class RoomApi {
         }
     }
 
-    @DeleteMapping("/room")
+    @DeleteMapping("/room/{roomId}")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteRoom(@RequestParam Long roomId){
+    public ResponseEntity<Room> deleteRoom(@PathVariable Long roomId){
         try{
             return new ResponseEntity<>(roomService.deleteRoom(roomId), HttpStatus.OK);
         } catch (RoomServiceException e){

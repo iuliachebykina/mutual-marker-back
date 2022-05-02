@@ -34,6 +34,7 @@ public class RoomService {
         Room room = roomRepository.findById(roomId).orElse(null);
         if (room == null){
             log.error("Failed to find room with id {}", roomId);
+            throw new RoomServiceException("Failed to find room");
         }
         return room;
     }

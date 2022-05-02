@@ -24,6 +24,9 @@ public class RoomAccessEvaluator {
         Room room = roomService.getRoomById(roomId);
         UserDetails details = (UserDetails)authentication.getPrincipal();
         Profile checked = profileService.getProfileByEmail(details.getUsername());
+        if (checked == null || room == null){
+            return false;
+        }
         return checked.getRooms().contains(room);
     }
 }
