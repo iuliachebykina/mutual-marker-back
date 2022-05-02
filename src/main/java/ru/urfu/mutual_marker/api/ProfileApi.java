@@ -47,7 +47,7 @@ public class ProfileApi {
             return new ResponseEntity<>(adminInfo, HttpStatus.OK);
         }
         catch (Exception e){
-            log.error("cause: {}", e.getMessage());
+            log.error("Failed to gotten admin with email: {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -75,7 +75,7 @@ public class ProfileApi {
             return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
         }
         catch (Exception e){
-            log.error("cause: {}", e.getMessage());
+            log.error("Failed to gotten teacher with email: {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
@@ -103,7 +103,7 @@ public class ProfileApi {
             return new ResponseEntity<>(studentInfo, HttpStatus.OK);
         }
         catch (Exception e){
-            log.error("cause: {}", e.getMessage());
+            log.error("Failed to gotten student with email: {}\ncause: {}", email, e.getMessage());
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
