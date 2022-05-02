@@ -69,6 +69,7 @@ public class Profile {
     Set<Room> rooms = new HashSet<>();
 
     @OneToMany(mappedBy = "profile")
+    @Builder.Default
     @JsonIgnore
     @ToString.Exclude
     Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();

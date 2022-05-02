@@ -37,7 +37,7 @@ public class MarkStep {
     String description;
 
     @OneToMany(mappedBy = "markStep")
-    List<MarkStepValue> values;
+    Set<MarkStepValue> values;
 
     @JsonIgnore
     @Builder.Default
