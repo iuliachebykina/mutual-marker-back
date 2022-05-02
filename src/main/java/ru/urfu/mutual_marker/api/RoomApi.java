@@ -25,7 +25,7 @@ public class RoomApi {
     RoomService roomService;
 
     @GetMapping("/room/{roomId}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)")
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> getRoom(@PathVariable("roomId") Long roomId) {
         try {
             return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
