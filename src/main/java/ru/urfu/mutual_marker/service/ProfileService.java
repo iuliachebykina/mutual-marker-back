@@ -12,6 +12,9 @@ import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.exception.UserExistingException;
 import ru.urfu.mutual_marker.exception.UserNotExistingException;
@@ -23,6 +26,7 @@ import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
@@ -34,10 +38,28 @@ public class ProfileService {
     ProfileMapper  profileMapper;
 
     @Transactional
-    public Profile getProfileByEmail(String email, Role role){
+    Profile getProfileByEmail(String email, Role role){
         Optional<Profile> profile = profileRepository.findByEmail(email);
         profile.ifPresent(value -> checkRole(value.getRole(), role));
-        return profile.orElse(null);
+        return profile.orElseThrow(()-> {
+            throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
+        });
+
+    }
+
+    public TeacherInfo getTeacher(String email){
+        Profile profileByEmail = getProfileByEmail(email);
+        return profileMapper.profileEntityToTeacherDto(profileByEmail);
+    }
+
+    public StudentInfo getStudent(String email){
+        Profile profileByEmail = getProfileByEmail(email);
+        return profileMapper.profileEntityToStudentDto(profileByEmail);
+    }
+
+    public AdminInfo getAdmin(String email){
+        Profile profileByEmail = getProfileByEmail(email);
+        return profileMapper.profileEntityToAdminDto(profileByEmail);
     }
 
     @Transactional
@@ -46,8 +68,30 @@ public class ProfileService {
     }
 
     @Transactional
-    public List<Profile> getAllProfilesByRole(Role role, Pageable pageable){
+    List<Profile> getAllProfilesByRole(Role role, Pageable pageable){
         return profileRepository.findAllByRole(role, pageable);
+    }
+
+
+    public List<TeacherInfo> getAllTeachers(Pageable pageable){
+        return getAllProfilesByRole(Role.ROLE_TEACHER, pageable)
+                .stream()
+                .map(profileMapper::profileEntityToTeacherDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<StudentInfo> getAllStudents(Pageable pageable){
+        return getAllProfilesByRole(Role.ROLE_STUDENT, pageable)
+                .stream()
+                .map(profileMapper::profileEntityToStudentDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<AdminInfo> getAllAdmins(Pageable pageable){
+        return getAllProfilesByRole(Role.ROLE_ADMIN, pageable)
+                .stream()
+                .map(profileMapper::profileEntityToAdminDto)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -144,7 +188,23 @@ public class ProfileService {
     }
 
     @Transactional
-    public List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
+    List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
         return profileRepository.findAllByRoomsIdAndRole(roomId, role, pageable);
     }
+
+    public List<StudentInfo> getStudentsInRoom(Long roomId, Pageable pageable){
+        List<Profile> students = getProfilesInRoom(roomId, Role.ROLE_STUDENT, pageable);
+        return students.stream()
+                .map(profileMapper::profileEntityToStudentDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<TeacherInfo> getTeachersInRoom(Long roomId, Pageable pageable){
+        List<Profile> teachers = getProfilesInRoom(roomId, Role.ROLE_TEACHER, pageable);
+        return teachers.stream()
+                .map(profileMapper::profileEntityToTeacherDto)
+                .collect(Collectors.toList());
+    }
+
+
 }

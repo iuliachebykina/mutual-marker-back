@@ -22,7 +22,6 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/profile")
@@ -37,9 +36,8 @@ public class ProfileApi {
     @GetMapping("/admins/{email}")
     public ResponseEntity<AdminInfo> getAdmin(@PathVariable String email ){
         try {
-            Profile admin = profileService.getProfileByEmail(email, Role.ROLE_ADMIN);
+            AdminInfo adminInfo = profileService.getAdmin(email);
             log.info("Got admin by id: {}", email);
-            AdminInfo adminInfo = profileMapper.profileEntityToAdminDto(admin);
             return new ResponseEntity<>(adminInfo, HttpStatus.OK);
         }
         catch (Exception e){
@@ -53,21 +51,16 @@ public class ProfileApi {
     public List<AdminInfo> getAllAdmins(@RequestParam("page") int page,
                                         @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
-        List<Profile> admins = profileService.getAllProfilesByRole(Role.ROLE_ADMIN, pageable);
         log.info("Got all admins");
-        return admins
-                .stream()
-                .map(profileMapper::profileEntityToAdminDto)
-                .collect(Collectors.toList());
+        return profileService.getAllAdmins(pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/teachers/{email}")
     public ResponseEntity<TeacherInfo> getTeacher(@PathVariable String email){
         try {
-            Profile teacher = profileService.getProfileByEmail(email, Role.ROLE_TEACHER);
+            TeacherInfo teacherInfo = profileService.getTeacher(email);
             log.info("Got teacher by email: {}", email);
-            TeacherInfo teacherInfo = profileMapper.profileEntityToTeacherDto(teacher);
             return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
         }
         catch (Exception e){
@@ -76,26 +69,21 @@ public class ProfileApi {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/teachers", params = { "page", "size" })
     public List<TeacherInfo> getAllTeachers(@RequestParam("page") int page,
                                             @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
-        List<Profile> teachers = profileService.getAllProfilesByRole( Role.ROLE_TEACHER, pageable);
         log.info("Got all teachers");
-        return teachers
-                .stream()
-                .map(profileMapper::profileEntityToTeacherDto)
-                .collect(Collectors.toList());
+        return profileService.getAllTeachers(pageable);
     }
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/students/{email}")
     public ResponseEntity<StudentInfo> getStudent(@PathVariable String email){
         try {
-            Profile student = profileService.getProfileByEmail(email, Role.ROLE_STUDENT);
+            StudentInfo studentInfo = profileService.getStudent(email);
             log.info("Got student by email: {}", email);
-            StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(student);
             return new ResponseEntity<>(studentInfo, HttpStatus.OK);
         }
         catch (Exception e){
@@ -105,17 +93,13 @@ public class ProfileApi {
     }
 
 
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER')")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/students")
     public List<StudentInfo> getAllStudents(@RequestParam("page") int page,
                                             @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
-        List<Profile> students = profileService.getAllProfilesByRole( Role.ROLE_STUDENT,pageable);
         log.info("Got all students");
-        return students
-                .stream()
-                .map(profileMapper::profileEntityToStudentDto)
-                .collect(Collectors.toList());
+        return profileService.getAllStudents(pageable);
     }
 
     @PatchMapping("/students")
@@ -131,7 +115,7 @@ public class ProfileApi {
     }
 
     @PatchMapping("/admins")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#admin.getEmail() == authentication.principal.username")
     public ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
         return updateProfile(admin, Role.ROLE_ADMIN);
     }
@@ -206,20 +190,20 @@ public class ProfileApi {
 
     @GetMapping("/room/students/{roomId}")
     @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
-    public List<Profile> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
+    public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all students in room with id: {}", roomId);
-        return profileService.getProfilesInRoom(roomId, Role.ROLE_STUDENT, pageable);
+        return profileService.getStudentsInRoom(roomId, pageable);
     }
 
     @GetMapping("/room/teachers/{roomId}")
     @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
-    public List<Profile> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
+    public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
-        return profileService.getProfilesInRoom(roomId, Role.ROLE_TEACHER, pageable);
+        return profileService.getTeachersInRoom(roomId, pageable);
     }
 
 }
