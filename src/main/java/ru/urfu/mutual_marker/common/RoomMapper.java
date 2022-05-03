@@ -11,7 +11,6 @@ import ru.urfu.mutual_marker.jpa.entity.Room;
 public interface RoomMapper {
     @Mappings({
             @Mapping(target = "title", source = "title"),
-            @Mapping(target = "code", source = "code")
     })
     Room addRoomDtoToRoom(AddRoomDto addRoomDto);
 }

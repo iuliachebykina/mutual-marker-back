@@ -72,6 +72,7 @@ public class Profile {
     @Builder.Default
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();
 
 

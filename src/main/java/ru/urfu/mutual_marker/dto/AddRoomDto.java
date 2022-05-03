@@ -9,7 +9,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class AddRoomDto {
     String title;
-    String code;
-    Integer maximumUsers;
     Long teacherId;
 }

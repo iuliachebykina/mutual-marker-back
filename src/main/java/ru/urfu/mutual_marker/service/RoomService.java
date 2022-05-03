@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.service;
 
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.RoomMapper;
-import ru.urfu.mutual_marker.dto.EntityToRoomDto;
 import ru.urfu.mutual_marker.dto.AddRoomDto;
+import ru.urfu.mutual_marker.dto.EntityToRoomDto;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
@@ -73,6 +74,8 @@ public class RoomService {
     @Transactional
     public Room addNewRoom(AddRoomDto addRoomDto){
         Room toAdd = roomMapper.addRoomDtoToRoom(addRoomDto);
+        String code = NanoIdUtils.randomNanoId();
+        toAdd.setCode(code);
         if (addRoomDto.getTeacherId() != null) {
             Profile teacher = profileRepository.getById(addRoomDto.getTeacherId());
             toAdd.getTeachers().add(teacher);
