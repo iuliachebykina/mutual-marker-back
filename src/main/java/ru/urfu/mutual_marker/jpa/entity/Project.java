@@ -55,7 +55,6 @@ public class Project {
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     @Builder.Default
     @ToString.Exclude
-    @JsonIgnore
     Set<Attachment> attachments = new HashSet<>();
 
 

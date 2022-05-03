@@ -45,12 +45,10 @@ public class Task {
     @OneToMany(mappedBy = "task")
     @Builder.Default
     @ToString.Exclude
-    @JsonIgnore
     Set<Project> projects = new HashSet<>();
     @ManyToMany(mappedBy = "tasks")
     @Builder.Default
     @ToString.Exclude
-    @JsonIgnore
     Set<MarkStep> markSteps = new HashSet<>();
     @OneToMany(mappedBy = "task")
     @JsonIgnore
