@@ -1,8 +1,8 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -25,7 +25,7 @@ public class MarkStepValue {
     Integer value;
 
     @ManyToOne
-    @JoinColumn(name = "mark_step_id")
+    @JsonIgnore
     MarkStep markStep;
 
     @JsonIgnore

@@ -1,9 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
@@ -55,6 +55,7 @@ public class Task {
     @OneToMany(mappedBy = "task")
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     Set<NumberOfGraded> numberOfGraded = new HashSet<>();
 
     public void addProject(Project project){

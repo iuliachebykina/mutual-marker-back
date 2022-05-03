@@ -71,6 +71,7 @@ public class Profile {
     @OneToMany(mappedBy = "profile")
     @JsonIgnore
     @ToString.Exclude
+    @Builder.Default
     Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();
 
 

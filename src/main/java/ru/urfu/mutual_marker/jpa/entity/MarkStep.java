@@ -1,15 +1,14 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,8 +35,7 @@ public class MarkStep {
     @NotNull
     String description;
 
-    @OneToMany(mappedBy = "markStep")
-    List<MarkStepValue> values;
+
 
     @JsonIgnore
     @Builder.Default
@@ -53,8 +51,12 @@ public class MarkStep {
             inverseJoinColumns = @JoinColumn(name = "task_id"))
     @Builder.Default
     @ToString.Exclude
- @JsonIgnore
+    @JsonIgnore
     Set<Task> tasks = new HashSet<>();
+    @OneToMany(mappedBy = "markStep")
+    @ToString.Exclude
+    @Builder.Default
+    Set<MarkStepValue> values = new HashSet<>();
 
 
     public void addTask(Task task) {
@@ -67,6 +69,18 @@ public class MarkStep {
         if(tasks == null)
             return;
         this.tasks.stream().filter(a -> a.getId() == taskId).findFirst().ifPresent(task -> this.tasks.remove(task));
+    }
+
+    public void addValue(MarkStepValue value) {
+        if(values == null)
+            values = new HashSet<>();
+        values.add(value);
+    }
+
+    public void removeValue(long valueId){
+        if(values == null)
+            return;
+        this.values.stream().filter(a -> a.getId() == valueId).findFirst().ifPresent(value -> this.values.remove(value));
     }
 
 
