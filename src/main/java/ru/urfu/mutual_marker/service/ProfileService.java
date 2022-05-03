@@ -143,4 +143,8 @@ public class ProfileService {
         return newProfile;
     }
 
+    @Transactional
+    public List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
+        return profileRepository.findAllByRoomsIdAndRole(roomId, role, pageable);
+    }
 }

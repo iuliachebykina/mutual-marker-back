@@ -204,4 +204,22 @@ public class ProfileApi {
         }
     }
 
+    @GetMapping("/room/students/{roomId}")
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
+    public List<Profile> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
+                                           @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        log.info("Got all students in room with id: {}", roomId);
+        return profileService.getProfilesInRoom(roomId, Role.ROLE_STUDENT, pageable);
+    }
+
+    @GetMapping("/rooms/teachers/{roomId}")
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
+    public List<Profile> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
+                                           @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        log.info("Got all teachers in room with id: {}", roomId);
+        return profileService.getProfilesInRoom(roomId, Role.ROLE_TEACHER, pageable);
+    }
+
 }
