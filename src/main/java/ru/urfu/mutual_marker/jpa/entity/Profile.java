@@ -20,6 +20,7 @@ import java.util.Set;
 @Setter
 @ToString
 @RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)

@@ -213,7 +213,7 @@ public class ProfileApi {
         return profileService.getProfilesInRoom(roomId, Role.ROLE_STUDENT, pageable);
     }
 
-    @GetMapping("/rooms/teachers/{roomId}")
+    @GetMapping("/room/teachers/{roomId}")
     @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
     public List<Profile> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
