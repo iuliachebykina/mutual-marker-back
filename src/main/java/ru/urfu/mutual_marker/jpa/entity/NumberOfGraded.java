@@ -27,6 +27,8 @@ public class NumberOfGraded {
     @ManyToOne
     Profile profile;
 
+    Integer graded;
+
     @JsonIgnore
     @Builder.Default
     Boolean deleted = Boolean.FALSE;

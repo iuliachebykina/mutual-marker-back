@@ -4,15 +4,21 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
+import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.service.MarkService;
 import ru.urfu.mutual_marker.service.MarkStepService;
+import ru.urfu.mutual_marker.service.NumberOfGradedService;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
@@ -26,6 +32,7 @@ import java.util.List;
 public class MarksApi {
     MarkService markService;
     MarkStepService markStepService;
+    NumberOfGradedService numberOfGradedService;
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_STUDENT' or 'ROLE_TEACHER')")
     @GetMapping("/{projectId}/{studentId}")
@@ -36,6 +43,14 @@ public class MarksApi {
         } catch (MarkServiceException e){
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    
+    @GetMapping(value = "/numberOfGraded", params = { "page", "size" })
+    public List<NumberOfGraded> getAllNumbersOfGraded(@RequestParam("page") int page,
+                                                      @RequestParam("size") int size,
+                                                      @CurrentSecurityContext(expression = "authentication.principal.username") String email){
+        Pageable pageable = PageRequest.of(page, size);
+        return numberOfGradedService.getAllNumbers(email, pageable);
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
