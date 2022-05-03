@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.RoomMapper;
 import ru.urfu.mutual_marker.dto.EntityToRoomDto;
@@ -11,20 +12,23 @@ import ru.urfu.mutual_marker.dto.AddRoomDto;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
+import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class RoomService {
+    //Get many to many repository, acquire all ids and get entities through them
+    //Inefficient but it kinda works i guess, dont wanna sleep but gotta stick to at least some kind of schedule
     RoomRepository roomRepository;
     ProfileRepository profileRepository;
     RoomMapper roomMapper;
@@ -40,8 +44,30 @@ public class RoomService {
     }
 
     @Transactional
-    public List<Room> getAllRooms(){
-        return roomRepository.findAll();
+    public List<Room> getAllRoomsForProfile(Pageable pageable, String email, Role role){
+        try {
+            switch (role){
+                case ROLE_STUDENT:
+                    return getAllRoomsForStudent(pageable, email);
+                case ROLE_TEACHER:
+                    return getAllRoomsForTeacher(pageable, email);
+                default:
+                    throw new RoomServiceException("Role is not recognized");
+            }
+        } catch (Exception e){
+            log.error("Failed to find all rooms which contain profile with role {}, email {}, error {}", role, email, e.getLocalizedMessage());
+            throw new RoomServiceException("Failed to find all rooms for student");
+        }
+    }
+
+    @Transactional
+    public List<Room> getAllRoomsForStudent(Pageable pageable, String studentEmail){
+        return roomRepository.findAllByStudentsEmail(studentEmail, pageable);
+    }
+
+    @Transactional
+    public List<Room> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
+        return roomRepository.findAllByTeachersEmail(teacherEmail, pageable);
     }
 
     @Transactional

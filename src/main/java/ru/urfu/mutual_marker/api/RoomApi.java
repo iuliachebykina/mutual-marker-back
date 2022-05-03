@@ -3,17 +3,24 @@ package ru.urfu.mutual_marker.api;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.EntityToRoomDto;
 import ru.urfu.mutual_marker.dto.AddRoomDto;
 import ru.urfu.mutual_marker.jpa.entity.Room;
+import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.RoomService;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import java.util.List;
+import java.util.Set;
 
 import static ru.urfu.mutual_marker.service.enums.EntityPassedToRoom.*;
 
@@ -34,9 +41,14 @@ public class RoomApi {
         }
     }
 
-    @GetMapping("/rooms")
-    public ResponseEntity<List<Room>> getAllRooms() {
-        return new ResponseEntity<>(roomService.getAllRooms(), HttpStatus.OK);
+    @GetMapping(value = "/rooms", params = { "page", "size" })
+    public List<Room> getAllRooms(@RequestParam("page") int page,
+                                  @RequestParam("size") int size,
+                                  @CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                  @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
+        Pageable pageable = PageRequest.of(page, size);
+        SimpleGrantedAuthority role = roles.stream().findFirst().orElse(null);
+        return roomService.getAllRoomsForProfile(pageable, email, Role.valueOf(role.getAuthority()));
     }
 
     @PostMapping("/room")
