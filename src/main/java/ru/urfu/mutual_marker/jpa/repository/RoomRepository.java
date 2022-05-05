@@ -11,4 +11,5 @@ import java.util.List;
 public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAllByStudentsEmail(String email, Pageable pageable);
     List<Room> findAllByTeachersEmail(String email, Pageable pageable);
+    Room findByCode(String code);
 }
