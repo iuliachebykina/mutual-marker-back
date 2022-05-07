@@ -47,10 +47,12 @@ public class Task {
     @Builder.Default
     @ToString.Exclude
     Set<Project> projects = new HashSet<>();
+
     @ManyToMany(mappedBy = "tasks")
     @Builder.Default
     @ToString.Exclude
     Set<MarkStep> markSteps = new HashSet<>();
+
     @OneToMany(mappedBy = "task")
     @JsonIgnore
     @ToString.Exclude

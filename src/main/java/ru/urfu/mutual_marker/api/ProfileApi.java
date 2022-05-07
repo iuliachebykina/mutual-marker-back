@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
@@ -29,7 +28,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProfileApi {
-    ProfileMapper profileMapper;
     ProfileService profileService;
 
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -91,7 +89,6 @@ public class ProfileApi {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/students")
