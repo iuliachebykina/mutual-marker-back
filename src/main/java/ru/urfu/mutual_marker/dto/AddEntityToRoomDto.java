@@ -4,7 +4,7 @@ import lombok.Data;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 
 @Data
-public class EntityToRoomDto {
-    Object entity;
-    Room room;
+public class AddEntityToRoomDto {
+    Long entityId;
+    String roomCode;
 }
