@@ -28,7 +28,7 @@ public class ProfileDetailsService implements UserDetailsService {
     ProfileService profileService;
 
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        String[] emailAndRole = StringUtils.split(username, "\\");
+        String[] emailAndRole = StringUtils.split(username, "\\", 2);
         String role = emailAndRole[0];
         String email = Arrays.toString(Arrays.stream(emailAndRole).skip(1).toArray());
         Profile user = profileService.getProfileByEmail(emailAndRole[1]);
