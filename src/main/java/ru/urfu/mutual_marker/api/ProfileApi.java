@@ -128,7 +128,6 @@ public class ProfileApi {
         }
     }
 
-
     @PostMapping("/password")
     @PreAuthorize("#changePassword.email == authentication.principal.username")
     private ResponseEntity<Void> updatePassword(@RequestBody ChangePassword changePassword){
@@ -202,5 +201,4 @@ public class ProfileApi {
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
     }
-
 }

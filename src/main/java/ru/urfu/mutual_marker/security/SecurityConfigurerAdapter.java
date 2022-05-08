@@ -1,5 +1,9 @@
 package ru.urfu.mutual_marker.security;
 
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -14,7 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.service.ProfileService;
 
 
 @Configuration
@@ -28,6 +34,32 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
     ProfileDetailsService profileDetailsService;
     PasswordEncoder passwordEncoder;
+    ProfileService profileService;
+
+    static Gson gson = createProfileGsonBuilder();
+
+    private static Gson createProfileGsonBuilder(){
+        GsonBuilder profileBuilder = new GsonBuilder();
+        profileBuilder.addSerializationExclusionStrategy(new ExclusionStrategy() {
+
+            @Override
+            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+
+                return fieldAttributes.getName().equals("deleted")
+                        || fieldAttributes.getName().equals("password")
+                        || fieldAttributes.getName().equals("attachments")
+                        || fieldAttributes.getName().equals("rooms")
+                        || fieldAttributes.getName().equals("numberOfGradedSet");
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> arg0) {
+                return false;
+            }
+        });
+
+        return profileBuilder.create();
+    }
 
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
@@ -64,7 +96,9 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
     private AuthenticationSuccessHandler successHandler() {
         return (httpServletRequest, httpServletResponse, authentication) -> {
-            httpServletResponse.getWriter().append("OK");
+            Profile profile = profileService.getProfileByEmail(authentication.getName());
+            httpServletResponse.setCharacterEncoding("UTF-8");
+            httpServletResponse.getWriter().append(gson.toJson(profile));
             httpServletResponse.setStatus(200);
         };
     }
