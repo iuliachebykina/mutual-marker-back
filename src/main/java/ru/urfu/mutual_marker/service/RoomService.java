@@ -28,7 +28,7 @@ import java.util.List;
 @Slf4j
 public class RoomService {
     RoomRepository roomRepository;
-    ProfileRepository profileRepository;
+    ProfileService profileService;
     RoomMapper roomMapper;
     TaskRepository taskRepository;
 
@@ -85,7 +85,7 @@ public class RoomService {
         String code = NanoIdUtils.randomNanoId();
         toAdd.setCode(code);
         if (addRoomDto.getTeacherId() != null) {
-            Profile teacher = profileRepository.getById(addRoomDto.getTeacherId());
+            Profile teacher = profileService.findById(addRoomDto.getTeacherId());
             toAdd.getTeachers().add(teacher);
         }
         return roomRepository.save(toAdd);
@@ -111,6 +111,12 @@ public class RoomService {
         }
         room.setDeleted(true);
         return roomRepository.save(room);
+    }
+
+    @Transactional
+    public Room addProfile(String email, String roomCode, EntityPassedToRoom entity){
+        Profile profile = profileService.getProfileByEmail(email);
+        return addEntity(profile.getId(), roomCode, entity);
     }
 
     @Transactional
@@ -178,7 +184,7 @@ public class RoomService {
 
     private Room addTeacher(Long teacherId, Room room){
         try{
-            Profile teacher = profileRepository.getById(teacherId);
+            Profile teacher = profileService.getById(teacherId);
             room.addTeacher(teacher);
             return roomRepository.save(room);
         } catch (Exception e){
@@ -190,7 +196,7 @@ public class RoomService {
 
     private Room addStudent(Long studentId, Room room){
         try{
-            Profile student = profileRepository.getById(studentId);
+            Profile student = profileService.getById(studentId);
             room.addStudent(student);
             return roomRepository.save(room);
         } catch (Exception e){

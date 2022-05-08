@@ -23,6 +23,7 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
@@ -45,6 +46,24 @@ public class ProfileService {
             throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
         });
 
+    }
+
+    @Transactional
+    public Profile getById(Long profileId){
+        try {
+            return profileRepository.getById(profileId);
+        } catch (EntityNotFoundException e){
+            log.error("Failed to get reference to profile with id {}", profileId);
+            throw new UserNotExistingException(String.format("User wit id %s not found", profileId));
+        }
+    }
+
+    public Profile findById(Long profileId){
+        Profile profile = profileRepository.findById(profileId).orElse(null);
+        if (profile == null){
+            throw new UserNotExistingException(String.format("Failed to find user with id %s", profileId));
+        }
+        return profile;
     }
 
     public TeacherInfo getTeacher(String email){
