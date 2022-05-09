@@ -26,41 +26,41 @@ public class RegistrationApi {
 
     @PostMapping("/student")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Object> registerStudent(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
             log.info("Registration student (email: {})", student.getEmail());
             return new ResponseEntity<>(student, HttpStatus.CREATED);
         } catch (Exception e) {
             log.info("Failed to registration student with email: {}\ncause: {}", registrationInfo.getEmail(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     
     @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping ("/admin")
-    public ResponseEntity<Profile> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Object> registerAdmin(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile admin = profileService.saveProfile(registrationInfo, Role.ROLE_ADMIN);
             log.info("Registration admin (email: {})", admin.getEmail());
             return new ResponseEntity<>(admin, HttpStatus.CREATED);
         } catch (Exception e) {
             log.info("Failed to registration admin with email: {}\ncause: {}", registrationInfo.getEmail(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PreAuthorize("permitAll()")
     @PostMapping ("/teacher")
-    public ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
+    public ResponseEntity<Object> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile teacher = profileService.saveProfile(registrationInfo, Role.ROLE_TEACHER);
             log.info("Registration teacher (email: {})", teacher.getEmail());
             return new ResponseEntity<>(teacher, HttpStatus.CREATED);
         } catch (Exception e) {
             log.info("Failed to registration teacher with email: {}\ncause: {}", registrationInfo.getEmail(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
