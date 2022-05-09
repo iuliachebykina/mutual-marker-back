@@ -81,7 +81,8 @@ public class RoomService {
 
     @Transactional
     public Room addNewRoom(AddRoomDto addRoomDto){
-        Room toAdd = roomMapper.addRoomDtoToRoom(addRoomDto);
+        Room toAdd = new Room();
+        toAdd.setTitle(addRoomDto.getTitle());
         String code = NanoIdUtils.randomNanoId();
         toAdd.setCode(code);
         if (addRoomDto.getTeacherId() != null) {
