@@ -25,7 +25,7 @@ public class RegistrationApi {
     ProfileService profileService;
 
     @PostMapping("/student")
-    @PreAuthorize("!isAuthenticated()")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Profile> registerStudent(@RequestBody RegistrationInfo registrationInfo){
         try {
             Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
@@ -51,7 +51,7 @@ public class RegistrationApi {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("permitAll()")
     @PostMapping ("/teacher")
     public ResponseEntity<Profile> registerTeacher(@RequestBody RegistrationInfo registrationInfo){
         try {
