@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.urfu.mutual_marker.common.ProfileMapper;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
@@ -29,12 +28,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class ProfileApi {
-    ProfileMapper profileMapper;
     ProfileService profileService;
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins/{email}")
-    public ResponseEntity<AdminInfo> getAdmin(@PathVariable String email ){
+    public ResponseEntity<Object> getAdmin(@PathVariable String email ){
         try {
             AdminInfo adminInfo = profileService.getAdmin(email);
             log.info("Got admin by id: {}", email);
@@ -42,7 +40,7 @@ public class ProfileApi {
         }
         catch (Exception e){
             log.error("Failed to gotten admin with email: {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -57,7 +55,7 @@ public class ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/teachers/{email}")
-    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable String email){
+    public ResponseEntity<Object> getTeacher(@PathVariable String email){
         try {
             TeacherInfo teacherInfo = profileService.getTeacher(email);
             log.info("Got teacher by email: {}", email);
@@ -65,7 +63,7 @@ public class ProfileApi {
         }
         catch (Exception e){
             log.error("Failed to gotten teacher with email: {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -80,7 +78,7 @@ public class ProfileApi {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/students/{email}")
-    public ResponseEntity<StudentInfo> getStudent(@PathVariable String email){
+    public ResponseEntity<Object> getStudent(@PathVariable String email){
         try {
             StudentInfo studentInfo = profileService.getStudent(email);
             log.info("Got student by email: {}", email);
@@ -88,10 +86,9 @@ public class ProfileApi {
         }
         catch (Exception e){
             log.error("Failed to gotten student with email: {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/students")
@@ -104,87 +101,86 @@ public class ProfileApi {
 
     @PatchMapping("/students")
     @PreAuthorize("#student.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Profile> updateStudent(@RequestBody Profile student){
+    public ResponseEntity<Object> updateStudent(@RequestBody Profile student){
         return updateProfile(student, Role.ROLE_STUDENT);
     }
 
     @PatchMapping("/teachers")
     @PreAuthorize("#teacher.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Profile> updateTeacher(@RequestBody Profile teacher){
+    public ResponseEntity<Object> updateTeacher(@RequestBody Profile teacher){
         return updateProfile(teacher, Role.ROLE_TEACHER);
     }
 
     @PatchMapping("/admins")
     @PreAuthorize("#admin.getEmail() == authentication.principal.username")
-    public ResponseEntity<Profile> updateAdmin(@RequestBody Profile admin){
+    public ResponseEntity<Object> updateAdmin(@RequestBody Profile admin){
         return updateProfile(admin, Role.ROLE_ADMIN);
     }
 
-    private ResponseEntity<Profile> updateProfile(Profile profile, Role role){
+    private ResponseEntity<Object> updateProfile(Profile profile, Role role){
         try {
             Profile newAdmin = profileService.updateProfile(profile, role);
             log.info("Updated profile with id: {}", profile.getId());
             return new ResponseEntity<>(newAdmin, HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to update profile with id: {}\ncause: {}", profile.getId(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-
     @PostMapping("/password")
     @PreAuthorize("#changePassword.email == authentication.principal.username")
-    private ResponseEntity<Void> updatePassword(@RequestBody ChangePassword changePassword){
+    private ResponseEntity<Object> updatePassword(@RequestBody ChangePassword changePassword){
         try {
             profileService.updatePassword(changePassword);
             log.info("Updated user's password with email: {}", changePassword.getEmail());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to update user's password with email: {}\ncause: {}", changePassword.getEmail(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/email")
     @PreAuthorize("#changeEmail.oldEmail == authentication.principal.username")
-    private ResponseEntity<Void> updateEmail(@RequestBody ChangeEmail changeEmail){
+    private ResponseEntity<Object> updateEmail(@RequestBody ChangeEmail changeEmail){
         try {
             profileService.updateEmail(changeEmail);
             log.info("Updated user's email: {}", changeEmail.getOldEmail());
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to update user's email: {}\ncause: {}", changeEmail.getOldEmail(), e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
 
     @DeleteMapping("/students/{email}")
     @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteStudent(@PathVariable String email){
+    public ResponseEntity<Object> deleteStudent(@PathVariable String email){
         return deleteProfile(email, Role.ROLE_STUDENT);
     }
 
     @DeleteMapping("/teachers/{email}")
     @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable String email){
+    public ResponseEntity<Object> deleteTeacher(@PathVariable String email){
         return deleteProfile(email, Role.ROLE_TEACHER);
     }
 
     @DeleteMapping("/admins/{email}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteAdmin(@PathVariable String email){
+    public ResponseEntity<Object> deleteAdmin(@PathVariable String email){
         return deleteProfile(email, Role.ROLE_ADMIN);
     }
 
-    private ResponseEntity<Void> deleteProfile(String email, Role role) {
+    private ResponseEntity<Object> deleteProfile(String email, Role role) {
         try {
             profileService.deleteProfile(email, role);
             log.info("Deleted user with email: {}", email);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
             log.error("Failed to delete user with email : {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -205,5 +201,4 @@ public class ProfileApi {
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
     }
-
 }

@@ -54,6 +54,7 @@ public class MarkStep {
     @ToString.Exclude
     @JsonIgnore
     Set<Task> tasks = new HashSet<>();
+
     @OneToMany(mappedBy = "markStep")
     @ToString.Exclude
     @Builder.Default

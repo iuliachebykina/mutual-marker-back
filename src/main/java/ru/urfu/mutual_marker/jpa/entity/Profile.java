@@ -51,7 +51,6 @@ public class Profile {
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
 
-
     @OneToMany(mappedBy = "student")
     @JsonIgnore
     @Builder.Default
@@ -74,7 +73,6 @@ public class Profile {
     @JsonIgnore
     @ToString.Exclude
     Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();
-
 
     public void addAttachment(Attachment attachment){
         if(attachments == null)
@@ -111,7 +109,6 @@ public class Profile {
             return;
         this.numberOfGradedSet.stream().filter(a -> a.getId() == numberOfGradedId).findFirst().ifPresent(numberOfGraded -> this.numberOfGradedSet.remove(numberOfGraded));
     }
-
 
     @Override
     public boolean equals(Object o) {

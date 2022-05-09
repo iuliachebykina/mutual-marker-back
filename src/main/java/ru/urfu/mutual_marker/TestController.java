@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.urfu.mutual_marker.dto.RegistrationInfo;
-import ru.urfu.mutual_marker.exception.UserExistingException;
+import ru.urfu.mutual_marker.security.exception.UserExistingException;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Room;

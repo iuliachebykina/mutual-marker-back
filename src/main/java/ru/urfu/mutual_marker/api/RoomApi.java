@@ -31,21 +31,21 @@ public class RoomApi {
 
     @GetMapping("/room/{roomId}")
     @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> getRoom(@PathVariable("roomId") Long roomId) {
+    public ResponseEntity<Object> getRoom(@PathVariable("roomId") Long roomId) {
         try {
             return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
         } catch (RoomServiceException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/room/{roomCode}")
     @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomCode))")
-    public ResponseEntity<Room> getRoomByCode(@PathVariable("roomCode") String roomCode){
+    public ResponseEntity<Object> getRoomByCode(@PathVariable("roomCode") String roomCode){
         try{
             return new ResponseEntity<>(roomService.getRoomByCode(roomCode), HttpStatus.OK);
         } catch (Exception e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -61,129 +61,129 @@ public class RoomApi {
 
     @PostMapping("/room")
     @PreAuthorize("hasAnyRole('ROLE_TEACHER', 'ROLE_ADMIN')")
-    public ResponseEntity<Room> addRoom(@RequestBody AddRoomDto addRoomDto) {
+    public ResponseEntity<Object> addRoom(@RequestBody AddRoomDto addRoomDto) {
         try {
             return new ResponseEntity<>(roomService.addNewRoom(addRoomDto), HttpStatus.OK);
         } catch (RoomServiceException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/room")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#room.id)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> updateRoom(@RequestBody Room room){
+    public ResponseEntity<Object> updateRoom(@RequestBody Room room){
         try{
             return new ResponseEntity<>(roomService.updateRoom(room), HttpStatus.OK);
         } catch (RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/room/{roomId}")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteRoom(@PathVariable Long roomId){
+    public ResponseEntity<Object> deleteRoom(@PathVariable Long roomId){
         try{
             return new ResponseEntity<>(roomService.deleteRoom(roomId), HttpStatus.OK);
         } catch (RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping("/teacher/")
+    @PutMapping("/teacher")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> addTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> addTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     TEACHER),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/teacher/{roomCode}")
-    public ResponseEntity<Room> selfAddTeacher(@CurrentSecurityContext(expression = "authentication.principal.username") String email,
+    public ResponseEntity<Object> selfAddTeacher(@CurrentSecurityContext(expression = "authentication.principal.username") String email,
                                                @PathVariable String roomCode){
         try{
             return new ResponseEntity<>(roomService.addProfile(email, roomCode, TEACHER), HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/student")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> addStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> addStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     STUDENT),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/student/{roomCode}")
-    public ResponseEntity<Room> selfAddStudent(@PathVariable String roomCode,
+    public ResponseEntity<Object> selfAddStudent(@PathVariable String roomCode,
                                                @CurrentSecurityContext(expression = "authentication.principal.username") String email){
         try{
             return new ResponseEntity<>(roomService.addProfile(email, roomCode, STUDENT), HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/task")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> addTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> addTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     TASK),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/teacher")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> deleteTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     TEACHER),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/student")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> deleteStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     STUDENT),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/task")
     @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
+    public ResponseEntity<Object> deleteTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto){
         try{
             return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(),
                     addEntityToRoomDto.getRoomCode(),
                     TASK),
                     HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
