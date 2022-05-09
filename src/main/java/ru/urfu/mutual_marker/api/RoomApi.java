@@ -60,6 +60,7 @@ public class RoomApi {
     }
 
     @GetMapping(value = "/rooms/teacher/{teacherEmail}", params = {"page", "size"})
+    @PreAuthorize("(hasAnyRole('ROLE_TEACHER'))")
     public List<Room> getAllRoomsTeacher(@RequestParam("page") int page,
                                       @RequestParam("size") int size,
                                       @PathVariable String teacherEmail){
@@ -68,6 +69,7 @@ public class RoomApi {
     }
 
     @GetMapping(value = "/rooms/student/{studentEmail}", params = {"page", "size"})
+    @PreAuthorize("(hasRole('ROLE_STUDENT'))")
     public List<Room> getAllRoomsStudent(@RequestParam("page") int page,
                                          @RequestParam("size") int size,
                                          @PathVariable String studentEmail){
