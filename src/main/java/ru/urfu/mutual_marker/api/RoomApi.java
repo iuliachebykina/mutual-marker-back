@@ -59,12 +59,20 @@ public class RoomApi {
         return roomService.getAllRoomsForProfile(pageable, email, Role.valueOf(role.getAuthority()));
     }
 
-    @GetMapping(value = "/rooms/{teacherEmail}", params = {"page", "size"})
-    public List<Room> getAllRoomsTest(@RequestParam("page") int page,
+    @GetMapping(value = "/rooms/teacher/{teacherEmail}", params = {"page", "size"})
+    public List<Room> getAllRoomsTeacher(@RequestParam("page") int page,
                                       @RequestParam("size") int size,
                                       @PathVariable String teacherEmail){
         Pageable pageable = PageRequest.of(page, size);
         return roomService.getAllRoomsForProfile(pageable, teacherEmail, Role.ROLE_TEACHER);
+    }
+
+    @GetMapping(value = "/rooms/student/{studentEmail}", params = {"page", "size"})
+    public List<Room> getAllRoomsStudent(@RequestParam("page") int page,
+                                         @RequestParam("size") int size,
+                                         @PathVariable String studentEmail){
+        Pageable pageable = PageRequest.of(page, size);
+        return roomService.getAllRoomsForProfile(pageable, studentEmail, Role.ROLE_STUDENT);
     }
 
     @PostMapping("/room")
