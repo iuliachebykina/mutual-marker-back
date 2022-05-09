@@ -102,10 +102,11 @@ public class RoomApi {
         }
     }
 
-    @PostMapping("/student/{teacherId}/{roomCode}")
-    public ResponseEntity<Object> selfAddTeacher(@PathVariable Long teacherId, @PathVariable String roomCode){
+    @PostMapping("/teacher/{roomCode}")
+    public ResponseEntity<Object> selfAddTeacher(@CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                               @PathVariable String roomCode){
         try{
-            return new ResponseEntity<>(roomService.addEntity(teacherId, roomCode, TEACHER), HttpStatus.OK);
+            return new ResponseEntity<>(roomService.addProfile(email, roomCode, TEACHER), HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -124,10 +125,11 @@ public class RoomApi {
         }
     }
 
-    @PostMapping("/student/{studentId}/{roomCode}")
-    public ResponseEntity<Object> selfAddStudent(@PathVariable Long studentId, @PathVariable String roomCode){
+    @PostMapping("/student/{roomCode}")
+    public ResponseEntity<Object> selfAddStudent(@PathVariable String roomCode,
+                                               @CurrentSecurityContext(expression = "authentication.principal.username") String email){
         try{
-            return new ResponseEntity<>(roomService.addEntity(studentId, roomCode, STUDENT), HttpStatus.OK);
+            return new ResponseEntity<>(roomService.addProfile(email, roomCode, STUDENT), HttpStatus.OK);
         } catch (IllegalArgumentException | RoomServiceException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
