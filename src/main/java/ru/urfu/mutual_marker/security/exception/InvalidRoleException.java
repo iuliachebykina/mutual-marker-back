@@ -1,7 +1,9 @@
 package ru.urfu.mutual_marker.security.exception;
 
-public class InvalidRoleException extends RuntimeException{
-    public InvalidRoleException(String message){
+import ru.urfu.mutual_marker.exception.MutualMarkerApiException;
+
+public class InvalidRoleException extends MutualMarkerApiException {
+    public InvalidRoleException(String message) {
         super(message);
     }
 

@@ -27,14 +27,11 @@ public class RegistrationApi {
     @PostMapping("/student")
     @PreAuthorize("permitAll()")
     public ResponseEntity<Object> registerStudent(@RequestBody RegistrationInfo registrationInfo){
-        try {
-            Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
-            log.info("Registration student (email: {})", student.getEmail());
-            return new ResponseEntity<>(student, HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.info("Failed to registration student with email: {}\ncause: {}", registrationInfo.getEmail(), e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+
+        Profile student = profileService.saveProfile(registrationInfo, Role.ROLE_STUDENT);
+        log.info("Registration student (email: {})", student.getEmail());
+        return new ResponseEntity<>(student, HttpStatus.CREATED);
+
     }
     
     

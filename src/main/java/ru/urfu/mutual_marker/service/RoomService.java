@@ -16,6 +16,7 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
+import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import javax.transaction.Transactional;
@@ -132,7 +133,7 @@ public class RoomService {
                 return addTeacher(entityId, room);
         }
         log.error("Failed to recognize type of entity passed to add entity room method");
-        throw new IllegalArgumentException("Failed to recognize type of entity passed to add entity");
+        throw new InvalidArgumentException("Failed to recognize type of entity passed to add entity");
     }
 
     @Transactional
