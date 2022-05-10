@@ -4,5 +4,11 @@
       "name": "spring.application.schema",
       "type": "java.lang.String",
       "description": "Default schema."
-  }
-] }
+    },
+    {
+      "name": "mutual-marker.filepath",
+      "type": "java.lang.String",
+      "description": "Filepath to attachments."
+    }
+  ]
+}

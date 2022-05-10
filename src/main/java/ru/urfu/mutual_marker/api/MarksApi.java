@@ -18,8 +18,6 @@ import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.service.MarkService;
 import ru.urfu.mutual_marker.service.MarkStepService;
 import ru.urfu.mutual_marker.service.NumberOfGradedService;
-import ru.urfu.mutual_marker.service.exception.MarkServiceException;
-import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
 import java.util.List;
 
@@ -35,13 +33,11 @@ public class MarksApi {
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_STUDENT' or 'ROLE_TEACHER')")
     @GetMapping("/{projectId}/{studentId}")
-    public ResponseEntity<Object> getStudentMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId){
-        try {
-            Mark mark = markService.findMarkByProjectAndStudentIds(projectId, studentId);
-            return new ResponseEntity<>(mark, HttpStatus.OK);
-        } catch (MarkServiceException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Mark> getStudentMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId) {
+
+        Mark mark = markService.findMarkByProjectAndStudentIds(projectId, studentId);
+        return new ResponseEntity<>(mark, HttpStatus.OK);
+
     }
     
     @GetMapping(value = "/numberOfGraded", params = { "page", "size" })
@@ -54,14 +50,11 @@ public class MarksApi {
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
     @DeleteMapping("/{projectId}/{studentId}")
-    public ResponseEntity<Object> deleteMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId){
-        try{
-            Mark deleted = markService.deleteMarkOnProjectForStudent(projectId, studentId);
-            return new ResponseEntity<>(deleted, HttpStatus.OK);
-        } catch (MarkServiceException e){
-            log.error("Failed to delete mark for project with id {}", projectId);
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Mark> deleteMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId) {
+
+        Mark deleted = markService.deleteMarkOnProjectForStudent(projectId, studentId);
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
+
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
@@ -84,13 +77,10 @@ public class MarksApi {
 
     @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
     @DeleteMapping("/{markStepId}")
-    public ResponseEntity<Object> deleteMarkStep(@PathVariable Long markStepId){
-        try{
-            MarkStep deleted = markStepService.deleteMarkStep(markStepId);
-            return new ResponseEntity<>(deleted, HttpStatus.OK);
-        } catch (MarkStepServiceException e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<MarkStep> deleteMarkStep(@PathVariable Long markStepId) {
+
+        MarkStep deleted = markStepService.deleteMarkStep(markStepId);
+        return new ResponseEntity<>(deleted, HttpStatus.OK);
     }
 
     @GetMapping("/{projectId}")

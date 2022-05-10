@@ -4,7 +4,7 @@ spring:
     name: mutual-marker
     schema: mutual_marker
   datasource:
-    url: jdbc:postgresql://${POSTGES_HOST}
+    url: jdbc:postgresql://${POSTGRES_HOST}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
   flyway:
