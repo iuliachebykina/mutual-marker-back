@@ -17,9 +17,7 @@ import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,12 +33,13 @@ public class AttachmentService {
     FileStorageService fileStorageService;
 
     @Transactional
-    public void uploadAttachments(UserDetails principal, MultipartFile[] files) {
+    public List<String> uploadAttachments(UserDetails principal, MultipartFile[] files) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
-
+        var filenames = new ArrayList<String>();
         for (var file : files) {
             var filename = generateFilename(Objects.requireNonNull(file.getOriginalFilename()));
+            filenames.add(filename);
             var attachment = Attachment.builder()
                     .fileName(filename)
                     .contentType(file.getContentType())
@@ -49,6 +48,7 @@ public class AttachmentService {
             fileStorageService.save(file, filename);
             attachmentRepository.save(attachment);
         }
+        return filenames;
     }
 
     public ResponseEntity downloadFile(String filename) {

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.service.AttachmentService;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(value = "api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -25,8 +27,8 @@ public class AttachmentApi {
 
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
-    public void uploadAttachment(Authentication authentication, @RequestParam("files") MultipartFile[] files) {
-        attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), files);
+    public List<String> uploadAttachment(Authentication authentication, @RequestParam("files") MultipartFile[] files) {
+        return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), files);
     }
 
     @Operation(summary = "Добавление вложений", description = "Добавляет вложения в уже созданный проект")
