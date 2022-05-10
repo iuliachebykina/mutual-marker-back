@@ -92,4 +92,13 @@ public class MarksApi {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/{projectId}")
+    public ResponseEntity<Object> getAllMarksForProject(@PathVariable Long projectId){
+        try{
+            return new ResponseEntity<>(markService.getAllMarksForProject(projectId), HttpStatus.OK);
+        } catch (MarkServiceException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

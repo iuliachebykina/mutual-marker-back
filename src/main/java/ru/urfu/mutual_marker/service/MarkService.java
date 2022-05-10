@@ -6,13 +6,16 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
+import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
+import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Data
@@ -20,6 +23,7 @@ import java.util.List;
 @Slf4j
 public class MarkService {
     MarkRepository markRepository;
+    ProjectRepository projectRepository;
 
     @Transactional
     public Mark saveMark(Mark mark){
@@ -38,6 +42,16 @@ public class MarkService {
         truncation = truncation.setScale(0, RoundingMode.HALF_UP);
         mark.setMarkValue(truncation.intValue());
         return markRepository.save(mark);
+    }
+
+    @Transactional
+    public Set<Mark> getAllMarksForProject(Long projectId){
+        Project project = projectRepository.findById(projectId).orElse(null);
+        if (project == null){
+            log.error("Failed to get all marks for project with id {}", projectId);
+            throw new MarkServiceException(String.format("Failed to obtain marks for project with %s", projectId));
+        }
+        return project.getMarks();
     }
 
     @Transactional
