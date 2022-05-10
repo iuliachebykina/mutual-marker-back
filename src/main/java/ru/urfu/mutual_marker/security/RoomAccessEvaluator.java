@@ -29,4 +29,9 @@ public class RoomAccessEvaluator {
         }
         return checked.getRooms().contains(room);
     }
+
+    public boolean isMemberOfRoom(String roomCode){
+        Room room = roomService.getRoomByCode(roomCode);
+        return isMemberOfRoom(room.getId());
+    }
 }

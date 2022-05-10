@@ -29,17 +29,17 @@ import static ru.urfu.mutual_marker.service.enums.EntityPassedToRoom.*;
 public class RoomApi {
     RoomService roomService;
 
-//    @GetMapping("/room/{roomId}")
-//    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
-//    public ResponseEntity<Object> getRoom(@PathVariable("roomId") Long roomId) {
-//        try {
-//            return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
-//        } catch (RoomServiceException e) {
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    @GetMapping("/room-by-id/{roomId}")
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomId)) or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> getRoom(@PathVariable("roomId") Long roomId) {
+        try {
+            return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
+        } catch (RoomServiceException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
-    @GetMapping("/room/{roomCode}")
+    @GetMapping("/room-by-code/{roomCode}")
     @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoom(#roomCode) or hasRole('ROLE_ADMIN'))")
     public ResponseEntity<Object> getRoomByCode(@PathVariable("roomCode") String roomCode){
         try{
@@ -57,24 +57,6 @@ public class RoomApi {
         Pageable pageable = PageRequest.of(page, size);
         SimpleGrantedAuthority role = roles.stream().findFirst().orElse(null);
         return roomService.getAllRoomsForProfile(pageable, email, Role.valueOf(role.getAuthority()));
-    }
-
-    @GetMapping(value = "/rooms/teacher/{teacherEmail}", params = {"page", "size"})
-    @PreAuthorize("(hasAnyRole('ROLE_TEACHER'))")
-    public List<Room> getAllRoomsTeacher(@RequestParam("page") int page,
-                                      @RequestParam("size") int size,
-                                      @PathVariable String teacherEmail){
-        Pageable pageable = PageRequest.of(page, size);
-        return roomService.getAllRoomsForProfile(pageable, teacherEmail, Role.ROLE_TEACHER);
-    }
-
-    @GetMapping(value = "/rooms/student/{studentEmail}", params = {"page", "size"})
-    @PreAuthorize("(hasRole('ROLE_STUDENT'))")
-    public List<Room> getAllRoomsStudent(@RequestParam("page") int page,
-                                         @RequestParam("size") int size,
-                                         @PathVariable String studentEmail){
-        Pageable pageable = PageRequest.of(page, size);
-        return roomService.getAllRoomsForProfile(pageable, studentEmail, Role.ROLE_STUDENT);
     }
 
     @PostMapping("/room")
