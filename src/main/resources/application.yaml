@@ -26,4 +26,4 @@ springdoc:
     path: /api-docs
 
 mutual-marker:
-  filepath: "/Users/serana/Documents/mutual"
+  filepath: # Path to directory where files should be placed
