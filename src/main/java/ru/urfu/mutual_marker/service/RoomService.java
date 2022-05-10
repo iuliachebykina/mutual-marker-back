@@ -13,7 +13,6 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
@@ -88,6 +87,7 @@ public class RoomService {
         if (addRoomDto.getTeacherId() != null) {
             Profile teacher = profileService.findById(addRoomDto.getTeacherId());
             toAdd.getTeachers().add(teacher);
+            teacher.addRoom(toAdd);
         }
         return roomRepository.save(toAdd);
     }
