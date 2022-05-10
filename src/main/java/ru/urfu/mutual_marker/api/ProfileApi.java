@@ -1,6 +1,7 @@
 package ru.urfu.mutual_marker.api;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,7 +18,6 @@ import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 import java.util.List;
@@ -30,20 +30,16 @@ import java.util.List;
 public class ProfileApi {
     ProfileService profileService;
 
+    @Operation(summary = "Получение инфы об админе по почте")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping("/admins/{email}")
-    public ResponseEntity<Object> getAdmin(@PathVariable String email ){
-        try {
-            AdminInfo adminInfo = profileService.getAdmin(email);
-            log.info("Got admin by id: {}", email);
-            return new ResponseEntity<>(adminInfo, HttpStatus.OK);
-        }
-        catch (Exception e){
-            log.error("Failed to gotten admin with email: {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<AdminInfo> getAdmin(@PathVariable String email) {
+        AdminInfo adminInfo = profileService.getAdmin(email);
+        log.info("Got admin by id: {}", email);
+        return new ResponseEntity<>(adminInfo, HttpStatus.OK);
     }
 
+    @Operation(summary = "Получение инфы обо всех админах")
     @PreAuthorize("hasAnyRole('ADMIN')")
     @GetMapping(value = "/admins", params = { "page", "size" })
     public List<AdminInfo> getAllAdmins(@RequestParam("page") int page,
@@ -53,20 +49,18 @@ public class ProfileApi {
         return profileService.getAllAdmins(pageable);
     }
 
+    @Operation(summary = "Получение инфы об учителе по почте")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/teachers/{email}")
-    public ResponseEntity<Object> getTeacher(@PathVariable String email){
-        try {
-            TeacherInfo teacherInfo = profileService.getTeacher(email);
-            log.info("Got teacher by email: {}", email);
-            return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
-        }
-        catch (Exception e){
-            log.error("Failed to gotten teacher with email: {}\ncause: {}", email, e.getMessage());
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable String email) {
+
+        TeacherInfo teacherInfo = profileService.getTeacher(email);
+        log.info("Got teacher by email: {}", email);
+        return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
+
     }
 
+    @Operation(summary = "Получение инфы обо всех учителях")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/teachers", params = { "page", "size" })
     public List<TeacherInfo> getAllTeachers(@RequestParam("page") int page,
@@ -76,9 +70,10 @@ public class ProfileApi {
         return profileService.getAllTeachers(pageable);
     }
 
+    @Operation(summary = "Получение инфы о студенте по почте")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/students/{email}")
-    public ResponseEntity<Object> getStudent(@PathVariable String email){
+    public ResponseEntity<StudentInfo> getStudent(@PathVariable String email) {
 
         StudentInfo studentInfo = profileService.getStudent(email);
         log.info("Got student by email: {}", email);
@@ -86,6 +81,7 @@ public class ProfileApi {
 
     }
 
+    @Operation(summary = "Получение инфы о всех студентах")
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/students")
     public List<StudentInfo> getAllStudents(@RequestParam("page") int page,
@@ -95,79 +91,48 @@ public class ProfileApi {
         return profileService.getAllStudents(pageable);
     }
 
-    @PatchMapping("/students")
-    @PreAuthorize("#student.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> updateStudent(@RequestBody Profile student){
-        return updateProfile(student, Role.ROLE_STUDENT);
-    }
 
-    @PatchMapping("/teachers")
-    @PreAuthorize("#teacher.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> updateTeacher(@RequestBody Profile teacher) {
-        return updateProfile(teacher, Role.ROLE_TEACHER);
-    }
-
-    @PatchMapping("/admins")
-    @PreAuthorize("#admin.getEmail() == authentication.principal.username")
-    public ResponseEntity<Object> updateAdmin(@RequestBody Profile admin) {
-        return updateProfile(admin, Role.ROLE_ADMIN);
-    }
-
-    private ResponseEntity<Object> updateProfile(Profile profile, Role role) {
-
-        Profile newAdmin = profileService.updateProfile(profile, role);
+    @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
+    @PatchMapping()
+    @PreAuthorize("#profile.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    public ResponseEntity<Profile> updateAdmin(@RequestBody Profile profile) {
+        Profile newProfile = profileService.updateProfile(profile);
         log.info("Updated profile with id: {}", profile.getId());
-        return new ResponseEntity<>(newAdmin, HttpStatus.OK);
-
+        return new ResponseEntity<>(newProfile, HttpStatus.OK);
     }
 
-    @PostMapping("/password")
-    @PreAuthorize("#changePassword.email == authentication.principal.username")
-    private ResponseEntity<Object> updatePassword(@RequestBody ChangePassword changePassword) {
 
+    @Operation(summary = "Обновление пароля авторизованного пользователя")
+    @PostMapping("/password")
+    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    private ResponseEntity<Profile> updatePassword(@RequestBody ChangePassword changePassword) {
         profileService.updatePassword(changePassword);
         log.info("Updated user's password with email: {}", changePassword.getEmail());
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
+    @Operation(summary = "Обновление почты авторизованного пользователя")
     @PostMapping("/email")
-    @PreAuthorize("#changeEmail.oldEmail == authentication.principal.username")
-    private ResponseEntity<Object> updateEmail(@RequestBody ChangeEmail changeEmail) {
-
+    @PreAuthorize("#changeEmail.oldEmail == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    private ResponseEntity<Profile> updateEmail(@RequestBody ChangeEmail changeEmail) {
         profileService.updateEmail(changeEmail);
         log.info("Updated user's email: {}", changeEmail.getOldEmail());
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
-
-    @DeleteMapping("/students/{email}")
+    @Operation(summary = "Удаление профиля по почте. Может удалять сам пользователь или администратор")
+    @DeleteMapping("/{email}")
     @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteStudent(@PathVariable String email){
-        return deleteProfile(email, Role.ROLE_STUDENT);
-    }
-
-    @DeleteMapping("/teachers/{email}")
-    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteTeacher(@PathVariable String email){
-        return deleteProfile(email, Role.ROLE_TEACHER);
-    }
-
-    @DeleteMapping("/admins/{email}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> deleteAdmin(@PathVariable String email){
-        return deleteProfile(email, Role.ROLE_ADMIN);
-    }
-
-    private ResponseEntity<Object> deleteProfile(String email, Role role) {
-
-        profileService.deleteProfile(email, role);
+    public ResponseEntity<Profile> deleteProfile(@PathVariable String email) {
+        profileService.deleteProfile(email);
         log.info("Deleted user with email: {}", email);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
 
+    @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
     @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
     public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
@@ -177,6 +142,7 @@ public class ProfileApi {
         return profileService.getStudentsInRoom(roomId, pageable);
     }
 
+    @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
     @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
     public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
