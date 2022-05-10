@@ -17,7 +17,6 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -39,7 +38,9 @@ public class Task {
     @ManyToOne
     Room room;
     @JsonIgnore
-    Boolean deleted;
+    @Builder.Default
+    Boolean deleted = Boolean.FALSE;
+
     @Column(name = "min_graded")
     Integer minNumberOfGraded;
 
@@ -86,6 +87,12 @@ public class Task {
             this.markSteps.remove(markStep);
             markStep.getTasks().remove(this);
         }
+    }
+
+
+    public void delete() {
+        this.deleted = true;
+        this.markSteps.forEach(MarkStep::delete);
     }
 
     @Override

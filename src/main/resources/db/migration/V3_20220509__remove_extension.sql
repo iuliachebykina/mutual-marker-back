@@ -1,0 +1,5 @@
+ALTER TABLE attachment
+DROP COLUMN IF EXISTS extension;
+
+ALTER TABLE attachment
+ADD COLUMN IF NOT EXISTS content_type VARCHAR;

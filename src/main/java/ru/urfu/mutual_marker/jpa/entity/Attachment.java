@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
-import ru.urfu.mutual_marker.jpa.entity.value_type.Extension;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -17,7 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -30,7 +28,7 @@ public class Attachment {
     Long id;
     @NotNull
     String fileName;
-    Extension extension;
+    String contentType;
     @NotNull
     @ManyToOne
     Profile student;

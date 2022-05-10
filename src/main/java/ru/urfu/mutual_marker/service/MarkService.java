@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
-import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;

@@ -29,6 +29,16 @@ public class MarkStepValue {
     MarkStep markStep;
 
     @JsonIgnore
+    @Builder.Default
     @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    Boolean deleted = Boolean.FALSE;
+
+    public MarkStepValue(Integer value) {
+        this.value = value;
+        this.deleted = false;
+    }
+
+    public void delete() {
+        this.deleted = true;
+    }
 }

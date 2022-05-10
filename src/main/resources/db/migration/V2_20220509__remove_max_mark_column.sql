@@ -1,0 +1,2 @@
+ALTER TABLE mark_step
+DROP COLUMN IF EXISTS max_mark;
