@@ -16,7 +16,6 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@RequiredArgsConstructor
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -35,8 +34,6 @@ public class MarkStep {
     @Column(length = 1000)
     @NotNull
     String description;
-
-
 
     @JsonIgnore
     @Builder.Default
@@ -83,6 +80,11 @@ public class MarkStep {
         if(values == null)
             return;
         this.values.stream().filter(a -> a.getId() == valueId).findFirst().ifPresent(value -> this.values.remove(value));
+    }
+
+    public void delete() {
+        this.deleted = true;
+        this.values.forEach(MarkStepValue::delete);
     }
 
 

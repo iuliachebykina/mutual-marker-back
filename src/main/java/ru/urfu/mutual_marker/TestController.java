@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -74,10 +75,8 @@ public class TestController {
                     .email(email)
                     .lastName(lastName)
                     .build();
+
              profileService.saveProfile(registrationInfo, role);
-
-
-
         }
 
     }
