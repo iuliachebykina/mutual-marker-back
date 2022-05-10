@@ -4,10 +4,9 @@ spring:
     name: mutual-marker
     schema: mutual_marker
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://${POSTGES_HOST}
     username: ${POSTGRES_USERNAME}
     password: ${POSTGRES_PASSWORD}
-    driverClassName:
   flyway:
     baseline-on-migrate: true
     schemas: ${spring.application.schema}
@@ -26,4 +25,4 @@ springdoc:
     path: /api-docs
 
 mutual-marker:
-  filepath: # Path to directory where files should be placed
+  filepath: ${FILE_STORAGE}

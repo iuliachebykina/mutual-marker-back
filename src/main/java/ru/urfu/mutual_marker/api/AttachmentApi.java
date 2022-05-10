@@ -42,12 +42,12 @@ public class AttachmentApi {
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")
     @SneakyThrows
     @GetMapping(value = "/attachments/open")
-    public ResponseEntity openFile(@RequestParam("filename") String filename) {
+    public ResponseEntity<?> openFile(@RequestParam("filename") String filename) {
         return attachmentService.downloadFile(filename);
     }
 
     @Operation(summary = "Удалить неиспользуемые вложения")
-    @DeleteMapping(value = "/admin/attachemnts/delete")
+    @DeleteMapping(value = "/admin/attachments/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFiles() {
         attachmentService.deleteUseless();
