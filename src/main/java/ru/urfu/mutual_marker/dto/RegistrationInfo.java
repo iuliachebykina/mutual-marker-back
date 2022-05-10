@@ -5,18 +5,24 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegistrationInfo {
+    @NotBlank
     @Schema(title = "Почта", example = "hi@gmail.com", required = true)
     String email;
+    @NotBlank
     @Schema(title = "Пароль", required = true)
     String password;
     @Schema(title = "Номер телефона", example = "88005553535")
     String phoneNumber;
+    @NotBlank
     @Schema(title = "Имя", example = "Петр", required = true)
     String firstName;
+    @NotBlank
     @Schema(title = "Фамилия", example = "Петров", required = true )
     String lastName;
     @Schema(title = "Отчество", example = "Петрович")
