@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -14,6 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - FILE_STORAGE=../mitual-marker
   psql:
     image: 'postgres:13.1-alpine'
     container_name: psql
