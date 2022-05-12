@@ -3,12 +3,14 @@ package ru.urfu.mutual_marker.service;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
@@ -18,6 +20,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class TaskService {
 
     TaskMapper taskMapper;
@@ -57,12 +60,10 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
-
         task.setRoom(room.get());
-        taskRepository.save(task);
         task.getMarkSteps().forEach(step -> {
             step.setOwner(owner);
-            step.getTasks().add(task);
+            step.addTask(task);
             step.setDeleted(false);
         });
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
@@ -70,6 +71,9 @@ public class TaskService {
             value.setMarkStep(markStep);
             markStepValueRepository.save(value);
         }));
+
+        Task save = taskRepository.save(task);
+        log.info("Create task with id: {}", save.getId());
     }
 
     @Transactional
