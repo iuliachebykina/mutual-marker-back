@@ -69,6 +69,7 @@ public class TaskService {
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
         markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
             value.setMarkStep(markStep);
+            value.setDeleted(false);
             markStepValueRepository.save(value);
         }));
 
