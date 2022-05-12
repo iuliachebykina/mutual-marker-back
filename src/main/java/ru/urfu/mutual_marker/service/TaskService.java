@@ -66,6 +66,7 @@ public class TaskService {
             step.addTask(task);
             step.setDeleted(false);
         });
+        Task save = taskRepository.save(task);
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
         markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
             value.setMarkStep(markStep);
@@ -73,7 +74,6 @@ public class TaskService {
             markStepValueRepository.save(value);
         }));
 
-        Task save = taskRepository.save(task);
         log.info("Create task with id: {}", save.getId());
     }
 
