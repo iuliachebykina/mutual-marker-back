@@ -18,7 +18,7 @@ public class RoomAccessEvaluator {
     RoomService roomService;
     ProfileService profileService;
 
-    public boolean isMemberOfRoom(Long roomId) {
+    public boolean isMemberOfRoomById(Long roomId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Room room = roomService.getRoomById(roomId);
         Profile checked = profileService.getProfileByEmail(authentication.getName());
@@ -28,8 +28,8 @@ public class RoomAccessEvaluator {
         return checked.getRooms().contains(room);
     }
 
-    public boolean isMemberOfRoom(String roomCode){
+    public boolean isMemberOfRoomByRoomCode(String roomCode){
         Room room = roomService.getRoomByCode(roomCode);
-        return isMemberOfRoom(room.getId());
+        return isMemberOfRoomById(room.getId());
     }
 }
