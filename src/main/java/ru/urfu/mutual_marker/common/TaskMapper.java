@@ -36,5 +36,6 @@ public interface TaskMapper {
     @Mapping(source = "room.id", target = "roomId")
     TaskFullInfo entityToFullInfo(Task task);
 
+    @Mapping(target = "deleted", defaultValue = "false")
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
 }

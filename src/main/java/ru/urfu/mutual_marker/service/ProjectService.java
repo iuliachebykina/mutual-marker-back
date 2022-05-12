@@ -12,6 +12,7 @@ import ru.urfu.mutual_marker.dto.ProjectInfo;
 import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
@@ -36,6 +37,9 @@ public class ProjectService {
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
         var student = profileRepository.findByEmail(principal.getUsername());
+        if(student.isEmpty()){
+            throw new UserNotExistingException(String.format("Student with email: %s does not existing", principal.getUsername()));
+        }
         var markedProjects = markRepository.findAllByStudentId(student.get().getId())
                 .stream().map(mark -> mark.getProject().getId())
                 .collect(Collectors.toList());
@@ -61,6 +65,9 @@ public class ProjectService {
     public void updateProject(UserDetails principal, ProjectUpdateInfo updateInfo) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
         var projectOptional = projectRepository.findById(updateInfo.getId());
         if (projectOptional.isPresent() && projectOptional.get().getStudent().equals(profile.get())) {
             var project = projectOptional.get();
@@ -71,8 +78,10 @@ public class ProjectService {
 
     @Transactional
     public void createProject(UserDetails principal, ProjectCreationInfo creationInfo, Long taskId) {
-
         var profile = profileRepository.findByEmail(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         var attachments = attachmentRepository.findAllByFileNames(creationInfo.getAttachments());
         var project = Project.builder()
@@ -80,15 +89,17 @@ public class ProjectService {
                 .task(task)
                 .title(creationInfo.getTitle())
                 .description(creationInfo.getDescription())
-                .attachments(attachments)
                 .build();
+        attachments.forEach(project::addAttachment);
         projectRepository.save(project);
-        attachments.forEach(attachment -> attachment.getProjects().add(project));
     }
 
     public ProjectInfo getSelfProject(UserDetails principal, Long taskId) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         var project = projectRepository.findByStudentAndTask(profile.get(), task)
                 .orElseThrow(() -> new NotFoundException("Project was not found"));

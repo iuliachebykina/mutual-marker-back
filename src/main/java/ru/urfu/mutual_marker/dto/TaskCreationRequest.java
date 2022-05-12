@@ -38,7 +38,7 @@ public class TaskCreationRequest {
 
     @NotEmpty
     @Schema(title = "Ступени оценивания", description = "Этапы всестороннего оценивания задания", required = true)
-    Set<TaskFullInfo.MarkStep> markSteps;
+    Set<MarkStep> markSteps;
 
     @NotBlank
     @Email
