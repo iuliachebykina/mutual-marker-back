@@ -132,19 +132,18 @@ public class ProfileApi {
 
     }
 
-    @Operation(summary = "Получение всех студентов в комнате по id комнаты")
+   // @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
-    public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
-                                           @RequestParam("size") int size){
-        Pageable pageable = PageRequest.of(page, size);
+    //  @PreAuthorize("hasRole('ROLE_ADMIN') or @roomAccessEvaluator.isMemberOfRoom(#roomId)")
+    public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId){
+        Pageable pageable = PageRequest.of(0, 3243);
         log.info("Got all students in room with id: {}", roomId);
         return profileService.getStudentsInRoom(roomId, pageable);
     }
 
-    @Operation(summary = "Получение всех учителей в комнате по id комнаты")
+  //  @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
+   // @PreAuthorize("@roomAccessEvaluator.isMemberOfRoom(#roomId) or hasRole('ROLE_ADMIN')")
     public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
