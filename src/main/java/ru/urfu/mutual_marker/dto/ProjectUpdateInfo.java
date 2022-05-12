@@ -6,12 +6,12 @@ import lombok.Value;
 @Value
 public class ProjectUpdateInfo {
 
-    @Schema(name = "ID проекта", example = "1")
+    @Schema(title = "ID проекта", example = "1")
     Long id;
 
-    @Schema(name = "Название проекта", example = "Проект")
+    @Schema(title = "Название проекта", example = "Проект")
     String title;
 
-    @Schema(name = "Описание проекта")
+    @Schema(title = "Описание проекта")
     String description;
 }

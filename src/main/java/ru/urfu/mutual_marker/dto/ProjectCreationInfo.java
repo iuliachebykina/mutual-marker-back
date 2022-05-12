@@ -8,12 +8,12 @@ import java.util.Set;
 @Value
 public class ProjectCreationInfo {
 
-    @Schema(name = "Название проекта")
+    @Schema(title = "Название проекта")
     String title;
 
-    @Schema(name = "Описание проекта")
+    @Schema(title = "Описание проекта")
     String description;
 
-    @Schema(name = "Вложения")
+    @Schema(title = "Вложения")
     Set<String> attachments;
 }
