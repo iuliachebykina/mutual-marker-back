@@ -57,6 +57,7 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
+
         task.setRoom(room.get());
         taskRepository.save(task);
         task.getMarkSteps().forEach(step -> {
@@ -64,12 +65,10 @@ public class TaskService {
             step.getTasks().add(task);
         });
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
-        markSteps.forEach(markStep -> {
-            markStep.getValues().forEach(value -> {
-                value.setMarkStep(markStep);
-                markStepValueRepository.save(value);
-            });
-        });
+        markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
+            value.setMarkStep(markStep);
+            markStepValueRepository.save(value);
+        }));
     }
 
     @Transactional
