@@ -63,6 +63,7 @@ public class TaskService {
         task.getMarkSteps().forEach(step -> {
             step.setOwner(owner);
             step.getTasks().add(task);
+            step.setDeleted(false);
         });
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
         markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
