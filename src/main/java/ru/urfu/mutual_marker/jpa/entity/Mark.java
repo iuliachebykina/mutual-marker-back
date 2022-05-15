@@ -7,9 +7,11 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Objects;
 
 @Entity
@@ -22,6 +24,7 @@ import java.util.Objects;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
 @Where(clause="deleted=false")
+@EntityListeners(AuditingEntityListener.class)
 public class Mark {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -32,9 +35,8 @@ public class Mark {
     Profile student;
     @NotNull
     Integer markValue;
-    @NotNull
     @CreatedDate
-    LocalDateTime markTime;
+    Date markTime;
     String comment;
     @JsonIgnore
     @Builder.Default
