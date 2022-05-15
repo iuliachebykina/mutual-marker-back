@@ -16,7 +16,6 @@ import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
-import java.rmi.UnexpectedException;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,7 +57,7 @@ public class ProjectService {
             return projectMapper.entityToInfo(project);
         }
 
-        throw new UnexpectedException("Сорян, пока проектов больше нет");
+        throw new NotFoundException("Сорян, пока проектов больше нет");
     }
 
     @Transactional
