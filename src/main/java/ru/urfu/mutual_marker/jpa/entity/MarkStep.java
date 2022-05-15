@@ -26,8 +26,7 @@ public class MarkStep {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "owner_id", referencedColumnName = "id")
+    @ManyToOne
     Profile owner;
     @Column(length = 50)
     @NotNull

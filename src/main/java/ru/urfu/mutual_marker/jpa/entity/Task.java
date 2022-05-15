@@ -46,6 +46,7 @@ public class Task {
 
     @OneToMany(mappedBy = "task")
     @Builder.Default
+    @JsonIgnore
     @ToString.Exclude
     Set<Project> projects = new HashSet<>();
 
