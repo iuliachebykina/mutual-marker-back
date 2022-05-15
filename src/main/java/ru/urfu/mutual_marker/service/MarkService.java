@@ -43,8 +43,8 @@ public class MarkService {
             }
             BigDecimal truncation = new BigDecimal(res);
             truncation = truncation.setScale(0, RoundingMode.HALF_UP);
-            Profile owner = profileService.getById(addMarkDto.getProfileId());
-            Project project = projectRepository.getById(addMarkDto.getProjectId());
+            Profile owner = profileService.findById(addMarkDto.getProfileId());
+            Project project = projectService.findProjectById(addMarkDto.getProjectId());
             mark = Mark
                     .builder()
                     .student(owner)
@@ -59,11 +59,7 @@ public class MarkService {
             log.error("Failed to find student with id {}", addMarkDto.getProfileId());
             throw new MarkServiceException(String.format("Failed to find student with id %s", addMarkDto.getProfileId()));
         }
-        Mark saved =  markRepository.save(mark);
-//        Hibernate.initialize(mark.getProject().getMarks());
-//        Hibernate.initialize(mark.getProject().getStudent().get);
-//        //Hibernate.initialize(mark.getStudent());
-        return saved;
+        return markRepository.save(mark);
     }
 
     @Transactional
@@ -103,12 +99,21 @@ public class MarkService {
     public Double calculateMarkForProject(Long projectId, Long studentId, int precision){
         double res;
         try {
-            Project project = projectRepository.findById(projectId).orElse(null);
+            Project project = projectService.findProjectById(projectId);
             Profile student = profileService.findById(studentId);
             Task task = project.getTask();
-            Integer number = student.getNumberOfGradedSet().stream()
-                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null).getGraded();
-            if (number >= task.getMinNumberOfGraded()) {
+            if (task == null){
+                log.error("Failed to calculate mark, not task found for project with id {}", projectId);
+                throw new MarkServiceException(String.format("Failed to find task for project with id %s", projectId));
+            }
+            NumberOfGraded number = student.getNumberOfGradedSet().stream()
+                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
+            if (number == null){
+                log.error("Failed to obtain number of graded works. Student id {}, task id {}", studentId, task.getId());
+                throw new MarkServiceException(String.format("Failed to obtain number of graded works. Student id %s, task id %s",
+                        studentId, task.getId()));
+            }
+            if (number.getGraded() >= task.getMinNumberOfGraded()) {
                 double gradeWithoutPrecision = project.getMarks().stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
                 res = BigDecimal.valueOf(gradeWithoutPrecision).setScale(precision, RoundingMode.HALF_UP).doubleValue();
             } else {
