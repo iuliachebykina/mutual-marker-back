@@ -13,6 +13,6 @@ public class MutualMarkerApiExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> mutualMarkerApiExceptionHandler(Throwable ex) {
         ex.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getLocalizedMessage());
     }
 }
