@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProjectMapper;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class ProjectService {
 
     ProjectRepository projectRepository;
@@ -104,5 +106,14 @@ public class ProjectService {
         var project = projectRepository.findByStudentAndTask(profile.get(), task)
                 .orElseThrow(() -> new NotFoundException("Project was not found"));
         return projectMapper.entityToInfo(project);
+    }
+
+    public Project findProjectById(Long projectId){
+        Project project = projectRepository.findById(projectId).orElse(null);
+        if (project == null){
+            log.error("Failed to find project with id {}", projectId);
+            throw new NotFoundException(String.format("Failed to find project with id %s", projectId));
+        }
+        return project;
     }
 }

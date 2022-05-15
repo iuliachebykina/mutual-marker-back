@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
+import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
 import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
@@ -31,15 +32,13 @@ public class MarksApi {
     MarkStepService markStepService;
     NumberOfGradedService numberOfGradedService;
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_STUDENT' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_STUDENT','ROLE_TEACHER')")
     @GetMapping("/{projectId}/{studentId}")
     public ResponseEntity<Mark> getStudentMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId) {
-
         Mark mark = markService.findMarkByProjectAndStudentIds(projectId, studentId);
         return new ResponseEntity<>(mark, HttpStatus.OK);
-
     }
-    
+
     @GetMapping(value = "/numberOfGraded", params = { "page", "size" })
     public List<NumberOfGraded> getAllNumbersOfGraded(@RequestParam("page") int page,
                                                       @RequestParam("size") int size,
@@ -48,7 +47,7 @@ public class MarksApi {
         return numberOfGradedService.getAllNumbers(email, pageable);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @DeleteMapping("/{projectId}/{studentId}")
     public ResponseEntity<Mark> deleteMarkForProject(@PathVariable Long projectId, @PathVariable Long studentId) {
 
@@ -57,25 +56,25 @@ public class MarksApi {
 
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markSteps")
     public ResponseEntity<List<MarkStep>> addMarkStepsForProject(@RequestBody List<AddMarkStepDto> addMarkStepDtoList){
         return new ResponseEntity<>(markStepService.addMarkSteps(addMarkStepDtoList), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markStepExisting")
     public ResponseEntity<MarkStep> addMarkStepForExistingProject(@RequestBody AddMarkStepDto addMarkStepDto){
         return new ResponseEntity<>(markStepService.addMarkStep(addMarkStepDto), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PutMapping("/markStep")
     public ResponseEntity<MarkStep> updateMarkStep(@RequestBody MarkStep markStep){
         return new ResponseEntity<>(markStepService.updateMarkStep(markStep), HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN' or 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @DeleteMapping("/{markStepId}")
     public ResponseEntity<MarkStep> deleteMarkStep(@PathVariable Long markStepId) {
 
@@ -86,5 +85,22 @@ public class MarksApi {
     @GetMapping("/{projectId}")
     public ResponseEntity<Object> getAllMarksForProject(@PathVariable Long projectId){
         return new ResponseEntity<>(markService.getAllMarksForProject(projectId), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{taskId}/{markStepId}")
+    public ResponseEntity<Object> deleteMarkStepForTask(@PathVariable Long taskId, @PathVariable Long markStepId){
+        return new ResponseEntity<>(markStepService.deleteMarkStepForTask(taskId, markStepId), HttpStatus.OK);
+    }
+
+    @PostMapping("/mark")
+    public ResponseEntity<Object> addMark(@RequestBody AddMarkDto addMarkDto){
+        return new ResponseEntity<>(markService.addMark(addMarkDto), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/calculateFinalMark/{projectId}/{profileId}", params = {"precision"})
+    public ResponseEntity<Object> calculateMarkForProject(@PathVariable Long projectId,
+                                                          @PathVariable Long profileId,
+                                                          @RequestParam("precision") Integer precision){
+        return new ResponseEntity<>(markService.calculateMarkForProject(projectId, profileId, precision), HttpStatus.OK);
     }
 }

@@ -56,7 +56,7 @@ public class MarkStepService { //TODO add error handling for repository methods
     public MarkStep deleteMarkStep(Long markStepId){
         MarkStep toDelete = markStepRepository.findById(markStepId).orElse(null);
         if (toDelete == null){
-            log.error("Failed to find markStep for deletion");
+            log.error("Failed to find markStep for deletion. Id: {}", markStepId);
             throw new MarkStepServiceException("Failed to find markStep for deletion");
         }
         toDelete.setDeleted(true);
