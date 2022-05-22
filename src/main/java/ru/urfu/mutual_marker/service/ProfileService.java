@@ -37,7 +37,6 @@ public class ProfileService {
     PasswordEncoder passwordEncoder;
     ProfileRepository profileRepository;
     ProfileMapper  profileMapper;
-    RoomService roomService;
 
     @Transactional
     public Profile getProfileByEmail(String email, Role role){
@@ -220,7 +219,6 @@ public class ProfileService {
 
     @Transactional
     List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
-        roomService.getRoomById(roomId);
         return profileRepository.findAllByRoomsIdAndRole(roomId, role, pageable);
     }
 
