@@ -32,13 +32,13 @@ public class TaskService {
     TaskRepository taskRepository;
     MarkStepRepository markStepRepository;
 
-    public List<TaskInfo> getAllTasks(Long roomId, Pageable pageable) {
+    public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_Id(roomId, pageable);
         return taskMapper.entitiesToInfos(tasks);
     }
 
-    public TaskFullInfo getTask(Long taskId) {
+    public TaskFullInfo findTask(Long taskId) {
 
         var task = taskRepository.findById(taskId);
 

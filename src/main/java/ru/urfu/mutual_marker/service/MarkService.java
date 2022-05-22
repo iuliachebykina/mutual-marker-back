@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
+import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
@@ -21,6 +22,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Data
@@ -31,6 +33,7 @@ public class MarkService {
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
+    TaskService taskService;
 
     @Transactional
     public Mark addMark(AddMarkDto addMarkDto){
@@ -127,5 +130,22 @@ public class MarkService {
             throw new MarkServiceException(e.getLocalizedMessage());
         }
         return res;
+    }
+
+    @Transactional
+    public List<ProjectFinalMarkDto> getAllMarksForTask(Long taskId){
+        List<Project> projects = projectService.findAllProjectsByTaskId(taskId);
+        if (projects.isEmpty()){
+            log.error("Failed to get all marks for task, no projects found for task with id {}", taskId);
+            throw new MarkServiceException("Failed to fetch all marks for task, no projects found");
+        }
+       return projects.stream().map(project -> ProjectFinalMarkDto
+                .builder()
+                .finalMark(calculateMarkForProject(project.getId(), project.getStudent().getId(), 2))
+                .projectTitle(project.getTitle())
+                .profileId(project.getStudent().getId())
+                .projectId(project.getId())
+                .build())
+                .collect(Collectors.toList());
     }
 }
