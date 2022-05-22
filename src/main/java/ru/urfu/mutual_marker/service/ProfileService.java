@@ -15,13 +15,13 @@ import ru.urfu.mutual_marker.dto.RegistrationInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.security.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.security.exception.UserExistingException;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.security.exception.WrongPasswordException;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -37,6 +37,7 @@ public class ProfileService {
     PasswordEncoder passwordEncoder;
     ProfileRepository profileRepository;
     ProfileMapper  profileMapper;
+    RoomService roomService;
 
     @Transactional
     public Profile getProfileByEmail(String email, Role role){
@@ -219,6 +220,7 @@ public class ProfileService {
 
     @Transactional
     List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
+        roomService.getRoomById(roomId);
         return profileRepository.findAllByRoomsIdAndRole(roomId, role, pageable);
     }
 
