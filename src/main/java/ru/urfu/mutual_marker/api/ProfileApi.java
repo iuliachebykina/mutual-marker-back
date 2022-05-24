@@ -35,9 +35,19 @@ public class ProfileApi {
     @GetMapping("/admins/{email}")
     public ResponseEntity<AdminInfo> getAdmin(@PathVariable String email) {
         AdminInfo adminInfo = profileService.getAdmin(email);
-        log.info("Got admin by id: {}", email);
+        log.info("Got admin by email: {}", email);
         return new ResponseEntity<>(adminInfo, HttpStatus.OK);
     }
+
+    @Operation(summary = "Получение инфы об админе по id")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/admin-by-id/{id}")
+    public ResponseEntity<AdminInfo> getAdmin(@PathVariable Long id) {
+        AdminInfo adminInfo = profileService.getAdmin(id);
+        log.info("Got admin by id: {}", id);
+        return new ResponseEntity<>(adminInfo, HttpStatus.OK);
+    }
+
 
     @Operation(summary = "Получение инфы обо всех админах")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -60,6 +70,17 @@ public class ProfileApi {
 
     }
 
+    @Operation(summary = "Получение инфы об учителе по id")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/teacher-by-id/{id}")
+    public ResponseEntity<TeacherInfo> getTeacher(@PathVariable Long id) {
+
+        TeacherInfo teacherInfo = profileService.getTeacher(id);
+        log.info("Got teacher by id: {}", id);
+        return new ResponseEntity<>(teacherInfo, HttpStatus.OK);
+
+    }
+
     @Operation(summary = "Получение инфы обо всех учителях")
     @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/teachers", params = { "page", "size" })
@@ -77,6 +98,17 @@ public class ProfileApi {
 
         StudentInfo studentInfo = profileService.getStudent(email);
         log.info("Got student by email: {}", email);
+        return new ResponseEntity<>(studentInfo, HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Получение инфы о студенте по id")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/student-by-id/{id}")
+    public ResponseEntity<StudentInfo> getStudent(@PathVariable Long id) {
+
+        StudentInfo studentInfo = profileService.getStudent(id);
+        log.info("Got student by id: {}", id);
         return new ResponseEntity<>(studentInfo, HttpStatus.OK);
 
     }

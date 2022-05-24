@@ -82,6 +82,21 @@ public class ProfileService {
         return profileMapper.profileEntityToAdminDto(profileByEmail);
     }
 
+    public TeacherInfo getTeacher(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToTeacherDto(profile);
+    }
+
+    public StudentInfo getStudent(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToStudentDto(profile);
+    }
+
+    public AdminInfo getAdmin(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToAdminDto(profile);
+    }
+
     @Transactional
     public Profile getProfileByEmail(String email){
         return profileRepository.findByEmail(email).orElseThrow(()-> {
