@@ -145,6 +145,7 @@ public class MarkService {
                 .projectTitle(project.getTitle())
                 .profileId(project.getStudent().getId())
                 .projectId(project.getId())
+                .studentName(project.getStudent().getName())
                 .build())
                 .collect(Collectors.toList());
     }
