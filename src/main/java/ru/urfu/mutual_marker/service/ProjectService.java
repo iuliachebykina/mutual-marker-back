@@ -59,8 +59,8 @@ public class ProjectService {
             }
             return projectMapper.entityToInfo(project);
         }
-
-        throw new NotFoundException("Сорян, пока проектов больше нет");
+        log.info("Not found available project for rate for user with email: {}", principal.getUsername());
+        return null;
     }
 
     @Transactional
