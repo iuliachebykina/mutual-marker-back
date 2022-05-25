@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
@@ -44,7 +45,13 @@ public class RoomAccessEvaluator {
 
     private boolean checkRoomForProfile(Room room){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Profile checked = profileService.getProfileByEmail(authentication.getName());
+        if (authentication == null){
+            return false;
+        }
+        UserDetails details = (UserDetails) authentication.getPrincipal();
+        Profile checked = details != null
+                ? profileService.getProfileByEmail(details.getUsername())
+                : null;
         if (checked == null){
             log.warn("Failed to find profile with principal {} to evaluate access", authentication.getName());
             return false;
