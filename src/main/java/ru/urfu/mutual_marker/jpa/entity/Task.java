@@ -90,6 +90,23 @@ public class Task {
         }
     }
 
+    public void addNumberOfGraded(NumberOfGraded num){
+        if (this.numberOfGraded == null){
+            this.numberOfGraded = new HashSet<>();
+        }
+        this.numberOfGraded.add(num);
+    }
+
+    public void removeNumberOfGraded(NumberOfGraded num) {
+        if (this.numberOfGraded == null) {
+            return;
+        }
+        this.numberOfGraded.stream()
+                .filter(n -> Objects.equals(n.getId(), num.getId()))
+                .findFirst()
+                .ifPresent(toRemove -> this.numberOfGraded.remove(toRemove));
+    }
+
 
     public void delete() {
         this.deleted = true;

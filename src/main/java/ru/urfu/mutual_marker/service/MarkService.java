@@ -10,6 +10,7 @@ import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
+import ru.urfu.mutual_marker.jpa.repository.NumberOfGradedRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
@@ -34,6 +35,7 @@ public class MarkService {
     ProfileService profileService;
     ProjectService projectService;
     TaskService taskService;
+    NumberOfGradedRepository numberOfGradedRepository;
 
     @Transactional
     public Mark addMark(AddMarkDto addMarkDto){
@@ -55,6 +57,16 @@ public class MarkService {
                     .comment(addMarkDto.getComment())
                     .markValue(truncation.intValue())
                     .build();
+            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
+                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
+                    .orElse(null);
+            if (numberOfGraded == null){
+                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
+                        owner.getId()));
+            }
+            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
+            numberOfGradedRepository.save(numberOfGraded);
+
         } catch (EntityNotFoundException e){
             log.error("Failed to find project with id {}", addMarkDto.getProjectId());
             throw new MarkServiceException(String.format("Failed to find project with id %s", addMarkDto.getProjectId()));
