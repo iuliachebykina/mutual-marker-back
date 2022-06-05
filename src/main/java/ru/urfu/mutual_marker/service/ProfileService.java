@@ -15,13 +15,13 @@ import ru.urfu.mutual_marker.dto.RegistrationInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.security.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.security.exception.UserExistingException;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.security.exception.WrongPasswordException;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -80,6 +80,21 @@ public class ProfileService {
     public AdminInfo getAdmin(String email){
         Profile profileByEmail = getProfileByEmail(email);
         return profileMapper.profileEntityToAdminDto(profileByEmail);
+    }
+
+    public TeacherInfo getTeacher(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToTeacherDto(profile);
+    }
+
+    public StudentInfo getStudent(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToStudentDto(profile);
+    }
+
+    public AdminInfo getAdmin(Long id){
+        Profile profile = getById(id);
+        return profileMapper.profileEntityToAdminDto(profile);
     }
 
     @Transactional

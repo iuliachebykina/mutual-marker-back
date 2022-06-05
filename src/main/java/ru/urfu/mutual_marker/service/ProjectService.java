@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,8 +66,8 @@ public class ProjectService {
             }
             return project.getId();
         }
-
-        throw new NotFoundException("Сорян, пока проектов больше нет");
+        log.info("Not found available project for rate for user with email: {}", principal.getUsername());
+        return null;
     }
 
     @Transactional
@@ -121,5 +122,9 @@ public class ProjectService {
             throw new NotFoundException(String.format("Failed to find project with id %s", projectId));
         }
         return project;
+    }
+
+    public List<Project> findAllProjectsByTaskId(Long taskId){
+        return projectRepository.findAllByTask_Id(taskId);
     }
 }

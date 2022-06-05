@@ -33,14 +33,14 @@ public class TasksApi {
                                       @RequestParam("room_id") Long id) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return taskService.getAllTasks(id, pageable);
+        return taskService.findAllTasks(id, pageable);
     }
 
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Получение подробной инфы по заданию")
     @GetMapping(value = "/task/{task_id}")
     public TaskFullInfo getTaskInfo(@PathVariable("task_id") Long id) {
-        return taskService.getTask(id);
+        return taskService.findTask(id);
     }
 
     @Operation(summary = "Создание задания")

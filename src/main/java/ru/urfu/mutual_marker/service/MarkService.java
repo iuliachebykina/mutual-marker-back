@@ -7,8 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
+import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
+import ru.urfu.mutual_marker.jpa.repository.NumberOfGradedRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
@@ -21,6 +23,7 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Data
@@ -31,6 +34,8 @@ public class MarkService {
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
+    TaskService taskService;
+    NumberOfGradedRepository numberOfGradedRepository;
 
     @Transactional
     public Mark addMark(AddMarkDto addMarkDto){
@@ -52,6 +57,16 @@ public class MarkService {
                     .comment(addMarkDto.getComment())
                     .markValue(truncation.intValue())
                     .build();
+            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
+                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
+                    .orElse(null);
+            if (numberOfGraded == null){
+                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
+                        owner.getId()));
+            }
+            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
+            numberOfGradedRepository.save(numberOfGraded);
+
         } catch (EntityNotFoundException e){
             log.error("Failed to find project with id {}", addMarkDto.getProjectId());
             throw new MarkServiceException(String.format("Failed to find project with id %s", addMarkDto.getProjectId()));
@@ -127,5 +142,32 @@ public class MarkService {
             throw new MarkServiceException(e.getLocalizedMessage());
         }
         return res;
+    }
+
+    @Transactional
+    public List<ProjectFinalMarkDto> getAllMarksForTask(Long taskId){
+        List<Project> projects = projectService.findAllProjectsByTaskId(taskId);
+        if (projects.isEmpty()){
+            log.error("Failed to get all marks for task, no projects found for task with id {}", taskId);
+            throw new MarkServiceException("Failed to fetch all marks for task, no projects found");
+        }
+        return projects.stream().map(project ->
+        {
+            try {
+                return ProjectFinalMarkDto
+                        .builder()
+                        .finalMark(calculateMarkForProject(project.getId(), project.getStudent().getId(), 2))
+                        .projectTitle(project.getTitle())
+                        .profileId(project.getStudent().getId())
+                        .projectId(project.getId())
+                        .studentName(project.getStudent().getName())
+                        .build();
+            } catch (MarkServiceException e) {
+                log.error("Failed to calculate mark for student with {} in project with id {}",
+                        project.getStudent().getId(),
+                        project.getId());
+                return null;
+            }
+        }).collect(Collectors.toList());
     }
 }
