@@ -151,14 +151,23 @@ public class MarkService {
             log.error("Failed to get all marks for task, no projects found for task with id {}", taskId);
             throw new MarkServiceException("Failed to fetch all marks for task, no projects found");
         }
-       return projects.stream().map(project -> ProjectFinalMarkDto
-                .builder()
-                .finalMark(calculateMarkForProject(project.getId(), project.getStudent().getId(), 2))
-                .projectTitle(project.getTitle())
-                .profileId(project.getStudent().getId())
-                .projectId(project.getId())
-                .studentName(project.getStudent().getName())
-                .build())
-                .collect(Collectors.toList());
+        return projects.stream().map(project ->
+        {
+            try {
+                return ProjectFinalMarkDto
+                        .builder()
+                        .finalMark(calculateMarkForProject(project.getId(), project.getStudent().getId(), 2))
+                        .projectTitle(project.getTitle())
+                        .profileId(project.getStudent().getId())
+                        .projectId(project.getId())
+                        .studentName(project.getStudent().getName())
+                        .build();
+            } catch (MarkServiceException e) {
+                log.error("Failed to calculate mark for student with {} in project with id {}",
+                        project.getStudent().getId(),
+                        project.getId());
+                return null;
+            }
+        }).collect(Collectors.toList());
     }
 }
