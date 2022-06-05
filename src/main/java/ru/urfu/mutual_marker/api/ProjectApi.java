@@ -35,10 +35,16 @@ public class ProjectApi {
         projectService.updateProject((UserDetails) authentication.getPrincipal(), updateInfo);
     }
 
-    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
+    @Operation(summary = "Рандомный проект id", description = "Возвращает id рандомного проекта для оценки в текущей таске")
     @GetMapping(value = "/task/{task_id}/project/random")
-    public ProjectInfo getRandomProject(Authentication authentication, @PathVariable("task_id") Long taskId) {
+    public Long getRandomProject(Authentication authentication, @PathVariable("task_id") Long taskId) {
         return projectService.getRandomProject((UserDetails) authentication.getPrincipal(), taskId);
+    }
+
+    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
+    @GetMapping(value = "/task/{task_id}/project/{project_id}")
+    public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
+        return projectService.getProject(projectId);
     }
 
     @Operation(summary = "Создание проекта", description = "Создает проект. ВАЖНО: сначала надо загрузить вложения")

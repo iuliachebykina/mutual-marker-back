@@ -32,8 +32,15 @@ public class ProjectService {
     AttachmentRepository attachmentRepository;
     ProjectMapper projectMapper;
 
+    public ProjectInfo getProject(Long projectId) {
+
+        var project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundException("Project was not found"));;
+        return projectMapper.entityToInfo(project);
+    }
+
     @SneakyThrows
-    public ProjectInfo getRandomProject(UserDetails principal, Long taskId) {
+    public Long getRandomProject(UserDetails principal, Long taskId) {
 
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
@@ -56,7 +63,7 @@ public class ProjectService {
                     project.getStudent().getEmail().equals(student.get().getEmail())) {
                 continue;
             }
-            return projectMapper.entityToInfo(project);
+            return project.getId();
         }
 
         throw new NotFoundException("Сорян, пока проектов больше нет");
@@ -103,7 +110,7 @@ public class ProjectService {
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         var project = projectRepository.findByStudentAndTask(profile.get(), task)
-                .orElseThrow(() -> new NotFoundException("Project was not found"));
+                .orElse(null);
         return projectMapper.entityToInfo(project);
     }
 
