@@ -32,7 +32,7 @@ public class RoomApi {
 
     @Operation(summary = "Получение комнаты по id, для авторизации необходимо быть членом комнаты или админом")
     @GetMapping("/room-by-id/{roomId}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> getRoom(@PathVariable("roomId") Long roomId) {
         return new ResponseEntity<>(roomService.getRoomById(roomId), HttpStatus.OK);
 
@@ -40,7 +40,7 @@ public class RoomApi {
 
     @Operation(summary = "Получение комнаты по коду, для авторизации необходимо быть членом комнаты или админом")
     @GetMapping("/room-by-code/{roomCode}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#roomCode) or hasRole('ROLE_ADMIN'))")
+    //@PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#roomCode) or hasRole('ROLE_ADMIN'))")
     public ResponseEntity<Room> getRoomByCode(@PathVariable("roomCode") String roomCode) {
 
         return new ResponseEntity<>(roomService.getRoomByCode(roomCode), HttpStatus.OK);
@@ -70,7 +70,7 @@ public class RoomApi {
 
     @Operation(summary = "Обновление имеющейся комнаты")
     @PutMapping("/room")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#room.id)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#room.id)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> updateRoom(@RequestBody Room room){
         return new ResponseEntity<>(roomService.updateRoom(room), HttpStatus.OK);
 
@@ -78,7 +78,7 @@ public class RoomApi {
 
     @Operation(summary = "Удаление комнаты, необходимо быть преподавателем, находящимся в комнате или админом")
     @DeleteMapping("/room/{roomId}")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> deleteRoom(@PathVariable Long roomId) {
 
         return new ResponseEntity<>(roomService.deleteRoom(roomId), HttpStatus.OK);
@@ -87,7 +87,7 @@ public class RoomApi {
 
     @Operation(summary = "Добавление преподавателя в комнату по коду комнаты. Доступно для преподавателей в комнате и админов")
     @PutMapping("/teacher")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> addTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), TEACHER), HttpStatus.OK);
@@ -104,7 +104,7 @@ public class RoomApi {
 
     @Operation(summary = "Добавление студента в комнату по коду. Доступно преподавателям в текущей комнате и админам")
     @PutMapping("/student")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> addStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), STUDENT), HttpStatus.OK);
@@ -121,7 +121,7 @@ public class RoomApi {
 
     @Operation(summary = "Добавление задания в комнату, доступно админам или преподавателями в данной комнате")
     @PutMapping("/task")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> addTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.addEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), TASK), HttpStatus.OK);
@@ -130,7 +130,7 @@ public class RoomApi {
 
     @Operation(summary = "Удаление преподавателя, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/teacher")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> deleteTeacher(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), TEACHER), HttpStatus.OK);
@@ -139,7 +139,7 @@ public class RoomApi {
 
     @Operation(summary = "Удаление студента, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/student")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> deleteStudent(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), STUDENT), HttpStatus.OK);
@@ -148,7 +148,7 @@ public class RoomApi {
 
     @Operation(summary = "Удаление задания, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/task")
-    @PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#addEntityToRoomDto.entityId)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> deleteTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), TASK), HttpStatus.OK);
