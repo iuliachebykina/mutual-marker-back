@@ -2,7 +2,7 @@
 spring:
   application:
     name: mutual-marker
-    schema: mutual_marker
+    schema: marker
   datasource:
     url: jdbc:postgresql://${POSTGRES_HOST}
     username: ${POSTGRES_USERNAME}
