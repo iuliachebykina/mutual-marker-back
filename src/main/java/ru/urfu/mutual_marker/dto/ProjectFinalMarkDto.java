@@ -21,4 +21,6 @@ public class ProjectFinalMarkDto {
     Long profileId;
     @Schema(name = "Финальная оценка с точностью до 2 цифр после запятой, рассчитывается повторно при повторных запросах")
     Double finalMark;
+    @Schema(name = "Группа студента")
+    String group;
 }

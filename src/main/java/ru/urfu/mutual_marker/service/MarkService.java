@@ -161,6 +161,7 @@ public class MarkService {
                         .profileId(project.getStudent().getId())
                         .projectId(project.getId())
                         .studentName(project.getStudent().getName())
+                        .group(project.getStudent().getStudentGroup())
                         .build();
             } catch (MarkServiceException e) {
                 log.error("Failed to calculate mark for student with {} in project with id {}",
