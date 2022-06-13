@@ -7,7 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
-import ru.urfu.mutual_marker.jpa.entity.*;
+import ru.urfu.mutual_marker.jpa.entity.Mark;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.Project;
+import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.NumberOfGradedRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
@@ -20,7 +23,6 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,19 +58,20 @@ public class MarkService {
                     .comment(addMarkDto.getComment())
                     .markValue(truncation.intValue())
                     .build();
-            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
-                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
-                    .orElse(null);
-            if (numberOfGraded == null){
-//                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-//                        owner.getId()));
-                numberOfGraded = NumberOfGraded.builder()
-                        .task(project.getTask())
-                        .profile(owner)
-                        .graded(0).build();
-            }
-            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
-            numberOfGradedRepository.save(numberOfGraded);
+
+//            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
+//                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
+//                    .orElse(null);
+//            if (numberOfGraded == null){
+////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
+////                        owner.getId()));
+//                numberOfGraded = NumberOfGraded.builder()
+//                        .task(project.getTask())
+//                        .profile(owner)
+//                        .graded(0).build();
+//            }
+//            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
+//            numberOfGradedRepository.save(numberOfGraded);
 
         } catch (EntityNotFoundException e){
             log.error("Failed to find project with id {}", addMarkDto.getProjectId());
@@ -124,15 +127,20 @@ public class MarkService {
                 log.error("Failed to calculate mark, not task found for project with id {}", projectId);
                 throw new MarkServiceException(String.format("Failed to find task for project with id %s", projectId));
             }
-            NumberOfGraded number = student.getNumberOfGradedSet().stream()
-                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
+//            NumberOfGraded number = student.getNumberOfGradedSet().stream()
+//                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
 
-            if (number == null){
-                log.error("Failed to obtain number of graded works. Student id {}, task id {}", studentId, task.getId());
-                throw new MarkServiceException(String.format("Failed to obtain number of graded works. Student id %s, task id %s",
-                        studentId, task.getId()));
-            }
-            if (number.getGraded() >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
+            long count = markRepository.findAllByStudentId(studentId).stream().filter(m -> m.getProject().getTask().getId().equals(task.getId())).count();
+
+//            if (number == null){
+////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
+////                        owner.getId()));
+//                number = NumberOfGraded.builder()
+//                        .task(project.getTask())
+//                        .profile(student)
+//                        .graded(0).build();
+//            }
+            if (count >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
                 double gradeWithoutPrecision = project.getMarks().stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
                 res = BigDecimal.valueOf(gradeWithoutPrecision).setScale(precision, RoundingMode.HALF_UP).doubleValue();
             } else {
