@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
@@ -61,8 +60,12 @@ public class MarkService {
                     .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
                     .orElse(null);
             if (numberOfGraded == null){
-                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-                        owner.getId()));
+//                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
+//                        owner.getId()));
+                numberOfGraded = NumberOfGraded.builder()
+                        .task(project.getTask())
+                        .profile(owner)
+                        .graded(0).build();
             }
             numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
             numberOfGradedRepository.save(numberOfGraded);
@@ -123,12 +126,13 @@ public class MarkService {
             }
             NumberOfGraded number = student.getNumberOfGradedSet().stream()
                     .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
+
             if (number == null){
                 log.error("Failed to obtain number of graded works. Student id {}, task id {}", studentId, task.getId());
                 throw new MarkServiceException(String.format("Failed to obtain number of graded works. Student id %s, task id %s",
                         studentId, task.getId()));
             }
-            if (number.getGraded() >= task.getMinNumberOfGraded()) {
+            if (number.getGraded() >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
                 double gradeWithoutPrecision = project.getMarks().stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
                 res = BigDecimal.valueOf(gradeWithoutPrecision).setScale(precision, RoundingMode.HALF_UP).doubleValue();
             } else {

@@ -1,5 +1,8 @@
 
 spring:
+  servlet:
+    multipart:
+      max-request-size: 50MB
   application:
     name: mutual-marker
     schema: mutual_marker
