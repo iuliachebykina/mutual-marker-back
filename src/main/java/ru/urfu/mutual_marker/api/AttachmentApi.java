@@ -32,7 +32,7 @@ public class AttachmentApi {
     }
 
     @Operation(summary = "Добавление вложений", description = "Добавляет вложения в уже созданный проект")
-    @PostMapping(value = "/project/{project_id}/attachments/append")
+    @PostMapping(value = "/project/{project_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachments(Authentication authentication,
                                   @RequestParam("files") MultipartFile[] files,
                                   @PathVariable("project_id") Long projectId) {
