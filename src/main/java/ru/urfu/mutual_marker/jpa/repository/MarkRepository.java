@@ -10,4 +10,6 @@ public interface MarkRepository extends JpaRepository<Mark, Long> {
     Optional<Mark> findByProjectIdAndStudentId(Long projectId, Long studentId);
 
     List<Mark> findAllByStudentId(Long studentId);
+
+    Long countAllByStudentIdAndProjectTaskId(Long studentId, Long taskId);
 }

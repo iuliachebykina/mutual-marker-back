@@ -130,7 +130,7 @@ public class MarkService {
 //            NumberOfGraded number = student.getNumberOfGradedSet().stream()
 //                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
 
-            long count = markRepository.findAllByStudentId(studentId).stream().filter(m -> m.getProject().getTask().getId().equals(task.getId())).count();
+            long count = markRepository.countAllByStudentIdAndProjectTaskId(studentId, project.getTask().getId());
 
 //            if (number == null){
 ////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
