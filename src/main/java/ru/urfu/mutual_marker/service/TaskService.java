@@ -89,6 +89,8 @@ public class TaskService {
             numberOfGradedRepository.save(numberOfGraded);
             student.addNumberOfGraded(numberOfGraded);
             task.addNumberOfGraded(numberOfGraded);
+            profileRepository.save(student);
+            taskRepository.save(task);
         });
 
         log.info("Create task with id: {}", save.getId());
