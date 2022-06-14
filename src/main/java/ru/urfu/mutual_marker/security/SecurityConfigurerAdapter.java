@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 
@@ -64,17 +63,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth
-                .userDetailsService(profileDetailsService)
-                .and()
-                .inMemoryAuthentication()
-                .withUser("admin").password(passwordEncoder.encode("admin"))
-                .authorities(Role.ROLE_ADMIN.name())
-                .and()
-                .withUser("teacher").password(passwordEncoder.encode("teacher"))
-                .authorities(Role.ROLE_TEACHER.name())
-                .and()
-                .withUser("student").password(passwordEncoder.encode("student"))
-                .authorities(Role.ROLE_STUDENT.name());
+                .userDetailsService(profileDetailsService);
     }
 
     @Override
