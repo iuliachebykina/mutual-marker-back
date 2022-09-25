@@ -33,6 +33,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
 
     ProfileDetailsService profileDetailsService;
     PasswordEncoder passwordEncoder;
+    CustomAuthenticationProvider customAuthenticationProvider;
     ProfileService profileService;
 
     static Gson gson = createProfileGsonBuilder();
@@ -71,8 +72,8 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     {
         http
                 .csrf().disable()
-                .httpBasic()
-                .and().sessionManagement().disable()
+                .authenticationProvider(customAuthenticationProvider)
+                .sessionManagement().disable()
                 .formLogin()
                 .loginProcessingUrl("/api/login")
                 .successHandler(successHandler())

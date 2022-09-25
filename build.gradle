@@ -19,19 +19,19 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web:2.6.7'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.6.7'
+    implementation 'org.springframework.boot:spring-boot-starter-web:2.7.3'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:2.7.3'
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.6.7'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.3'
     implementation group: 'com.h2database', name: 'h2', version: '2.1.212'
     implementation group: 'org.flywaydb', name: 'flyway-maven-plugin', version: '8.5.9'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.4'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.8'
-    implementation 'org.mapstruct:mapstruct:1.5.0.RC1'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.4.2.Final'
-    implementation 'org.springframework.security:spring-security-config:5.6.3'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.7'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.3.7'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.11'
+    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+    implementation 'org.springframework.security:spring-security-config:5.7.3'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.7.3'
     implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
     implementation 'com.google.code.gson:gson:2.9.0'
 }
