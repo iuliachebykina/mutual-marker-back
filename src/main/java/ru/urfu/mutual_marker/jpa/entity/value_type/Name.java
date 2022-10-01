@@ -21,4 +21,8 @@ public class Name {
     @Column(length = 50)
     String patronymic;
 
+    @Override
+    public String toString(){
+        return String.format("%s %s %s", lastName, firstName, patronymic);
+    }
 }

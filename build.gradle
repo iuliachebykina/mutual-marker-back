@@ -34,6 +34,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client:2.6.7'
     implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
     implementation 'com.google.code.gson:gson:2.9.0'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation group: 'org.apache.poi', name: 'poi', version: '5.2.3'
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.3'
 }
 
 tasks.named('test') {
