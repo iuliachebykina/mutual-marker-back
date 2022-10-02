@@ -1,13 +1,14 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -24,7 +25,8 @@ import java.util.Set;
 @Where(clause="deleted=false")
 public class Attachment {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "attachmentSeq", sequenceName = "attachmentSeq")
+    @GeneratedValue(generator = "attachmentSeq")
     Long id;
     @NotNull
     String fileName;

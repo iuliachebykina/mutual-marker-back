@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.ProfileInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.security.RoomAccessEvaluator;
 import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import java.util.List;
 
@@ -29,6 +32,7 @@ import java.util.List;
 @Slf4j
 public class ProfileApi {
     ProfileService profileService;
+    RoomAccessEvaluator roomAccessEvaluator;
 
     @Operation(summary = "Получение инфы об админе по почте")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -166,9 +170,12 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    //@PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
+   // @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
-                                           @RequestParam("size") int size){
+                                               @RequestParam("size") int size){
+        if(!roomAccessEvaluator.isMemberOfRoomById(roomId)){
+            throw new RoomServiceException(roomId.toString());
+        }
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all students in room with id: {}", roomId);
         return profileService.getStudentsInRoom(roomId, pageable);
@@ -176,11 +183,43 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    //@PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
+//     @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
-                                           @RequestParam("size") int size){
+                                               @RequestParam("size") int size){
+        if(!roomAccessEvaluator.isMemberOfRoomById(roomId)){
+            throw new RoomServiceException(roomId.toString());
+        }
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
+    }
+
+    @Operation(summary = "Поиск преподавателя по имени или почте")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/room/teachers/search/{search}")
+    public List<ProfileInfo> getTeachersByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
+                                                     @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return profileService.searchTeachers(search, pageable);
+
+
+    }
+
+    @Operation(summary = "Поиск студента по имени или почте")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/room/students/search/{search}")
+    public List<ProfileInfo> getStudentsByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
+                                                     @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return profileService.searchStudents(search, pageable);
+
+
+    }
+
+    @Operation(summary = "Получение количества участников в комнате по ид комнаты")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/room/count-of-members/{roomId}")
+    public Long getCountOfMembersInRoom(@PathVariable Long roomId){
+        return profileService.getCountOfMembersInRoom(roomId);
     }
 }
