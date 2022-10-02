@@ -1,10 +1,11 @@
 package ru.urfu.mutual_marker.jpa.entity.value_type;
 
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.Column;
+import javax.validation.constraints.NotNull;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
