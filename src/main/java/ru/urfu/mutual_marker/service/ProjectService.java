@@ -46,8 +46,12 @@ public class ProjectService {
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
         var student = profileRepository.findByEmail(principal.getUsername());
+
         if(student.isEmpty()){
             throw new UserNotExistingException(String.format("Student with email: %s does not existing", principal.getUsername()));
+        }
+        if(!projectRepository.existsByStudentIdAndTaskId(student.get().getId(), taskId)) {
+            return null;
         }
         var markedProjects = markRepository.findAllByStudentId(student.get().getId())
                 .stream().map(mark -> mark.getProject().getId())
