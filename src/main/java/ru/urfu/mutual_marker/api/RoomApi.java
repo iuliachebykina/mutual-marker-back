@@ -78,10 +78,10 @@ public class RoomApi {
 
     @Operation(summary = "Удаление комнаты, необходимо быть преподавателем, находящимся в комнате или админом")
     @DeleteMapping("/room/{roomId}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Room> deleteRoom(@PathVariable Long roomId) {
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#code)) or hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Room> deleteRoom(@PathVariable String code) {
 
-        return new ResponseEntity<>(roomService.deleteRoom(roomId), HttpStatus.OK);
+        return new ResponseEntity<>(roomService.deleteRoom(code), HttpStatus.OK);
 
     }
 

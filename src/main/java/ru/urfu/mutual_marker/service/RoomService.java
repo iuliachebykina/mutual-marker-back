@@ -21,6 +21,7 @@ import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Data
@@ -71,12 +72,12 @@ public class RoomService {
 
     @Transactional
     public Room getRoomByCode(String roomCode){
-        Room room = roomRepository.findByCode(roomCode);
-        if (room == null){
+        Optional<Room> room = roomRepository.findByCode(roomCode);
+        if (room.isEmpty()){
             log.error("Failed to find room with code {}", roomCode);
             throw new RoomServiceException(String.format("Failed to find room by code %s", roomCode));
         }
-        return room;
+        return room.get();
     }
 
     @Transactional
@@ -105,11 +106,11 @@ public class RoomService {
     }
 
     @Transactional
-    public Room deleteRoom(Long roomId){
-        Room room = roomRepository.findById(roomId).orElse(null);
+    public Room deleteRoom(String code){
+        Room room = roomRepository.findByCode(code).orElse(null);
         if (room == null){
-            log.error("Failed to delete room with id {}", roomId);
-            throw new RoomServiceException("Failed to delete room with id" + roomId);
+            log.error("Failed to delete room with code{}", code);
+            throw new RoomServiceException("Failed to delete room with code" + code);
         }
         room.setDeleted(true);
         return roomRepository.save(room);
