@@ -12,7 +12,6 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.service.ProfileService;
 import ru.urfu.mutual_marker.service.RoomService;
-import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 @Service
 @Data
@@ -23,10 +22,12 @@ public class RoomAccessEvaluator {
     ProfileService profileService;
 
     public boolean isMemberOfRoomById(Long roomId) {
+        if(roomId == null)
+            return false;
         try {
             Room room = roomService.getRoomById(roomId);
             return checkRoomForProfile(room);
-        } catch (RoomServiceException e){
+        } catch (Exception e){
             log.error("Failed to evaluate access to the room with id {}, room does not exist", roomId);
             return false;
         }
@@ -37,7 +38,7 @@ public class RoomAccessEvaluator {
         try {
             Room room = roomService.getRoomByCode(roomCode);
             return checkRoomForProfile(room);
-        } catch (RoomServiceException e){
+        } catch (Exception e){
             log.error("Failed to evaluate access to room with code {}, room does not exist", roomCode);
             return false;
         }
