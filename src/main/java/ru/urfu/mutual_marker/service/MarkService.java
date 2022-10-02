@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
+import ru.urfu.mutual_marker.dto.AddTeacherMarkDto;
 import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -38,8 +39,17 @@ public class MarkService {
     TaskService taskService;
     NumberOfGradedRepository numberOfGradedRepository;
 
+
+    public Mark addStudentMark(AddMarkDto addMarkDto){
+        return addMark(addMarkDto, false, null);
+    }
+
+    public Mark addTeacherMark(AddTeacherMarkDto addTeacherMarkDto){
+        return addMark(addTeacherMarkDto, true, addTeacherMarkDto.getCoefficient());
+    }
+
     @Transactional
-    public Mark addMark(AddMarkDto addMarkDto){
+    Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
             Double res = addMarkDto.getMarkStepValues().stream().mapToInt(m -> m).average().orElse(Double.NaN);
@@ -53,9 +63,11 @@ public class MarkService {
             Project project = projectService.findProjectById(addMarkDto.getProjectId());
             mark = Mark
                     .builder()
-                    .student(owner)
+                    .owner(owner)
                     .project(project)
                     .comment(addMarkDto.getComment())
+                    .isTeacherMark(isTeacherMark)
+                    .coefficient(coefficient)
                     .markValue(truncation.intValue())
                     .build();
 
@@ -100,7 +112,7 @@ public class MarkService {
 
     @Transactional
     public Mark findMarkByProjectAndStudentIds(Long projectId, Long studentId){
-        Mark mark = markRepository.findByProjectIdAndStudentId(projectId, studentId).orElse(null);
+        Mark mark = markRepository.findByProjectIdAndOwnerId(projectId, studentId).orElse(null);
         if (mark == null){
             log.error("Failed to find mark for project with id {}", projectId);
             throw new MarkServiceException("Failed to find mark");
@@ -130,7 +142,7 @@ public class MarkService {
 //            NumberOfGraded number = student.getNumberOfGradedSet().stream()
 //                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
 
-            long count = markRepository.countAllByStudentIdAndProjectTaskId(studentId, project.getTask().getId());
+            long count = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
 
 //            if (number == null){
 ////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
@@ -141,8 +153,32 @@ public class MarkService {
 //                        .graded(0).build();
 //            }
             if (count >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
-                double gradeWithoutPrecision = project.getMarks().stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
-                res = BigDecimal.valueOf(gradeWithoutPrecision).setScale(precision, RoundingMode.HALF_UP).doubleValue();
+                double teachersMark = 0;
+                double studentsMark = 0;
+                double teacherCoefficient = 0;
+                int countOfStudentsMark = project.getMarks().size();
+                int countOfTeachersMark = 0;
+                for (Mark mark : project.getMarks()) {
+                    if(mark.getIsTeacherMark()) {
+                        teachersMark += mark.getMarkValue();
+                        countOfStudentsMark--;
+                        countOfTeachersMark++;
+                        teacherCoefficient+=mark.getCoefficient();
+                    }
+                    else {
+                        studentsMark+=mark.getMarkValue();
+                    }
+                }
+                if(countOfTeachersMark != 0){
+                    teacherCoefficient = (teacherCoefficient/countOfTeachersMark);
+                    teachersMark = (teachersMark/countOfTeachersMark)*teacherCoefficient;
+                }
+                if(countOfStudentsMark != 0){
+                    studentsMark = (studentsMark/countOfStudentsMark)*(1d-teacherCoefficient);
+                }
+
+
+                res = BigDecimal.valueOf(teachersMark+studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
             } else {
                 res = Double.NaN;
             }

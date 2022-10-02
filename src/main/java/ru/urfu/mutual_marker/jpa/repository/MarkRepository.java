@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MarkRepository extends JpaRepository<Mark, Long> {
-    Optional<Mark> findByProjectIdAndStudentId(Long projectId, Long studentId);
+    Optional<Mark> findByProjectIdAndOwnerId(Long projectId, Long studentId);
 
-    List<Mark> findAllByStudentId(Long studentId);
+    List<Mark> findAllByOwnerId(Long studentId);
 
-    Long countAllByStudentIdAndProjectTaskId(Long studentId, Long taskId);
+    Long countAllByOwnerIdAndProjectTaskId(Long studentId, Long taskId);
 }

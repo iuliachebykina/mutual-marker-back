@@ -17,6 +17,8 @@ services:
       - FILE_STORAGE=../mutual-marker
   psql:
     image: 'postgres:13.1-alpine'
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d
     container_name: psql
     environment:
       - POSTGRES_USER=postgres

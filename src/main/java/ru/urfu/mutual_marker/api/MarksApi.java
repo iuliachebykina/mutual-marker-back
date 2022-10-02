@@ -1,5 +1,6 @@
 package ru.urfu.mutual_marker.api;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
+import ru.urfu.mutual_marker.dto.AddTeacherMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
 import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
@@ -93,8 +95,14 @@ public class MarksApi {
     }
 
     @PostMapping("/mark")
-    public ResponseEntity<Object> addMark(@RequestBody AddMarkDto addMarkDto){
-        return new ResponseEntity<>(markService.addMark(addMarkDto), HttpStatus.OK);
+    public ResponseEntity<Object> addStudentMark(@RequestBody AddMarkDto addMarkDto){
+        return new ResponseEntity<>(markService.addStudentMark(addMarkDto), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Оценка работы преподавателем")
+    @PostMapping("/mark/teacher")
+    public ResponseEntity<Object> addTeacherMark(@RequestBody AddTeacherMarkDto addTeacherMarkDto){
+        return new ResponseEntity<>(markService.addStudentMark(addTeacherMarkDto), HttpStatus.OK);
     }
 
     @GetMapping(value = "/calculateFinalMark/{projectId}/{profileId}", params = {"precision"})

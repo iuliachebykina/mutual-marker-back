@@ -1,7 +1,6 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
@@ -11,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
@@ -34,7 +32,10 @@ public class Mark {
     @ManyToOne
     Project project;
     @ManyToOne
-    Profile student;
+    Profile owner;
+    Double coefficient;
+    @Builder.Default
+    Boolean isTeacherMark = Boolean.FALSE;
     @NotNull
     Integer markValue;
     @CreatedDate

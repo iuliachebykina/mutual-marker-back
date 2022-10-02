@@ -53,7 +53,7 @@ public class ProjectService {
         if(!projectRepository.existsByStudentIdAndTaskId(student.get().getId(), taskId)) {
             return null;
         }
-        var markedProjects = markRepository.findAllByStudentId(student.get().getId())
+        var markedProjects = markRepository.findAllByOwnerId(student.get().getId())
                 .stream().map(mark -> mark.getProject().getId())
                 .collect(Collectors.toList());
         var projects = projectRepository.findAllByTask(task)
