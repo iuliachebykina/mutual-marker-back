@@ -167,7 +167,7 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    //@PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
     public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
