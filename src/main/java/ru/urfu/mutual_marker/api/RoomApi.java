@@ -70,7 +70,7 @@ public class RoomApi {
 
     @Operation(summary = "Обновление имеющейся комнаты")
     @PutMapping("/room")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#room.getCode())) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> updateRoom(@RequestBody Room room){
         return new ResponseEntity<>(roomService.updateRoom(room), HttpStatus.OK);
 
