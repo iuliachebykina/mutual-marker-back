@@ -186,6 +186,7 @@ public class ProfileApi {
     }
 
     @Operation(summary = "Поиск преподавателя по имени или почте")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/room/teachers/search/{search}")
     public List<ProfileInfo> getTeachersByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
                                                      @RequestParam("size") int size){
@@ -196,6 +197,7 @@ public class ProfileApi {
     }
 
     @Operation(summary = "Поиск студента по имени или почте")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/room/students/search/{search}")
     public List<ProfileInfo> getStudentsByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
                                                      @RequestParam("size") int size){
@@ -203,5 +205,12 @@ public class ProfileApi {
         return profileService.searchStudents(search, pageable);
 
 
+    }
+
+    @Operation(summary = "Получение количества участников в комнате по ид комнаты")
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/room/count-of-members/{roomId}")
+    public Long getCountOfMembersInRoom(@PathVariable Long roomId){
+        return profileService.getCountOfMembersInRoom(roomId);
     }
 }

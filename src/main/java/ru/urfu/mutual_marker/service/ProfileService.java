@@ -276,4 +276,8 @@ public class ProfileService {
                 .collect(Collectors.toList());
 
     }
+
+    public Long getCountOfMembersInRoom(Long roomId) {
+        return profileRepository.countByRoomsId(roomId);
+    }
 }
