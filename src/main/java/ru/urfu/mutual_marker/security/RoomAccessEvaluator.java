@@ -21,7 +21,10 @@ public class RoomAccessEvaluator {
     RoomService roomService;
     ProfileService profileService;
 
-    public boolean isMemberOfRoomById(long roomId) {
+    public boolean isMemberOfRoomById(Long roomId) {
+        if(roomId == null){
+            return false;
+        }
         try {
             Room room = roomService.getRoomById(roomId);
             return checkRoomForProfile(room);

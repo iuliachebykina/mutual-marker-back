@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
@@ -167,9 +168,9 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
-    public List<StudentInfo> getStudentsInRoom(@PathVariable long roomId, @RequestParam("page") int page,
-                                           @RequestParam("size") int size){
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#room) or hasRole('ROLE_ADMIN')")
+    public List<StudentInfo> getStudentsInRoom(@P("room") @PathVariable Long roomId, @RequestParam("page") int page,
+                                               @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all students in room with id: {}", roomId);
         return profileService.getStudentsInRoom(roomId, pageable);
@@ -177,9 +178,9 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
-    public List<TeacherInfo> getTeachersInRoom(@PathVariable long roomId, @RequestParam("page") int page,
-                                           @RequestParam("size") int size){
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#room) or hasRole('ROLE_ADMIN')")
+    public List<TeacherInfo> getTeachersInRoom(@P("room") @PathVariable Long roomId, @RequestParam("page") int page,
+                                               @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
