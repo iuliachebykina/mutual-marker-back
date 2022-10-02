@@ -1,7 +1,7 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
@@ -9,6 +9,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Objects;
@@ -26,7 +27,8 @@ import java.util.Set;
 @Where(clause="deleted=false")
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "roomSeq", sequenceName = "roomSeq")
+    @GeneratedValue(generator = "roomSeq")
     Long id;
     @NotNull
     String title;

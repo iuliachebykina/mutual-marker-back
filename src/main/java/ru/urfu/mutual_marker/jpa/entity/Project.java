@@ -2,13 +2,14 @@ package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +26,8 @@ import java.util.Set;
 @Where(clause="deleted=false")
 public class Project {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "projectSeq", sequenceName = "projectSeq")
+    @GeneratedValue(generator = "projectSeq")
     Long id;
     @ManyToOne
     Profile student;

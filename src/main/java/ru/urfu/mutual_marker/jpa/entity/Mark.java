@@ -1,7 +1,7 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
@@ -27,7 +28,8 @@ import java.util.Objects;
 @EntityListeners(AuditingEntityListener.class)
 public class Mark {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "markSeq", sequenceName = "markSeq")
+    @GeneratedValue(generator = "markSeq")
     Long id;
     @ManyToOne
     Project project;

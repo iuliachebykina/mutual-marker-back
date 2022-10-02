@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
 import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
+import ru.urfu.mutual_marker.dto.profileInfo.ProfileInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -176,11 +177,31 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    //@PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#roomId) or hasRole('ROLE_ADMIN')")
     public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                            @RequestParam("size") int size){
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
+    }
+
+    @Operation(summary = "Поиск преподавателя по имени или почте")
+    @GetMapping("/room/teachers/search/{search}")
+    public List<ProfileInfo> getTeachersByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
+                                                     @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return profileService.searchTeachers(search, pageable);
+
+
+    }
+
+    @Operation(summary = "Поиск студента по имени или почте")
+    @GetMapping("/room/students/search/{search}")
+    public List<ProfileInfo> getStudentsByNameOrEmail(@PathVariable String search, @RequestParam("page") int page,
+                                                     @RequestParam("size") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        return profileService.searchStudents(search, pageable);
+
+
     }
 }

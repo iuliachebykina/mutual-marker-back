@@ -18,7 +18,8 @@ import javax.persistence.*;
 @Where(clause="deleted=false")
 public class NumberOfGraded {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "numberOfGradedSeq", sequenceName = "numberOfGradedSeq")
+    @GeneratedValue(generator = "numberOfGradedSeq")
     Long id;
 
     @ManyToOne

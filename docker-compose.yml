@@ -14,7 +14,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - FILE_STORAGE=../mitual-marker
+      - FILE_STORAGE=../mutual-marker
   psql:
     image: 'postgres:13.1-alpine'
     container_name: psql

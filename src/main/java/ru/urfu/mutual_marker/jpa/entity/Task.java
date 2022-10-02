@@ -1,13 +1,14 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sun.istack.NotNull;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
@@ -25,7 +26,8 @@ import java.util.Set;
 @Where(clause="deleted=false")
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "taskSeq", sequenceName = "taskSeq")
+    @GeneratedValue(generator = "taskSeq")
     Long id;
     @NotNull
     String title;

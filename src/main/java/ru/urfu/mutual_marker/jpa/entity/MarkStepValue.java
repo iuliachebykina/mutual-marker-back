@@ -18,7 +18,8 @@ import javax.persistence.*;
 @Where(clause="deleted=false")
 public class MarkStepValue {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @SequenceGenerator(name = "markStepValueSeq", sequenceName = "markStepValueSeq")
+    @GeneratedValue(generator = "markStepValueSeq")
     Long id;
 
     @Column
