@@ -21,6 +21,7 @@ import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.security.RoomAccessEvaluator;
 import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import java.util.List;
 
@@ -169,11 +170,12 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+   // @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                                @RequestParam("size") int size){
-//        if(!roomAccessEvaluator.isMemberOfRoomById(roomId))
-//            throw new RoomServiceException("Access denied");
+        if(!roomAccessEvaluator.isMemberOfRoomById(roomId)){
+            throw new RoomServiceException(roomId.toString());
+        }
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all students in room with id: {}", roomId);
         return profileService.getStudentsInRoom(roomId, pageable);
@@ -181,11 +183,12 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+//     @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
     public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                                @RequestParam("size") int size){
-//        if(!roomAccessEvaluator.isMemberOfRoomById(roomId))
-//           throw new RoomServiceException("Access denied");
+        if(!roomAccessEvaluator.isMemberOfRoomById(roomId)){
+            throw new RoomServiceException(roomId.toString());
+        }
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
