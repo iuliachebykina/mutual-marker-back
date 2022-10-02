@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
@@ -20,6 +19,7 @@ import ru.urfu.mutual_marker.dto.profileInfo.ProfileInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.security.RoomAccessEvaluator;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 import java.util.List;
@@ -31,6 +31,7 @@ import java.util.List;
 @Slf4j
 public class ProfileApi {
     ProfileService profileService;
+    RoomAccessEvaluator roomAccessEvaluator;
 
     @Operation(summary = "Получение инфы об админе по почте")
     @PreAuthorize("hasAnyRole('ADMIN')")
@@ -168,9 +169,11 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех студентов в комнате по id комнаты")
     @GetMapping("/room/students/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#room) or hasRole('ROLE_ADMIN')")
-    public List<StudentInfo> getStudentsInRoom(@P("room") @PathVariable Long roomId, @RequestParam("page") int page,
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+    public List<StudentInfo> getStudentsInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                                @RequestParam("size") int size){
+//        if(!roomAccessEvaluator.isMemberOfRoomById(roomId))
+//            throw new RoomServiceException("Access denied");
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all students in room with id: {}", roomId);
         return profileService.getStudentsInRoom(roomId, pageable);
@@ -178,9 +181,11 @@ public class ProfileApi {
 
     @Operation(summary = "Получение всех учителей в комнате по id комнаты")
     @GetMapping("/room/teachers/{roomId}")
-    @PreAuthorize("@roomAccessEvaluator.isMemberOfRoomById(#room) or hasRole('ROLE_ADMIN')")
-    public List<TeacherInfo> getTeachersInRoom(@P("room") @PathVariable Long roomId, @RequestParam("page") int page,
+    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_STUDENT', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomId)) or hasRole('ROLE_ADMIN')")
+    public List<TeacherInfo> getTeachersInRoom(@PathVariable Long roomId, @RequestParam("page") int page,
                                                @RequestParam("size") int size){
+//        if(!roomAccessEvaluator.isMemberOfRoomById(roomId))
+//           throw new RoomServiceException("Access denied");
         Pageable pageable = PageRequest.of(page, size);
         log.info("Got all teachers in room with id: {}", roomId);
         return profileService.getTeachersInRoom(roomId, pageable);
