@@ -211,8 +211,8 @@ public class ProfileService {
     }
 
     @Transactional
-    public Profile updateProfile(Profile updatedProfile) {
-        Optional<Profile> opt = profileRepository.findByEmail(updatedProfile.getEmail());
+    public Profile updateProfile(Profile updatedProfile, String email) {
+        Optional<Profile> opt = profileRepository.findByEmail(email);
         if (opt.isEmpty()) {
             log.error("User with id: {} does not existing", updatedProfile.getId());
             throw new UserNotExistingException(String.format("User with id: %s does not existing", updatedProfile.getId()));

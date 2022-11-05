@@ -129,16 +129,26 @@ public class ProfileApi {
     }
 
 
-    @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
+    @Operation(summary = "Обновление профиля пользователя админом. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
     @PatchMapping()
-    @PreAuthorize("#profile.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile) {
-        Profile newProfile = profileService.updateProfile(profile);
-        log.info("Updated profile with id: {}", profile.getId());
+        Profile newProfile = profileService.updateProfile(profile, profile.getEmail());
+        log.info("Updated profile with email: {}", profile.getEmail());
         return new ResponseEntity<>(newProfile, HttpStatus.OK);
     }
 
     @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
+    @PatchMapping()
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile, @CurrentSecurityContext(expression = "authentication.principal.username") String email ) {
+        Profile newProfile = profileService.updateProfile(profile, email);
+        log.info("Updated profile with email: {}", profile.getEmail());
+        return new ResponseEntity<>(newProfile, HttpStatus.OK);
+    }
+
+
+    @Operation(summary = "Получение информации о себе")
     @GetMapping("/self")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Profile> getProfile(@CurrentSecurityContext(expression = "authentication.principal.username") String email) {
