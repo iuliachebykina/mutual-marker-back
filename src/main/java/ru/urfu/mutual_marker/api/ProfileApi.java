@@ -131,7 +131,7 @@ public class ProfileApi {
     @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
     @PatchMapping()
     @PreAuthorize("#profile.getEmail() == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Profile> updateAdmin(@RequestBody Profile profile) {
+    public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile) {
         Profile newProfile = profileService.updateProfile(profile);
         log.info("Updated profile with id: {}", profile.getId());
         return new ResponseEntity<>(newProfile, HttpStatus.OK);
