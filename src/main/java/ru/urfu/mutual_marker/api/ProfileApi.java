@@ -139,9 +139,9 @@ public class ProfileApi {
     }
 
     @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
-    @PatchMapping()
+    @PatchMapping("/self")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Profile> updateSelfProfile(@RequestBody Profile profile, @CurrentSecurityContext(expression = "authentication.principal.username") String email ) {
+    public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile, @CurrentSecurityContext(expression = "authentication.principal.username") String email ) {
         Profile newProfile = profileService.updateProfile(profile, email);
         log.info("Updated profile with email: {}", profile.getEmail());
         return new ResponseEntity<>(newProfile, HttpStatus.OK);
