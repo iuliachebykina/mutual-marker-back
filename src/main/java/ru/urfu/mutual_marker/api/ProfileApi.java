@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ChangeEmail;
 import ru.urfu.mutual_marker.dto.ChangePassword;
@@ -136,6 +137,16 @@ public class ProfileApi {
         log.info("Updated profile with id: {}", profile.getId());
         return new ResponseEntity<>(newProfile, HttpStatus.OK);
     }
+
+    @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
+    @GetMapping("/self")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Profile> getProfile(@CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+        Profile profile = profileService.getProfileByEmail(email);
+        log.info("Get self profile with id: {}", profile.getId());
+        return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
 
 
     @Operation(summary = "Обновление пароля авторизованного пользователя")
