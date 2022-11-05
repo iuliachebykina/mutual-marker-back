@@ -13,4 +13,6 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
     Set<Attachment> findAllByFileNames(Iterable<String> filenames);
 
     Optional<Attachment> findByFileName(String filename);
+
+    void deleteByFileName(String filename);
 }

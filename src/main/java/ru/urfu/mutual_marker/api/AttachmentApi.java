@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,13 @@ public class AttachmentApi {
         return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), files);
     }
 
+    @Operation(summary = "Удалить вложение")
+    @DeleteMapping(value = "/attachments/delete/{filename}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAttachments(Authentication authentication, @PathVariable String filename) {
+        attachmentService.deleteAttachment((UserDetails) authentication.getPrincipal(), filename );
+    }
+
     @Operation(summary = "Добавление вложений", description = "Добавляет вложения в уже созданный проект")
     @PostMapping(value = "/project/{project_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachments(Authentication authentication,
@@ -48,6 +56,7 @@ public class AttachmentApi {
 
     @Operation(summary = "Удалить неиспользуемые вложения")
     @DeleteMapping(value = "/admin/attachments/delete")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteFiles() {
         attachmentService.deleteUseless();

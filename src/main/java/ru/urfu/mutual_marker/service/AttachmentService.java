@@ -51,6 +51,17 @@ public class AttachmentService {
         return filenames;
     }
 
+    @Transactional
+    public void deleteAttachment(UserDetails principal, String filename) {
+        Optional<Attachment> attachment = attachmentRepository.findByFileName(filename);
+        if(attachment.isEmpty() || !attachment.get().getStudent().getEmail().equals(principal.getUsername())){
+            return;
+        }
+        attachmentRepository.deleteByFileName(filename);
+        fileStorageService.deleteAll(List.of(filename));
+
+    }
+
     public ResponseEntity downloadFile(String filename) {
         var attachment = attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found."));
         var file = fileStorageService.load(filename);
