@@ -14,6 +14,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.AddEntityToRoomDto;
 import ru.urfu.mutual_marker.dto.AddRoomDto;
+import ru.urfu.mutual_marker.dto.RoomDto;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.service.RoomService;
@@ -49,10 +50,10 @@ public class RoomApi {
 
     @Operation(summary = "Получение списка комнат, доступных пользователю")
     @GetMapping(value = "/rooms", params = { "page", "size" })
-    public List<Room> getAllRooms(@RequestParam("page") int page,
-                                  @RequestParam("size") int size,
-                                  @CurrentSecurityContext(expression = "authentication.principal.username") String email,
-                                  @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
+    public List<RoomDto> getAllRooms(@RequestParam("page") int page,
+                                     @RequestParam("size") int size,
+                                     @CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                     @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
         Pageable pageable = PageRequest.of(page, size);
         SimpleGrantedAuthority role = roles.stream().findFirst().orElseThrow(() -> {
             throw new NotFoundException("Not found roles for authorize");

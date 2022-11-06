@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.RoomMapper;
 import ru.urfu.mutual_marker.dto.AddRoomDto;
+import ru.urfu.mutual_marker.dto.RoomDto;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
@@ -20,6 +21,7 @@ import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,7 +46,7 @@ public class RoomService {
     }
 
     @Transactional
-    public List<Room> getAllRoomsForProfile(Pageable pageable, String email, Role role){
+    public List<RoomDto> getAllRoomsForProfile(Pageable pageable, String email, Role role){
         try {
             switch (role){
                 case ROLE_STUDENT:
@@ -61,13 +63,28 @@ public class RoomService {
     }
 
     @Transactional
-    public List<Room> getAllRoomsForStudent(Pageable pageable, String studentEmail){
-        return roomRepository.findAllByStudentsEmail(studentEmail, pageable);
+    public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail){
+        List<Room> allByStudentsEmail = roomRepository.findAllByStudentsEmail(studentEmail, pageable);
+        return getRoomsDto(allByStudentsEmail);
     }
 
     @Transactional
-    public List<Room> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
-        return roomRepository.findAllByTeachersEmail(teacherEmail, pageable);
+    public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
+        List<Room> allByTeachersEmail = roomRepository.findAllByTeachersEmail(teacherEmail, pageable);
+        return getRoomsDto(allByTeachersEmail);
+    }
+
+    private List<RoomDto> getRoomsDto(List<Room> allByTeachersEmail) {
+        List<RoomDto> answer = new ArrayList<>();
+        for (Room room : allByTeachersEmail) {
+            answer.add(RoomDto.builder()
+                    .id(room.getId())
+                    .code(room.getCode())
+                    .title(room.getTitle())
+                    .membersCount(room.getTeachers().size() + room.getStudents().size())
+                    .build());
+        }
+        return answer;
     }
 
     @Transactional
