@@ -1,3 +1,9 @@
+#logging:
+#  level:
+#    root: DEBUG
+#    org.springframework.web: DEBUG
+#    com.howtodoinjava: DEBUG
+#    org.hibernate: DEBUG
 
 spring:
   servlet:

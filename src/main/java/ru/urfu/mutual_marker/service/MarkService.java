@@ -133,16 +133,13 @@ public class MarkService {
         double res;
         try {
             Project project = projectService.findProjectById(projectId);
-            Profile student = profileService.findById(studentId);
             Task task = project.getTask();
             if (task == null){
                 log.error("Failed to calculate mark, not task found for project with id {}", projectId);
                 throw new MarkServiceException(String.format("Failed to find task for project with id %s", projectId));
             }
-//            NumberOfGraded number = student.getNumberOfGradedSet().stream()
-//                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
 
-            long count = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
+            long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
 
 //            if (number == null){
 ////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
@@ -152,7 +149,7 @@ public class MarkService {
 //                        .profile(student)
 //                        .graded(0).build();
 //            }
-            if (count >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
+            if (numberOfGradedWorks >= task.getMinNumberOfGraded() && project.getMarks().size() >= task.getMinNumberOfGraded()) {
                 double teachersMark = 0;
                 double studentsMark = 0;
                 double teacherCoefficient = 0;
