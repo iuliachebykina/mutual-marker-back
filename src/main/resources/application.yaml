@@ -24,6 +24,15 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+#cloud:
+#    aws:
+#      region:
+#        static: eu-central-1
+#      stack:
+#        auto: false
+#      credentials:
+#        profile-name: dev
+
 springdoc:
   api-docs:
     path: /api-docs
