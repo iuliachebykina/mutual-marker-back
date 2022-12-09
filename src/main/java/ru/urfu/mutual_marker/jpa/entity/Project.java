@@ -8,6 +8,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -41,6 +42,9 @@ public class Project {
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
 
+    @Column
+    @NotNull
+    LocalDateTime completionDate;
 
     @OneToMany(mappedBy = "project")
     @Builder.Default
