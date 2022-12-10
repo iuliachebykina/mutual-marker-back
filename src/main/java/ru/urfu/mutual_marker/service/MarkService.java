@@ -174,7 +174,6 @@ public class MarkService {
     }
 
     public double calculateAfterCloseDate(Project project, Task task, Long studentId, int precision){
-        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
         if (task.getCloseDate().isAfter(project.getCompletionDate())){
             if (project.getMarks().size() > task.getMinNumberOfGraded()) {
                 return Double.NaN;

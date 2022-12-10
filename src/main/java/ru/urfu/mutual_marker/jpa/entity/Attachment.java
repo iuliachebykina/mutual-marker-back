@@ -46,6 +46,10 @@ public class Attachment {
     @JsonIgnore
     Set<Project> projects = new HashSet<>();
 
+    @ManyToOne
+    @ToString.Exclude
+//    @JsonIgnore
+    Task task;
 
     public void addProject(Project project){
         if(projects == null) //  если собирать с помощью билдера, сеты остаются не инициализированными, пусть на всякий случай эта проверка остается

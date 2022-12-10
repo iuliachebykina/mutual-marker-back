@@ -45,6 +45,9 @@ public class TaskCreationRequest {
     @Schema(title = "Создатель", example = "example@mail.com")
     String owner;
 
+    @Schema(title = "Вложения")
+    Set<String> attachments;
+
     @Value
     public static class MarkStep {
 

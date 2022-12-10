@@ -4,9 +4,15 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -19,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +37,7 @@ public class ExcelStatisticsService {
     final MarkService markService;
     final TaskRepository taskRepository;
 
-    public byte[] statisticsForProject(Long taskId) {
+    public ResponseEntity<Resource> statisticsForProject(Long taskId) {
         XSSFWorkbook workbook = new XSSFWorkbook();
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null){
@@ -124,7 +131,14 @@ public class ExcelStatisticsService {
             log.error("Error while writing statistics to excel ", e);
             throw new StatisticsServiceException("Failed to generate excel report", e);
         }
+        String filename = String.format("Отчет по заданию \"%s\".xlsx", task.getTitle());
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
 
-        return baos.toByteArray();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .contentLength(resource.contentLength())
+                .body(resource);
     }
 }

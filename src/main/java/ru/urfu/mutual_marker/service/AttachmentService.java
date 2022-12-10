@@ -10,10 +10,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
+import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.AttachmentRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
+import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
@@ -31,6 +34,7 @@ public class AttachmentService {
     ProfileRepository profileRepository;
     ProjectRepository projectRepository;
     FileStorageService fileStorageService;
+    TaskRepository taskRepository;
 
     @Transactional
     public List<String> uploadAttachments(UserDetails principal, MultipartFile[] files) {
@@ -72,7 +76,7 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void appendAttachments(UserDetails principal, MultipartFile[] files, Long projectId) {
+    public void appendAttachmentsToProject(UserDetails principal, MultipartFile[] files, Long projectId) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
         var project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project was not found."));
@@ -95,6 +99,26 @@ public class AttachmentService {
             attachmentRepository.save(attachment);
             project.getAttachments().add(attachment);
         }
+    }
+
+    @Transactional
+    public void appendAttachmentsToTask(UserDetails principal, MultipartFile[] files, Long taskId){
+        Profile profile = profileRepository.findByEmail(principal.getUsername()).orElse(null);
+        Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found."));
+
+        for (var file : files) {
+            var filename = generateFilename(Objects.requireNonNull(file.getOriginalFilename()));
+            var attachment = Attachment.builder()
+                    .fileName(filename)
+                    .contentType(file.getContentType())
+                    .student(profile)
+                    .task(task)
+                    .build();
+            task.addAttachment(attachment);
+            fileStorageService.save(file, filename);
+            attachmentRepository.save(attachment);
+        }
+        taskRepository.save(task);
     }
 
     @Transactional
