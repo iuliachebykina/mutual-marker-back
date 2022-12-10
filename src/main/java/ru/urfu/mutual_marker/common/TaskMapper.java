@@ -6,10 +6,12 @@ import org.mapstruct.ReportingPolicy;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -37,5 +39,8 @@ public interface TaskMapper {
     TaskFullInfo entityToFullInfo(Task task);
 
     @Mapping(target = "deleted", defaultValue = "false")
+    @Mapping(target = "attachments", source = "request.attachments")
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
+
+    default Set<Attachment> map(Set<String> value){return new HashSet<>();}
 }
