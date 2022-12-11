@@ -4,28 +4,27 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
-import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
-import ru.urfu.mutual_marker.service.*;
+import ru.urfu.mutual_marker.service.MarkService;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Set;
 
 @Service
@@ -35,9 +34,10 @@ import java.util.Set;
 public class ExcelStatisticsService {
     final MarkService markService;
     final TaskRepository taskRepository;
+    final ResourceLoader resourceLoader;
 
     public ResponseEntity<Resource> statisticsForProject(Long taskId) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(ResourceUtils.getFile("classpath:resources/statistics-template.xlsx"))) {
+        try (XSSFWorkbook workbook = new XSSFWorkbook(resourceLoader.getResource("classpath:/statistics-template.xlsx").getInputStream())) {
             Task task = taskRepository.findById(taskId).orElse(null);
             if (task == null) {
                 throw new IllegalArgumentException("Task with given id not found");
@@ -113,7 +113,7 @@ public class ExcelStatisticsService {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
                     .contentLength(resource.contentLength())
                     .body(resource);
-        } catch (IOException | InvalidFormatException e) {
+        } catch (IOException e) {
             log.error("Error while trying to build excel report", e);
             throw new RuntimeException(e);
         }
