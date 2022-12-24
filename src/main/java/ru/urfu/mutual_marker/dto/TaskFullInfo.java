@@ -38,6 +38,9 @@ public class TaskFullInfo {
     @Schema(title = "Статус жизни")
     Boolean deleted;
 
+    @Schema(title = "Вложения")
+    Set<String> attachments;
+
     @Value
     public static class MarkStep {
 

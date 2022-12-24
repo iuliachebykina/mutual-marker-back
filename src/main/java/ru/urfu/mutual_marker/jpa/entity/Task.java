@@ -46,12 +46,12 @@ public class Task {
     @Column(name = "min_graded")
     Integer minNumberOfGraded;
 
-    @ManyToMany
-    @JoinTable(
-            name = "task_attachments",
-            schema = "mutual_marker",
-            joinColumns = @JoinColumn(name = "task_id"),
-            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    @OneToMany(mappedBy = "task")
+//    @JoinTable(
+//            name = "task_attachments",
+//            schema = "mutual_marker",
+//            joinColumns = @JoinColumn(name = "task_id"),
+//            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     @Builder.Default
     @ToString.Exclude
     Set<Attachment> attachments = new HashSet<>();

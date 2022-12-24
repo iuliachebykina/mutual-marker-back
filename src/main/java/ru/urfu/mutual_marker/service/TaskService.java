@@ -66,15 +66,7 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
-        var attachments = attachmentRepository.findAllByFileNames(request.getAttachments());
 
-        attachments.forEach(task::addAttachment);
-        task.setRoom(room.get());
-        task.getMarkSteps().forEach(step -> {
-            step.setOwner(owner);
-            step.addTask(task);
-            step.setDeleted(false);
-        });
         Task save = taskRepository.save(task);
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
         markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {

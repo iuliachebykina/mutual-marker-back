@@ -28,7 +28,7 @@ public class AttachmentApi {
 
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
-    public List<String> uploadAttachment(Authentication authentication, @RequestParam("files") MultipartFile[] files) {
+    public List<String> uploadAttachments(Authentication authentication, @RequestParam("files") MultipartFile[] files) {
         return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), files);
     }
 
@@ -45,6 +45,14 @@ public class AttachmentApi {
                                   @RequestParam("files") MultipartFile[] files,
                                   @PathVariable("project_id") Long projectId) {
         attachmentService.appendAttachmentsToProject((UserDetails) authentication.getPrincipal(), files, projectId);
+    }
+
+    @Operation(summary = "Добавление вложений", description = "Добавляет вложения в созданное задание")
+    @PostMapping(value = "/task/{task_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void appendAttachmentsTask(Authentication authentication,
+                                  @RequestParam("files") MultipartFile[] files,
+                                  @PathVariable("task_id") Long taskId) {
+        attachmentService.appendAttachmentsToTask((UserDetails) authentication.getPrincipal(), files, taskId);
     }
 
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")

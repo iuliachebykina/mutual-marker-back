@@ -56,7 +56,7 @@ public class Project {
     @JoinTable(
             name = "project_attachments",
             schema = "mutual_marker",
-            joinColumns = @JoinColumn(name = "project_id"),
+            joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
     @Builder.Default
     @ToString.Exclude

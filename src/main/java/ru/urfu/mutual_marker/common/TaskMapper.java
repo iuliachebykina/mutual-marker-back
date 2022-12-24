@@ -38,9 +38,10 @@ public interface TaskMapper {
     @Mapping(source = "room.id", target = "roomId")
     TaskFullInfo entityToFullInfo(Task task);
 
-    @Mapping(target = "deleted", defaultValue = "false")
-    @Mapping(target = "attachments", source = "request.attachments")
-    Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
+    default String attachmentToString(Attachment attachment) {
+        return attachment.getFileName();
+    }
 
-    default Set<Attachment> map(Set<String> value){return new HashSet<>();}
+    @Mapping(target = "deleted", defaultValue = "false")
+    Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
 }
