@@ -44,7 +44,7 @@ public class AttachmentApi {
     public void appendAttachments(Authentication authentication,
                                   @RequestParam("files") MultipartFile[] files,
                                   @PathVariable("project_id") Long projectId) {
-        attachmentService.appendAttachments((UserDetails) authentication.getPrincipal(), files, projectId);
+        attachmentService.appendAttachmentsToProject((UserDetails) authentication.getPrincipal(), files, projectId);
     }
 
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")

@@ -36,6 +36,8 @@ public class TaskService {
     MarkStepRepository markStepRepository;
     NumberOfGradedRepository numberOfGradedRepository;
 
+    AttachmentRepository attachmentRepository;
+
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_Id(roomId, pageable);
@@ -64,6 +66,9 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
+        var attachments = attachmentRepository.findAllByFileNames(request.getAttachments());
+
+        attachments.forEach(task::addAttachment);
         task.setRoom(room.get());
         task.getMarkSteps().forEach(step -> {
             step.setOwner(owner);

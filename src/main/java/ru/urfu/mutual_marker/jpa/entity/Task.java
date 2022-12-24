@@ -46,6 +46,16 @@ public class Task {
     @Column(name = "min_graded")
     Integer minNumberOfGraded;
 
+    @ManyToMany
+    @JoinTable(
+            name = "task_attachments",
+            schema = "mutual_marker",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    @Builder.Default
+    @ToString.Exclude
+    Set<Attachment> attachments = new HashSet<>();
+
     @OneToMany(mappedBy = "task")
     @Builder.Default
     @JsonIgnore
@@ -107,6 +117,13 @@ public class Task {
                 .filter(n -> Objects.equals(n.getId(), num.getId()))
                 .findFirst()
                 .ifPresent(toRemove -> this.numberOfGraded.remove(toRemove));
+    }
+
+    public void addAttachment(Attachment attachment){
+        if(attachments == null)
+            attachments = new HashSet<>();
+        attachments.add(attachment);
+        attachment.setTask(this);
     }
 
 
