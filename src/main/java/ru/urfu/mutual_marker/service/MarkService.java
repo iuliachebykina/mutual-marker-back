@@ -175,7 +175,7 @@ public class MarkService {
 
     public double calculateAfterCloseDate(Project project, Task task, Long studentId, int precision){
         if (task.getCloseDate().isAfter(project.getCompletionDate())){
-            if (project.getMarks().size() > task.getMinNumberOfGraded()) {
+            if (project.getMarks().size() < task.getMinNumberOfGraded()) {
                 return Double.NaN;
             } else{
                 return calculate(project, precision);
@@ -195,8 +195,8 @@ public class MarkService {
             teachersMark += mark.getMarkValue();
             teacherCoefficient+=mark.getCoefficient();
         }
-        studentsMark = studentMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
-        teachersMark = teacherMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(Double.NaN);
+        studentsMark = studentMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(0);
+        teachersMark = teacherMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(0);
         if(teacherMarks.size() != 0){
             teacherCoefficient = (teacherCoefficient/teacherMarks.size());
             teachersMark = teachersMark * teacherCoefficient;
