@@ -18,6 +18,7 @@ import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -108,5 +109,16 @@ public class TaskService {
 
         var task = taskOptional.get();
         task.delete();
+    }
+
+    public TaskInfo updateTask(Long taskId, TaskCreationRequest request) {
+        Optional<Task> task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new IllegalArgumentException("Task was not found");
+        }
+        var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
+
+        Task save = taskRepository.save(taskMapper.creationRequestToExistingEntity(task.get(), request, owner));
+        return taskMapper.entityToInfo(save);
     }
 }

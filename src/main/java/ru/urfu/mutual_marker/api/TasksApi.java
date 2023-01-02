@@ -49,6 +49,13 @@ public class TasksApi {
         return taskService.saveTask(request);
     }
 
+    @Operation(summary = "Изменить задание")
+    @PatchMapping(value = "/task/{task_id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
+    public TaskInfo updateTask(@RequestBody TaskCreationRequest request, @PathVariable("task_id") Long taskId) {
+        return taskService.updateTask(taskId, request);
+    }
+
     @Operation(summary = "Удаление задания")
     @DeleteMapping(value = "/task/{task_id}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
