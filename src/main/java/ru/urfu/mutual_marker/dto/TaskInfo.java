@@ -32,6 +32,6 @@ public class TaskInfo {
     @Schema(title = "Статус жизни", description = "Удалено или нет", example = "false")
     boolean deleted;
 
-    @Schema(title = "Количество оцененных работ", description = "Количество оцененных работ для текущего пользователя", example = "5")
-    Long numberOfGradedWorks;
+    @Schema(title = "Количество работ, которые необходимо оценить", description = "Количество работ, которые необходимо оценить для получения оценкм", example = "1")
+    Long numberOfWorksLeftToGrade;
 }

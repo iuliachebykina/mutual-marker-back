@@ -54,7 +54,8 @@ public class TaskService {
         List<TaskInfo> infos = taskMapper.entitiesToInfos(tasks);
         infos.forEach(info -> {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
-            info = info.toBuilder().numberOfGradedWorks(numberOfGradedWorks).build();
+            Long leftToGrade = taskRepository.getMinNumberOfGradedForTask(info.getId()) - numberOfGradedWorks;
+            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
         });
         return infos;
     }
