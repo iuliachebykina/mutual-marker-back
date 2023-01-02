@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -52,7 +53,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void saveTask(TaskCreationRequest request) {
+    public TaskInfo saveTask(TaskCreationRequest request) {
 
         var room  = roomRepository.findById(request.getRoomId());
 
@@ -62,6 +63,7 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
+        task.setRoom(room.get());
 
         Task save = taskRepository.save(task);
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
@@ -72,6 +74,8 @@ public class TaskService {
         }));
 
         log.info("Create task with id: {}", save.getId());
+        return taskMapper.entityToInfo(save);
+
     }
 
     @Transactional
@@ -85,5 +89,16 @@ public class TaskService {
 
         var task = taskOptional.get();
         task.delete();
+    }
+
+    public TaskInfo updateTask(Long taskId, TaskCreationRequest request) {
+        Optional<Task> task = taskRepository.findById(taskId);
+        if (task.isEmpty()) {
+            throw new IllegalArgumentException("Task was not found");
+        }
+        var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
+
+        Task save = taskRepository.save(taskMapper.creationRequestToExistingEntity(task.get(), request, owner));
+        return taskMapper.entityToInfo(save);
     }
 }

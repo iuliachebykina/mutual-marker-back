@@ -1,8 +1,6 @@
 package ru.urfu.mutual_marker.common;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
@@ -11,11 +9,10 @@ import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface TaskMapper {
 
     default Integer map(MarkStepValue value) {
@@ -44,4 +41,6 @@ public interface TaskMapper {
 
     @Mapping(target = "deleted", defaultValue = "false")
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
+
+    Task creationRequestToExistingEntity(@MappingTarget Task task, TaskCreationRequest request, Profile owner);
 }
