@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,8 @@ import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
 import ru.urfu.mutual_marker.dto.ProjectInfo;
 import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.service.ProjectService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -41,11 +44,19 @@ public class ProjectApi {
         return projectService.getRandomProject((UserDetails) authentication.getPrincipal(), taskId);
     }
 
-    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
-    @GetMapping(value = "/task/{task_id}/project/{project_id}")
-    public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
-        return projectService.getProject(projectId);
+//    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
+//    @GetMapping(value = "/task/{task_id}/project/{project_id}")
+//    public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
+//        return projectService.getProject(projectId);
+//    }
+
+    @Operation(summary = "Все проекты в задании", description = "Возвращает все проекты в задании")
+    @GetMapping(value = "/task/{task_id}/projects")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    public List<ProjectInfo> getProjects(@PathVariable("task_id") Long taskId) {
+        return projectService.getProjects(taskId);
     }
+
 
     @Operation(summary = "Создание проекта", description = "Создает проект. ВАЖНО: сначала надо загрузить вложения")
     @PostMapping(value = "/task/{task_id}/project")

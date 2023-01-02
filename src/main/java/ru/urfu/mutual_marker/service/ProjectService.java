@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -130,5 +131,14 @@ public class ProjectService {
 
     public List<Project> findAllProjectsByTaskId(Long taskId){
         return projectRepository.findAllByTask_Id(taskId);
+    }
+
+    public List<ProjectInfo> getProjects(Long taskId) {
+        List<Project> allByTask_id = findAllProjectsByTaskId(taskId);
+        List<ProjectInfo> projectInfos = new ArrayList<>();
+        for (Project project : allByTask_id) {
+            projectInfos.add(projectMapper.entityToInfo(project));
+        }
+        return projectInfos;
     }
 }
