@@ -110,6 +110,7 @@ public class ProjectService {
                 .task(task)
                 .title(creationInfo.getTitle())
                 .description(creationInfo.getDescription())
+                .completionDate(LocalDateTime.now())
                 .build();
         attachments.forEach(project::addAttachment);
         Project save = projectRepository.save(project);
