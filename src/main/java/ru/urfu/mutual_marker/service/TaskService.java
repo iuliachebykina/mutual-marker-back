@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
@@ -16,9 +18,14 @@ import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +41,22 @@ public class TaskService {
     ProfileRepository profileRepository;
     TaskRepository taskRepository;
     MarkStepRepository markStepRepository;
+    ProfileService profileService;
+    MarkRepository markRepository;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_Id(roomId, pageable);
-        return taskMapper.entitiesToInfos(tasks);
+        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+        tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
+
+        List<TaskInfo> infos = taskMapper.entitiesToInfos(tasks);
+        infos.forEach(info -> {
+            Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
+            info = info.toBuilder().numberOfGradedWorks(numberOfGradedWorks).build();
+        });
+        return infos;
     }
 
     public TaskFullInfo findTask(Long taskId) {
