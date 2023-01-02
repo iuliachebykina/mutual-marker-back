@@ -45,11 +45,11 @@ public class ProjectApi {
         return projectService.getRandomProject((UserDetails) authentication.getPrincipal(), taskId);
     }
 
-//    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
-//    @GetMapping(value = "/task/{task_id}/project/{project_id}")
-//    public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
-//        return projectService.getProject(projectId);
-//    }
+    @Operation(summary = "Рандомный проект", description = "Возвращает рандомный проект для оценки в текущей таске")
+    @GetMapping(value = "/task/{task_id}/project/{project_id}")
+    public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
+        return projectService.getProject(projectId);
+    }
 
     @Operation(summary = "Все проекты в задании", description = "Возвращает все проекты в задании")
     @GetMapping(value = "/task/{task_id}/projects")
