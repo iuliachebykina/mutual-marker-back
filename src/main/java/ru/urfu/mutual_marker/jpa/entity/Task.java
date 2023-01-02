@@ -62,12 +62,6 @@ public class Task {
     @ToString.Exclude
     Set<MarkStep> markSteps = new HashSet<>();
 
-    @OneToMany(mappedBy = "task")
-    @JsonIgnore
-    @ToString.Exclude
-    @Builder.Default
-    Set<NumberOfGraded> numberOfGraded = new HashSet<>();
-
     public void addProject(Project project){
         if(projects == null)
             projects = new HashSet<>();
@@ -95,23 +89,6 @@ public class Task {
             this.markSteps.remove(markStep);
             markStep.getTasks().remove(this);
         }
-    }
-
-    public void addNumberOfGraded(NumberOfGraded num){
-        if (this.numberOfGraded == null){
-            this.numberOfGraded = new HashSet<>();
-        }
-        this.numberOfGraded.add(num);
-    }
-
-    public void removeNumberOfGraded(NumberOfGraded num) {
-        if (this.numberOfGraded == null) {
-            return;
-        }
-        this.numberOfGraded.stream()
-                .filter(n -> Objects.equals(n.getId(), num.getId()))
-                .findFirst()
-                .ifPresent(toRemove -> this.numberOfGraded.remove(toRemove));
     }
 
     public void addAttachment(Attachment attachment){

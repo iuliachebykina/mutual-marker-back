@@ -69,12 +69,6 @@ public class Profile {
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
 
-    @OneToMany(mappedBy = "profile")
-    @Builder.Default
-    @JsonIgnore
-    @ToString.Exclude
-    Set<NumberOfGraded> numberOfGradedSet = new HashSet<>();
-
     public void addAttachment(Attachment attachment){
         if(attachments == null)
             attachments = new HashSet<>();
@@ -87,12 +81,6 @@ public class Profile {
         rooms.add(room);
     }
 
-    public void addNumberOfGraded(NumberOfGraded numberOfGraded){
-        if(numberOfGradedSet == null)
-            numberOfGradedSet = new HashSet<>();
-        numberOfGradedSet.add(numberOfGraded);
-    }
-
     public void removeAttachment(long attachmentId){
         if(attachments == null)
             return;
@@ -103,12 +91,6 @@ public class Profile {
         if(rooms == null)
             return;
         this.rooms.stream().filter(a -> a.getId() == roomId).findFirst().ifPresent(room -> this.rooms.remove(room));
-    }
-
-    public void removeNumberOfGraded(long numberOfGradedId){
-        if(numberOfGradedSet == null)
-            return;
-        this.numberOfGradedSet.stream().filter(a -> a.getId() == numberOfGradedId).findFirst().ifPresent(numberOfGraded -> this.numberOfGradedSet.remove(numberOfGraded));
     }
 
     @Override

@@ -13,7 +13,6 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
-import ru.urfu.mutual_marker.jpa.repository.NumberOfGradedRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
@@ -38,7 +37,6 @@ public class MarkService {
     ProfileService profileService;
     ProjectService projectService;
     TaskService taskService;
-    NumberOfGradedRepository numberOfGradedRepository;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
