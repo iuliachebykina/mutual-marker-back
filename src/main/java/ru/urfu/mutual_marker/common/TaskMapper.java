@@ -11,7 +11,6 @@ import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

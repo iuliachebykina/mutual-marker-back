@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -46,9 +45,8 @@ public class TasksApi {
     @Operation(summary = "Создание задания")
     @PostMapping(value = "/task")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createTask(@RequestBody TaskCreationRequest request) {
-        taskService.saveTask(request);
+    public TaskInfo createTask(@RequestBody TaskCreationRequest request) {
+        return taskService.saveTask(request);
     }
 
     @Operation(summary = "Удаление задания")

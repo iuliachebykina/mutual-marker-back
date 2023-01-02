@@ -56,7 +56,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void saveTask(TaskCreationRequest request) {
+    public TaskInfo saveTask(TaskCreationRequest request) {
 
         var room  = roomRepository.findById(request.getRoomId());
 
@@ -66,6 +66,7 @@ public class TaskService {
 
         var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
+        task.setRoom(room.get());
 
         Task save = taskRepository.save(task);
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
@@ -75,6 +76,7 @@ public class TaskService {
             markStepValueRepository.save(value);
         }));
 
+        // что это вообще? TODO
         Set<Profile> roomStudents = room.get().getStudents();
         roomStudents.forEach(student -> {
             NumberOfGraded numberOfGraded = NumberOfGraded
@@ -91,6 +93,8 @@ public class TaskService {
         });
 
         log.info("Create task with id: {}", save.getId());
+        return taskMapper.entityToInfo(save);
+
     }
 
     @Transactional
