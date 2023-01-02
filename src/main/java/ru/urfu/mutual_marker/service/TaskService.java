@@ -10,7 +10,6 @@ import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
-import ru.urfu.mutual_marker.jpa.entity.NumberOfGraded;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
@@ -35,9 +34,6 @@ public class TaskService {
     ProfileRepository profileRepository;
     TaskRepository taskRepository;
     MarkStepRepository markStepRepository;
-    NumberOfGradedRepository numberOfGradedRepository;
-
-    AttachmentRepository attachmentRepository;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -76,22 +72,6 @@ public class TaskService {
             value.setDeleted(false);
             markStepValueRepository.save(value);
         }));
-
-        // что это вообще? TODO
-        Set<Profile> roomStudents = room.get().getStudents();
-        roomStudents.forEach(student -> {
-            NumberOfGraded numberOfGraded = NumberOfGraded
-                    .builder()
-                    .task(task)
-                    .profile(student)
-                    .graded(0)
-                    .build();
-            numberOfGradedRepository.save(numberOfGraded);
-            student.addNumberOfGraded(numberOfGraded);
-            task.addNumberOfGraded(numberOfGraded);
-            profileRepository.save(student);
-            taskRepository.save(task);
-        });
 
         log.info("Create task with id: {}", save.getId());
         return taskMapper.entityToInfo(save);
