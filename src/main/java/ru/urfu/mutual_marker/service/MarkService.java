@@ -62,6 +62,9 @@ public class MarkService {
             truncation = truncation.setScale(0, RoundingMode.HALF_UP);
             Profile owner = profileService.findById(addMarkDto.getProfileId());
             Project project = projectService.findProjectById(addMarkDto.getProjectId());
+            if(project.getTask().getCloseDate().isBefore(LocalDateTime.now()) && !isTeacherMark){
+                return null;
+            }
             mark = Mark
                     .builder()
                     .owner(owner)

@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
 import ru.urfu.mutual_marker.dto.ProjectInfo;
 import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.service.ProjectService;
@@ -60,8 +61,7 @@ public class ProjectApi {
 
     @Operation(summary = "Создание проекта", description = "Создает проект. ВАЖНО: сначала надо загрузить вложения")
     @PostMapping(value = "/task/{task_id}/project")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void createProject(Authentication authentication, @PathVariable("task_id") Long taskId, @RequestBody ProjectCreationInfo creationInfo) {
-        projectService.createProject((UserDetails) authentication.getPrincipal(), creationInfo, taskId);
+    public ProjectCreationResultDto createProject(Authentication authentication, @PathVariable("task_id") Long taskId, @RequestBody ProjectCreationInfo creationInfo) {
+        return projectService.createProject((UserDetails) authentication.getPrincipal(), creationInfo, taskId);
     }
 }

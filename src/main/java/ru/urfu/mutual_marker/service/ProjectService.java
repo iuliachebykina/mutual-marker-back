@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProjectMapper;
 import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
 import ru.urfu.mutual_marker.dto.ProjectInfo;
 import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.jpa.entity.Project;
@@ -17,6 +18,7 @@ import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -91,12 +93,17 @@ public class ProjectService {
     }
 
     @Transactional
-    public void createProject(UserDetails principal, ProjectCreationInfo creationInfo, Long taskId) {
+    public ProjectCreationResultDto createProject(UserDetails principal, ProjectCreationInfo creationInfo, Long taskId) {
         var profile = profileRepository.findByEmail(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
+        if(task.getCloseDate().isBefore(LocalDateTime.now())){
+            return ProjectCreationResultDto.builder()
+                    .isOverdue(true)
+                    .build();
+        }
         var attachments = attachmentRepository.findAllByFileNames(creationInfo.getAttachments());
         var project = Project.builder()
                 .student(profile.get())
@@ -105,7 +112,11 @@ public class ProjectService {
                 .description(creationInfo.getDescription())
                 .build();
         attachments.forEach(project::addAttachment);
-        projectRepository.save(project);
+        Project save = projectRepository.save(project);
+        return ProjectCreationResultDto.builder()
+                .id(save.getId())
+                .isOverdue(false)
+                .build();
     }
 
     public ProjectInfo getSelfProject(UserDetails principal, Long taskId) {
