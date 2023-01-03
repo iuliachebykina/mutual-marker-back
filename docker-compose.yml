@@ -1,14 +1,15 @@
 version: '3.8'
 services:
   minio:
-    image: bitnami/minio:2021.3.1
+    image: bitnami/minio:2022
     container_name: minio
     environment:
-      MINIO_ACCESS_KEY: "Q3AM3UQ867SPQQA43P2F"
-      MINIO_SECRET_KEY: "tfteSlswRu7BJ86wekitnifILbZam1KYY3TG"
+      MINIO_ROOT_USER: "user"
+      MINIO_ROOT_PASSWORD: "password"
       MINIO_DEFAULT_BUCKETS: 202301-urfu-rtf
     ports:
-      - 9000:9000
+      - "9000:9000"
+
   mutual-marker-back:
     container_name: mutual-marker-back
     build:
@@ -27,11 +28,16 @@ services:
       FILE_STORAGE: ../mutual-marker
       MINIO_URL: http://minio:9000
       MINIO_BUCKET: 202301-urfu-rtf
-      MINIO_ACCESS_KEY: Q3AM3UQ867SPQQA43P2F
-      MINIO_SECRET_KEY: tfteSlswRu7BJ86wekitnifILbZam1KYY3TG
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
       MAX_FILE_SIZE: 20MB
       MAX_REQUEST_SIZE: 20MB
       FILE-SIZE-THRESHOLD: 2KB
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
 
   psql:
     image: 'postgres:13.1-alpine'
