@@ -14,6 +14,6 @@ public class RoomDto {
     Long id;
     String title;
     String code;
-    int membersCount;
+    Long membersCount;
 
 }

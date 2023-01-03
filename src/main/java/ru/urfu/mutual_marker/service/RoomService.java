@@ -81,7 +81,7 @@ public class RoomService {
                     .id(room.getId())
                     .code(room.getCode())
                     .title(room.getTitle())
-                    .membersCount(room.getTeachers().size() + room.getStudents().size())
+                    .membersCount(profileService.getCountOfMembersInRoom(room.getId()))
                     .build());
         }
         return answer;
