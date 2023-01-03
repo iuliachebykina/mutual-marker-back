@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -137,5 +138,23 @@ public class AttachmentService {
 
     public String getDescription(String filename) {
         return attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found.")).getDescription();
+    }
+
+    //TODO удалить нужно, так для простого теста делалось
+    public List<String> uploadAttachmentsV1(UserDetails principal, MultipartFile[] attachments) {
+        var profile = profileRepository.findByEmail(principal.getUsername());
+        var filenames = new ArrayList<String>();
+        for (var attachmentDto : attachments) {
+            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getOriginalFilename()));
+            filenames.add(filename);
+            var attachment = Attachment.builder()
+                    .fileName(filename)
+                    .contentType(attachmentDto.getContentType())
+                    .student(profile.get())
+                    .build();
+            fileStorageService.save(attachmentDto, filename);
+            attachmentRepository.save(attachment);
+        }
+        return filenames;
     }
 }

@@ -40,7 +40,7 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.3'
     implementation 'org.springframework.security:spring-security-web:5.7.3'
     implementation 'org.springframework.security:spring-security-core:5.7.3'
-
+    implementation 'com.jlefebure:spring-boot-starter-minio:1.4'
 
 }
 
