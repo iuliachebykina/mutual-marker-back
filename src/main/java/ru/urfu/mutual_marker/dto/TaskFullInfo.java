@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class TaskFullInfo {
 
     @Schema(title = "ИД задания", example = "1")
@@ -40,6 +40,9 @@ public class TaskFullInfo {
 
     @Schema(title = "Вложения")
     Set<String> attachments;
+
+    @Schema(title = "Количество работ, которое осталось оценить")
+    Long numberOfWorksLeftToGrade;
 
     @Value
     public static class MarkStep {

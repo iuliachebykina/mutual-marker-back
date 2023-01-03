@@ -12,7 +12,6 @@ import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
@@ -21,11 +20,6 @@ import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +48,7 @@ public class TaskService {
         List<TaskInfo> infos = taskMapper.entitiesToInfos(tasks);
         infos.forEach(info -> {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
-            Long leftToGrade = taskRepository.getMinNumberOfGradedForTask(info.getId()) - numberOfGradedWorks;
+            Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
             info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
         });
         return infos;
@@ -68,7 +62,15 @@ public class TaskService {
             throw new NotFoundException("Task was not found");
         }
 
-        return taskMapper.entityToFullInfo(task.get());
+        TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
+
+        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+
+        Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
+        Long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
+        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+        return taskFullInfo;
     }
 
     @Transactional

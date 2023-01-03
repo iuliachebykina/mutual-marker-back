@@ -14,6 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByRoom_Id(Long roomId, Pageable pageable);
 
-    @Query(value = "SELECT task.minNumberOfGraded FROM Task task WHERE task.id= :taskId")
-    Long getMinNumberOfGradedForTask(@Param("taskId") Long taskId);
+    //Второй вариант для рассчёта того, сколько работ осталось оценить
+//    @Query(value = "SELECT task.minNumberOfGraded FROM Task task WHERE task.id= :taskId")
+//    Long getMinNumberOfGradedForTask(@Param("taskId") Long taskId);
 }
