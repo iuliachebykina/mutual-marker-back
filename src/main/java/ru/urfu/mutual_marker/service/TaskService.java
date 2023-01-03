@@ -7,10 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.TaskMapper;
+import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
@@ -18,7 +18,6 @@ import ru.urfu.mutual_marker.service.exception.NotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +33,7 @@ public class TaskService {
     ProfileRepository profileRepository;
     TaskRepository taskRepository;
     MarkStepRepository markStepRepository;
+    AttachmentService attachmentService;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -49,7 +49,12 @@ public class TaskService {
             throw new NotFoundException("Task was not found");
         }
 
-        return taskMapper.entityToFullInfo(task.get());
+        TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
+        for (AttachmentInfoDto attachment : taskFullInfo.getAttachments()) {
+            String description = attachmentService.getDescription(attachment.getDescription());
+            attachment.setDescription(description);
+        }
+        return taskFullInfo;
     }
 
     @Transactional

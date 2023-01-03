@@ -2,12 +2,14 @@ package ru.urfu.mutual_marker.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @Value
+@Data
 @Builder
 public class TaskFullInfo {
 
@@ -39,7 +41,7 @@ public class TaskFullInfo {
     Boolean deleted;
 
     @Schema(title = "Вложения")
-    Set<String> attachments;
+    Set<AttachmentInfoDto> attachments;
 
     @Value
     public static class MarkStep {
