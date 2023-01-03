@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.TaskMapper;
+import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
@@ -37,6 +38,7 @@ public class TaskService {
     MarkStepRepository markStepRepository;
     ProfileService profileService;
     MarkRepository markRepository;
+    AttachmentService attachmentService;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -63,6 +65,10 @@ public class TaskService {
         }
 
         TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
+        for (AttachmentInfoDto attachment : taskFullInfo.getAttachments()) {
+            String description = attachmentService.getDescription(attachment.getDescription());
+            attachment.setDescription(description);
+        }
 
         UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();

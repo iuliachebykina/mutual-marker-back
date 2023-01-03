@@ -2,6 +2,7 @@ package ru.urfu.mutual_marker.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.Set;
 
 @Value
 @Builder(toBuilder = true)
+@Data
 public class TaskFullInfo {
 
     @Schema(title = "ИД задания", example = "1")
@@ -39,7 +41,7 @@ public class TaskFullInfo {
     Boolean deleted;
 
     @Schema(title = "Вложения")
-    Set<String> attachments;
+    Set<AttachmentInfoDto> attachments;
 
     @Schema(title = "Количество работ, которое осталось оценить")
     Long numberOfWorksLeftToGrade;

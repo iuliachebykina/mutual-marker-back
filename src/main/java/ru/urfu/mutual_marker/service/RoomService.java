@@ -81,7 +81,7 @@ public class RoomService {
                     .id(room.getId())
                     .code(room.getCode())
                     .title(room.getTitle())
-                    .membersCount(room.getTeachers().size() + room.getStudents().size())
+                    .membersCount(profileService.getCountOfMembersInRoom(room.getId()))
                     .build());
         }
         return answer;
@@ -101,8 +101,17 @@ public class RoomService {
     public Room addNewRoom(AddRoomDto addRoomDto){
         Room toAdd = new Room();
         toAdd.setTitle(addRoomDto.getTitle());
-        String code = NanoIdUtils.randomNanoId();
-        toAdd.setCode(code);
+        if(addRoomDto.getCode() != null
+                && !addRoomDto.getCode().isBlank()){
+            if(roomRepository.findByCode(addRoomDto.getCode()).isPresent()){
+                return null;
+            }
+            toAdd.setCode(addRoomDto.getCode());
+        } else {
+            String code = NanoIdUtils.randomNanoId();
+            toAdd.setCode(code);
+        }
+
         if (addRoomDto.getTeacherId() != null) {
             Profile teacher = profileService.findById(addRoomDto.getTeacherId());
             toAdd.getTeachers().add(teacher);
