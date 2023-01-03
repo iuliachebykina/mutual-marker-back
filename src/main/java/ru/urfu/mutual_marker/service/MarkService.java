@@ -5,8 +5,10 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.dto.AddTeacherMarkDto;
+import ru.urfu.mutual_marker.dto.MarkDto;
 import ru.urfu.mutual_marker.dto.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -37,6 +39,7 @@ public class MarkService {
     ProfileService profileService;
     ProjectService projectService;
     TaskService taskService;
+    MarkMapper markMapper;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
@@ -103,13 +106,13 @@ public class MarkService {
     }
 
     @Transactional
-    public Set<Mark> getAllMarksForProject(Long projectId){
+    public List<MarkDto> getAllMarksForProject(Long projectId){
         Project project = projectRepository.findById(projectId).orElse(null);
         if (project == null){
             log.error("Failed to get all marks for project with id {}", projectId);
             throw new MarkServiceException(String.format("Failed to obtain marks for project with %s", projectId));
         }
-        return project.getMarks();
+        return markMapper.entityToDto(project.getMarks());
     }
 
     @Transactional

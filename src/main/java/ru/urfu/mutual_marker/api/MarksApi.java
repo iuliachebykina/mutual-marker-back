@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.AddMarkStepDto;
 import ru.urfu.mutual_marker.dto.AddMarkDto;
 import ru.urfu.mutual_marker.dto.AddTeacherMarkDto;
+import ru.urfu.mutual_marker.dto.MarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
 import ru.urfu.mutual_marker.service.MarkService;
@@ -71,7 +72,7 @@ public class MarksApi {
     }
 
     @GetMapping("/{projectId}")
-    public ResponseEntity<Object> getAllMarksForProject(@PathVariable Long projectId){
+    public ResponseEntity<List<MarkDto>> getAllMarksForProject(@PathVariable Long projectId){
         return new ResponseEntity<>(markService.getAllMarksForProject(projectId), HttpStatus.OK);
     }
 
