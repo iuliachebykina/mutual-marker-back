@@ -35,8 +35,8 @@ public class ProjectApi {
     @Operation(summary = "Обновление проекта")
     @PutMapping(value = "/task/{task_id}/project/self")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateProject(Authentication authentication, @RequestBody ProjectUpdateInfo updateInfo) {
-        projectService.updateProject((UserDetails) authentication.getPrincipal(), updateInfo);
+    public ProjectCreationResultDto updateProject(Authentication authentication, @RequestBody ProjectUpdateInfo updateInfo) {
+        return projectService.updateProject((UserDetails) authentication.getPrincipal(), updateInfo);
     }
 
     @Operation(summary = "Рандомный проект id", description = "Возвращает id рандомного проекта для оценки в текущей таске")

@@ -78,18 +78,28 @@ public class ProjectService {
     }
 
     @Transactional
-    public void updateProject(UserDetails principal, ProjectUpdateInfo updateInfo) {
+    public ProjectCreationResultDto updateProject(UserDetails principal, ProjectUpdateInfo updateInfo) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
+
+
         var projectOptional = projectRepository.findById(updateInfo.getId());
         if (projectOptional.isPresent() && projectOptional.get().getStudent().equals(profile.get())) {
+            if(projectOptional.get().getTask().getCloseDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())){
+                return ProjectCreationResultDto.builder()
+                        .isOverdue(true)
+                        .build();
+            }
             var project = projectOptional.get();
             project.setTitle(updateInfo.getTitle());
             project.setDescription(updateInfo.getDescription());
         }
+        return ProjectCreationResultDto.builder()
+                .isOverdue(false)
+                .build();
     }
 
     @Transactional
@@ -99,7 +109,7 @@ public class ProjectService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
-        if(task.getCloseDate().isBefore(LocalDateTime.now())){
+        if(task.getCloseDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())){
             return ProjectCreationResultDto.builder()
                     .isOverdue(true)
                     .build();
