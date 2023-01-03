@@ -14,6 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AttachmentDto {
     @Schema(title = "Файл", required = true)
     MultipartFile file;
-    @Schema(title = "Описание", required = true)
+    @Schema(title = "Описание")
     String description;
 }
