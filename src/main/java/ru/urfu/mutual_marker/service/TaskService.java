@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
@@ -16,6 +18,7 @@ import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,12 +36,24 @@ public class TaskService {
     ProfileRepository profileRepository;
     TaskRepository taskRepository;
     MarkStepRepository markStepRepository;
+    ProfileService profileService;
+    MarkRepository markRepository;
     AttachmentService attachmentService;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_Id(roomId, pageable);
-        return taskMapper.entitiesToInfos(tasks);
+        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+        tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
+
+        List<TaskInfo> infos = taskMapper.entitiesToInfos(tasks);
+        infos.forEach(info -> {
+            Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
+            Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
+            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+        });
+        return infos;
     }
 
     public TaskFullInfo findTask(Long taskId) {
@@ -54,6 +69,13 @@ public class TaskService {
             String description = attachmentService.getDescription(attachment.getDescription());
             attachment.setDescription(description);
         }
+
+        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+
+        Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
+        Long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
+        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
         return taskFullInfo;
     }
 

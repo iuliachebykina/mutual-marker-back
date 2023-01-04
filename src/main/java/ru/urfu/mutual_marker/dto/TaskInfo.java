@@ -2,12 +2,13 @@ package ru.urfu.mutual_marker.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Setter;
 import lombok.Value;
 
 import java.time.LocalDateTime;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class TaskInfo {
 
     @Schema(title = "ИД задания", example = "1")
@@ -30,4 +31,10 @@ public class TaskInfo {
 
     @Schema(title = "Статус жизни", description = "Удалено или нет", example = "false")
     boolean deleted;
+
+    @Schema(title = "Минимальное количество оцененных работ", description = "Сколько работ необходимо оценить для добавления работы в пул оцениваемых")
+    Integer minNumberOfGraded;
+
+    @Schema(title = "Количество работ, которые необходимо оценить", description = "Количество работ, которые необходимо оценить для получения оценкм", example = "1")
+    Long numberOfWorksLeftToGrade;
 }
