@@ -23,10 +23,18 @@ spring:
                 PostgreSQL10Dialect
   main:
     allow-bean-definition-overriding: true
+    allow-circular-references: true
+  minio:
+    bucket: ${MINIO_BUCKET:file-storage}
+    url: ${MINIO_URL:http://127.0.0.1:9000}
+    access-key: ${MINIO_ACCESS_KEY:user}
+    secret-key: ${MINIO_SECRET_KEY:password}
+
 
 springdoc:
   api-docs:
     path: /api-docs
+
 
 mutual-marker:
   filepath: ${FILE_STORAGE}

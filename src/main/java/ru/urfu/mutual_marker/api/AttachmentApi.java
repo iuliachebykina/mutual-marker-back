@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.service.AttachmentService;
 
@@ -30,6 +31,13 @@ public class AttachmentApi {
     @PostMapping(value = "/attachments/upload")
     public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") AttachmentDto[] attachments) {
         return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), attachments);
+    }
+
+    //TODO удалить нужно, так для простого теста делалось
+    @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
+    @PostMapping(value = "/v1/attachments/upload")
+    public List<String> uploadAttachmentsV1(Authentication authentication, @RequestParam("files") MultipartFile[] attachments) {
+        return attachmentService.uploadAttachmentsV1((UserDetails) authentication.getPrincipal(), attachments);
     }
 
     @Operation(summary = "Удалить вложение")

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Slf4j
-@Component
+@Service
 public class FileStorageServiceImpl implements FileStorageService {
 
     @Value("${mutual-marker.filepath}")
@@ -24,7 +24,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private Path root;
 
-    @Override
     @PostConstruct
     public void init() {
         File directory = new File(filepath);
@@ -60,12 +59,15 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     @Override
     public void deleteAll(List<String> filenames) {
-        filenames.forEach(filename -> {
-            try {
-                Files.deleteIfExists(root.resolve(filename));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        filenames.forEach(this::delete);
+    }
+
+    @Override
+    public void delete(String filename) {
+        try {
+            Files.deleteIfExists(root.resolve(filename));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

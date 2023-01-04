@@ -1,5 +1,16 @@
-version: '3'
+version: '3.8'
 services:
+  minio:
+    image: bitnami/minio:2022
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: "user"
+      MINIO_ROOT_PASSWORD: "password"
+      MINIO_DEFAULT_BUCKETS: 202301-urfu-rtf
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
   mutual-marker-back:
     container_name: mutual-marker-back
     build:
@@ -9,17 +20,31 @@ services:
       - "8090:8080"
     depends_on:
       - psql
+      - minio
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://psql:5432/postgres
-      - SPRING_DATASOURCE_USERNAME=postgres
-      - SPRING_DATASOURCE_PASSWORD=postgres
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - FILE_STORAGE=../mutual-marker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://psql:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      FILE_STORAGE: ../mutual-marker
+      MINIO_URL: http://minio:9000
+      MINIO_BUCKET: 202301-urfu-rtf
+      MINIO_ACCESS_KEY: user
+      MINIO_SECRET_KEY: password
+      MAX_FILE_SIZE: 20MB
+      MAX_REQUEST_SIZE: 20MB
+      FILE-SIZE-THRESHOLD: 2KB
+#    healthcheck:
+#      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+#      interval: 30s
+#      timeout: 20s
+#      retries: 3
+
   psql:
     image: 'postgres:13.1-alpine'
     container_name: psql
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"

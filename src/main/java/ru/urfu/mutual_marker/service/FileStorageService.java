@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface FileStorageService {
 
-    void init();
     void save(MultipartFile file, String filename);
     Resource load(String filename);
     void deleteAll(List<String> filenames);
+    void delete(String filename);
 }
