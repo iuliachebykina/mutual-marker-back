@@ -29,7 +29,7 @@ public class AttachmentApi {
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
     public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") AttachmentDto[] attachments) {
-        return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), attachments);
+        return attachmentService.uploadAttachmentsAndReturnNames((UserDetails) authentication.getPrincipal(), attachments);
     }
 
     @Operation(summary = "Удалить вложение")

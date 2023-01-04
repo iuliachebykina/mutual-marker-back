@@ -8,6 +8,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -19,7 +21,6 @@ import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,13 +38,18 @@ public class AttachmentService {
     TaskRepository taskRepository;
 
     @Transactional
-    public List<String> uploadAttachments(UserDetails principal, AttachmentDto[] attachmentDtos) {
+    public List<String> uploadAttachmentsAndReturnNames(UserDetails principal, AttachmentDto[] attachmentDtos) {
+
+        return uploadAttachments(principal, attachmentDtos).stream().map(Attachment::getFileName).collect(Collectors.toList());
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Attachment> uploadAttachments(UserDetails principal, AttachmentDto[] attachmentDtos) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
-        var filenames = new ArrayList<String>();
+        var filenames = new ArrayList<Attachment>();
         for (var attachmentDto : attachmentDtos) {
             var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
-            filenames.add(filename);
             var attachment = Attachment.builder()
                     .fileName(filename)
                     .description(attachmentDto.getDescription())
@@ -51,7 +57,8 @@ public class AttachmentService {
                     .student(profile.get())
                     .build();
             fileStorageService.save(attachmentDto.getFile(), filename);
-            attachmentRepository.save(attachment);
+            Attachment toReturn = attachmentRepository.save(attachment); //TODO Naming
+            filenames.add(toReturn);
         }
         return filenames;
     }

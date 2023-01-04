@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.ProjectMapper;
-import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
-import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
-import ru.urfu.mutual_marker.dto.ProjectInfo;
-import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
+import ru.urfu.mutual_marker.dto.*;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
@@ -35,6 +32,7 @@ public class ProjectService {
     ProfileRepository profileRepository;
     AttachmentRepository attachmentRepository;
     ProjectMapper projectMapper;
+    AttachmentService attachmentService;
 
     public ProjectInfo getProject(Long projectId) {
 
@@ -115,6 +113,34 @@ public class ProjectService {
                     .build();
         }
         var attachments = attachmentRepository.findAllByFileNames(creationInfo.getAttachments());
+        var project = Project.builder()
+                .student(profile.get())
+                .task(task)
+                .title(creationInfo.getTitle())
+                .description(creationInfo.getDescription())
+                .completionDate(LocalDateTime.now())
+                .build();
+        attachments.forEach(project::addAttachment);
+        Project save = projectRepository.save(project);
+        return ProjectCreationResultDto.builder()
+                .id(save.getId())
+                .isOverdue(false)
+                .build();
+    }
+
+    @Transactional
+    public ProjectCreationResultDto createProjectWithAttachments(UserDetails principal, ProjectCreationInfoV2 creationInfo, Long taskId) {
+        var profile = profileRepository.findByEmail(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
+        var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
+        if(task.getCloseDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())){
+            return ProjectCreationResultDto.builder()
+                    .isOverdue(true)
+                    .build();
+        }
+        var attachments = attachmentService.uploadAttachments(principal, creationInfo.getAttachments());
         var project = Project.builder()
                 .student(profile.get())
                 .task(task)
