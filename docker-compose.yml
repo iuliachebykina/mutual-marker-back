@@ -9,6 +9,7 @@ services:
       MINIO_DEFAULT_BUCKETS: 202301-urfu-rtf
     ports:
       - "9000:9000"
+      - "9001:9001"
 
   mutual-marker-back:
     container_name: mutual-marker-back
