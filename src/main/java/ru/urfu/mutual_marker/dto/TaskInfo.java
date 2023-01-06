@@ -2,12 +2,16 @@ package ru.urfu.mutual_marker.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
+import lombok.Setter;
 import lombok.Value;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
+@Setter
 public class TaskInfo {
 
     @Schema(title = "ИД задания", example = "1")
@@ -30,4 +34,6 @@ public class TaskInfo {
 
     @Schema(title = "Статус жизни", description = "Удалено или нет", example = "false")
     boolean deleted;
+
+    List<String> attachments;
 }

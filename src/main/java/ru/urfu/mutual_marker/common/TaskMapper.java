@@ -40,7 +40,9 @@ public interface TaskMapper {
     }
 
     @Mapping(target = "deleted", defaultValue = "false")
+    @Mapping(target = "attachments", source = "request.attachments")
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
 
+    @Mapping(target = "attachments", source = "request.attachments")
     Task creationRequestToExistingEntity(@MappingTarget Task task, TaskCreationRequest request, Profile owner);
 }

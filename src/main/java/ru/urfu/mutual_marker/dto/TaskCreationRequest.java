@@ -5,6 +5,7 @@ import lombok.Value;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Value
@@ -44,6 +45,9 @@ public class TaskCreationRequest {
     @Email
     @Schema(title = "Создатель", example = "example@mail.com")
     String owner;
+
+    @Schema(title = "Файлы прикрепленные к заданию")
+    AttachmentDto[] attachments;
 
     @Value
     public static class MarkStep {

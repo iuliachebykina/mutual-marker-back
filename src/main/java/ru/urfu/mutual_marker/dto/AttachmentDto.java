@@ -12,8 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Value
 public class AttachmentDto {
-    @Schema(title = "Файл", required = true)
-    MultipartFile file;
+//    @Schema(title = "Файл", required = true)
+//    MultipartFile file;
     @Schema(title = "Описание")
     String description;
+    @Schema(title = "Уникальное имя файла", required = true)
+    String fileName;
 }

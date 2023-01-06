@@ -4,12 +4,14 @@ import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.math3.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -38,29 +40,41 @@ public class AttachmentService {
     TaskRepository taskRepository;
 
     @Transactional
-    public List<String> uploadAttachmentsAndReturnNames(UserDetails principal, AttachmentDto[] attachmentDtos) {
+    public List<String> uploadAttachmentsAndReturnNames(UserDetails principal, MultipartFile[] files, AttachmentDto[] attachmentDtos) {
 
-        return uploadAttachments(principal, attachmentDtos).stream().map(Attachment::getFileName).collect(Collectors.toList());
+        return uploadAttachments(principal,files, attachmentDtos).stream().map(Attachment::getFileName).collect(Collectors.toList());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public List<Attachment> uploadAttachments(UserDetails principal, AttachmentDto[] attachmentDtos) {
+    public List<Attachment> uploadAttachments(UserDetails principal, MultipartFile[] files, AttachmentDto[] attachmentDtos) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
         var filenames = new ArrayList<Attachment>();
-        for (var attachmentDto : attachmentDtos) {
-            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
+        List<Pair<MultipartFile, String>> fileToDescription = resolveFileToDescription(files, attachmentDtos);
+        for (var pair : fileToDescription) {
+//            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
+            MultipartFile file = pair.getFirst();
             var attachment = Attachment.builder()
-                    .fileName(filename)
-                    .description(attachmentDto.getDescription())
-                    .contentType(attachmentDto.getFile().getContentType())
+                    .fileName(file.getName())
+                    .description(pair.getSecond())
+                    .contentType(file.getContentType())
                     .student(profile.get())
                     .build();
-            fileStorageService.save(attachmentDto.getFile(), filename);
+            fileStorageService.save(file, file.getName());
             Attachment toReturn = attachmentRepository.save(attachment); //TODO Naming
             filenames.add(toReturn);
         }
         return filenames;
+    }
+
+    private List<Pair<MultipartFile, String>> resolveFileToDescription(MultipartFile[] files, AttachmentDto[] attachmentDtos){
+        List<Pair<MultipartFile, String>> res = new ArrayList<>();
+        Arrays.stream(files).forEach(file -> {
+            AttachmentDto desc = Arrays.stream(attachmentDtos).filter(dto -> dto.getFileName().equals(file.getName())).findFirst().orElseThrow(() -> new RuntimeException("Failed to find file"));
+            Pair<MultipartFile, String> pair = Pair.create(file, desc.getDescription());
+            res.add(pair);
+        });
+        return res;
     }
 
     @Transactional
@@ -84,7 +98,7 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void appendAttachmentsToProject(UserDetails principal, AttachmentDto[] attachmentDtos, Long projectId) {
+    public void appendAttachmentsToProject(UserDetails principal, MultipartFile[] files, AttachmentDto[] attachmentDtos, Long projectId) {
 
         var profile = profileRepository.findByEmail(principal.getUsername());
         var project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project was not found."));
@@ -93,37 +107,43 @@ public class AttachmentService {
             throw new IllegalArgumentException("This user don't have access to this project");
         }
 
-        for (var attachmentDto : attachmentDtos) {
-            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
+        List<Pair<MultipartFile, String>> fileToDescription = resolveFileToDescription(files, attachmentDtos);
+
+        for (var pair : fileToDescription) {
+//            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
+            MultipartFile file = pair.getFirst();
             var projects = new HashSet<Project>();
             projects.add(project);
             var attachment = Attachment.builder()
-                    .fileName(filename)
-                    .contentType(attachmentDto.getFile().getContentType())
+                    .fileName(file.getName())
+                    .contentType(file.getContentType())
                     .student(profile.get())
                     .projects(projects)
                     .build();
-            fileStorageService.save(attachmentDto.getFile(), filename);
+            fileStorageService.save(file, file.getName());
             attachmentRepository.save(attachment);
             project.getAttachments().add(attachment);
         }
     }
 
     @Transactional
-    public void appendAttachmentsToTask(UserDetails principal, AttachmentDto[] attachmentDtos, Long taskId){
+    public void appendAttachmentsToTask(UserDetails principal, MultipartFile[] files, AttachmentDto[] attachmentDtos, Long taskId){
         Profile profile = profileRepository.findByEmail(principal.getUsername()).orElse(null);
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found."));
 
-        for (var attachmentDto : attachmentDtos) {
-            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
+        List<Pair<MultipartFile, String>> fileToDescription = resolveFileToDescription(files, attachmentDtos);
+
+        for (var pair : fileToDescription) {
+            MultipartFile file = pair.getFirst();
+//            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getFile().getOriginalFilename()));
             var attachment = Attachment.builder()
-                    .fileName(filename)
-                    .contentType(attachmentDto.getFile().getContentType())
+                    .fileName(file.getName())
+                    .contentType(file.getContentType())
                     .student(profile)
                     .task(task)
                     .build();
             task.addAttachment(attachment);
-            fileStorageService.save(attachmentDto.getFile(), filename);
+            fileStorageService.save(file, file.getName());
             attachmentRepository.save(attachment);
         }
         taskRepository.save(task);

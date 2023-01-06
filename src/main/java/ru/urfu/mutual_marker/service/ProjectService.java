@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.ProjectMapper;
 import ru.urfu.mutual_marker.dto.*;
 import ru.urfu.mutual_marker.jpa.entity.Project;
@@ -129,7 +130,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResultDto createProjectWithAttachments(UserDetails principal, ProjectCreationInfoV2 creationInfo, Long taskId) {
+    public ProjectCreationResultDto createProjectWithAttachments(UserDetails principal, MultipartFile[] files,
+                                                                 ProjectCreationInfoV2 creationInfo, Long taskId) {
         var profile = profileRepository.findByEmail(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
@@ -140,7 +142,7 @@ public class ProjectService {
                     .isOverdue(true)
                     .build();
         }
-        var attachments = attachmentService.uploadAttachments(principal, creationInfo.getAttachments());
+        var attachments = attachmentService.uploadAttachments(principal, files, creationInfo.getAttachments());
         var project = Project.builder()
                 .student(profile.get())
                 .task(task)

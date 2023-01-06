@@ -8,7 +8,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
@@ -45,8 +48,9 @@ public class TasksApi {
     @Operation(summary = "Создание задания")
     @PostMapping(value = "/task")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
-    public TaskInfo createTask(@RequestBody TaskCreationRequest request) {
-        return taskService.saveTask(request);
+    public TaskInfo createTask(Authentication authentication, @RequestParam("files") MultipartFile[] files,
+                               @RequestBody TaskCreationRequest request) {
+        return taskService.saveTask((UserDetails) authentication.getPrincipal(), files, request);
     }
 
     @Operation(summary = "Изменить задание")

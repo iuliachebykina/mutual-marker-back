@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.ProjectCreationInfoV2;
 import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
 import ru.urfu.mutual_marker.service.ProjectService;
@@ -21,7 +22,9 @@ public class ProjectApiV2 {
 
     @Operation(summary = "Создание проекта", description = "Создает проект с вложениями")
     @PostMapping(value = "/task/{task_id}/v2/project")
-    public ProjectCreationResultDto createProject(Authentication authentication, @PathVariable("task_id") Long taskId, @RequestBody ProjectCreationInfoV2 creationInfo) {
-        return projectService.createProjectWithAttachments((UserDetails) authentication.getPrincipal(), creationInfo, taskId);
+    public ProjectCreationResultDto createProject(Authentication authentication, @PathVariable("task_id") Long taskId,
+                                                  @RequestParam("files") MultipartFile[] files,
+                                                  @RequestBody ProjectCreationInfoV2 creationInfo) {
+        return projectService.createProjectWithAttachments((UserDetails) authentication.getPrincipal(), files, creationInfo, taskId);
     }
 }

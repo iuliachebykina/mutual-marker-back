@@ -5,17 +5,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +62,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskInfo saveTask(TaskCreationRequest request) {
+    public TaskInfo saveTask(UserDetails principal, MultipartFile[] files, TaskCreationRequest request) {
 
         var room  = roomRepository.findById(request.getRoomId());
 
@@ -78,9 +82,12 @@ public class TaskService {
             markStepValueRepository.save(value);
         }));
 
-        log.info("Create task with id: {}", save.getId());
-        return taskMapper.entityToInfo(save);
+        List<Attachment> attachments = attachmentService.uploadAttachments(principal, files, request.getAttachments());
 
+        log.info("Create task with id: {}", save.getId());
+        TaskInfo taskInfo = taskMapper.entityToInfo(save);
+//        taskInfo.set
+        return taskInfo;
     }
 
     @Transactional

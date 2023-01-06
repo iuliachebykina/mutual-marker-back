@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.service.AttachmentService;
 
@@ -28,8 +29,8 @@ public class AttachmentApi {
 
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
-    public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") AttachmentDto[] attachments) {
-        return attachmentService.uploadAttachmentsAndReturnNames((UserDetails) authentication.getPrincipal(), attachments);
+    public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") MultipartFile[] files, AttachmentDto[] attachments) {
+        return attachmentService.uploadAttachmentsAndReturnNames((UserDetails) authentication.getPrincipal(), files, attachments);
     }
 
     @Operation(summary = "Удалить вложение")
@@ -43,16 +44,18 @@ public class AttachmentApi {
     @PostMapping(value = "/project/{project_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachments(Authentication authentication,
                                   @RequestParam("attachments") AttachmentDto[] attachments,
+                                  @RequestParam("attachments") MultipartFile[] files,
                                   @PathVariable("project_id") Long projectId) {
-        attachmentService.appendAttachmentsToProject((UserDetails) authentication.getPrincipal(), attachments, projectId);
+        attachmentService.appendAttachmentsToProject((UserDetails) authentication.getPrincipal(), files, attachments, projectId);
     }
 
     @Operation(summary = "Добавление вложений", description = "Добавляет вложения в созданное задание")
     @PostMapping(value = "/task/{task_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachmentsTask(Authentication authentication,
                                   @RequestParam("attachments") AttachmentDto[] attachments,
+                                  @RequestParam("attachments") MultipartFile[] files,
                                   @PathVariable("task_id") Long taskId) {
-        attachmentService.appendAttachmentsToTask((UserDetails) authentication.getPrincipal(), attachments, taskId);
+        attachmentService.appendAttachmentsToTask((UserDetails) authentication.getPrincipal(), files, attachments, taskId);
     }
 
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")
