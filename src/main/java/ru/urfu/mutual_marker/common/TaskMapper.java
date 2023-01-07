@@ -40,7 +40,9 @@ public interface TaskMapper {
     }
 
     @Mapping(target = "deleted", defaultValue = "false")
+    @Mapping(target = "attachments", ignore = true)
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
 
+    @Mapping(target = "attachments", ignore = true) //TODO Check if overwrites existing attachments
     Task creationRequestToExistingEntity(@MappingTarget Task task, TaskCreationRequest request, Profile owner);
 }
