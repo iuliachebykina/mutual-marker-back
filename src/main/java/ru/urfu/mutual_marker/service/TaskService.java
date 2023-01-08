@@ -66,10 +66,6 @@ public class TaskService {
         }
 
         TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
-        for (AttachmentInfoDto attachment : taskFullInfo.getAttachments()) {
-            String description = attachmentService.getDescription(attachment.getDescription());
-            attachment.setDescription(description);
-        }
 
         UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();

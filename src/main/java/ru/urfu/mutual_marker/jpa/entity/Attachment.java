@@ -31,7 +31,6 @@ public class Attachment {
     @NotNull
     String fileName;
     String contentType;
-    String description;
     @NotNull
     @ManyToOne
     Profile student;

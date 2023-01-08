@@ -46,7 +46,6 @@ public class AttachmentService {
             filenames.add(filename);
             var attachment = Attachment.builder()
                     .fileName(filename)
-                    .description("") //TODO STUB
                     .contentType(file.getContentType())
                     .student(profile.get())
                     .build();
@@ -72,6 +71,7 @@ public class AttachmentService {
 
         for (Attachment attachment : attachments){
             task.addAttachment(attachment);
+            attachment.setTask(task);
         }
         return task;
     }
@@ -156,9 +156,9 @@ public class AttachmentService {
         return oldName.replaceAll(FILENAME_PATTERN, NanoIdUtils.randomNanoId() + '.');
     }
 
-    public String getDescription(String filename) {
-        return attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found.")).getDescription();
-    }
+//    public String getDescription(String filename) {
+//        return attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found.")).getDescription();
+//    }
 
     //TODO удалить нужно, так для простого теста делалось
     public List<String> uploadAttachmentsV1(UserDetails principal, MultipartFile[] attachments) {
