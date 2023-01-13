@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.TaskFullInfo;
@@ -33,6 +35,18 @@ public class TasksApi {
 
         Pageable pageable = PageRequest.of(page, size);
         return taskService.findAllTasks(id, pageable);
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Получение выполненных заданий")
+    @GetMapping(value = "/task/completed", params = { "page", "size" })
+    public List<TaskInfo> getCompletedTasks(Authentication authentication,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("size") int size,
+                                            @RequestParam("room_id") Long id) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return taskService.findCompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
     }
 
     @PreAuthorize("isAuthenticated()")

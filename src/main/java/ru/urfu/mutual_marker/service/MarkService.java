@@ -73,6 +73,7 @@ public class MarkService {
                     .comment(addMarkDto.getComment())
                     .isTeacherMark(isTeacherMark)
                     .coefficient(coefficient)
+                    .taskId(project.getTask().getId())
                     .markValue(truncation.intValue())
                     .build();
 

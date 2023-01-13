@@ -15,6 +15,7 @@ import ru.urfu.mutual_marker.dto.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
@@ -54,6 +55,15 @@ public class TaskService {
             info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
         });
         return infos;
+    }
+
+    public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
+        var profile = profileRepository.findByEmail(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
+        var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
+        return taskMapper.entitiesToInfos(tasks);
     }
 
     public TaskFullInfo findTask(Long taskId) {

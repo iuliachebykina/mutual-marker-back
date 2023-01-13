@@ -41,6 +41,7 @@ public class Mark {
     @CreatedDate
     Date markTime;
     String comment;
+    Long taskId;
     @JsonIgnore
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
