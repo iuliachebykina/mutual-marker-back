@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +37,6 @@ public class ProjectApi {
 
     @Operation(summary = "Обновление проекта")
     @PutMapping(value = "/task/{task_id}/project/self")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ProjectCreationResultDto updateProject(Authentication authentication, @RequestBody ProjectUpdateInfo updateInfo) {
         return projectService.updateProject((UserDetails) authentication.getPrincipal(), updateInfo);
     }
