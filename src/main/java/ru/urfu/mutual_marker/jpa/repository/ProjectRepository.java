@@ -16,5 +16,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     Optional<Project> findByStudentAndTask(Profile student, Task task);
 
+    Optional<Project> findByStudentAndId(Profile student, Long projectId);
+
     Boolean existsByStudentIdAndTaskId(Long studentId, Long taskId);
 }

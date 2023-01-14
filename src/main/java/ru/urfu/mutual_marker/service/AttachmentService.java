@@ -57,13 +57,23 @@ public class AttachmentService {
     }
 
     @Transactional
-    public Project appendExistingAttachmentsToProject(Set<String> filenames, Project project){
+    public Project appendExistingAttachmentsToProject(Set<String> filenames, Project project) {
         Set<Attachment> attachments = attachmentRepository.findAllByFileNames(filenames);
 
         for (Attachment attachment : attachments){
             project.addAttachment(attachment);
         }
         return project;
+    }
+
+    @Transactional
+    public void unpinAttachment(UserDetails principal, Long projectId, String filename) {
+
+        Profile profile = profileRepository.findByEmail(principal.getUsername()).orElseThrow(() -> new NotFoundException("User not found"));
+        Project project = projectRepository.findByStudentAndId(profile, projectId).orElseThrow(() -> new NotFoundException("Project not found"));
+        Attachment attach = attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File not found"));
+        attach.getProjects().removeIf(prj -> Objects.equals(prj.getId(), projectId));
+        project.getAttachments().removeIf(attachment -> attachment.getFileName().equals(filename));
     }
 
     @Transactional
