@@ -1,6 +1,5 @@
 package ru.urfu.mutual_marker.service;
 
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +19,8 @@ import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,28 +154,11 @@ public class AttachmentService {
     }
 
     private String generateFilename(String oldName){
-        return oldName.replaceAll(FILENAME_PATTERN, NanoIdUtils.randomNanoId() + '.');
+        return LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli() + "___" + oldName;
     }
 
 //    public String getDescription(String filename) {
 //        return attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found.")).getDescription();
 //    }
 
-    //TODO удалить нужно, так для простого теста делалось
-    public List<String> uploadAttachmentsV1(UserDetails principal, MultipartFile[] attachments) {
-        var profile = profileRepository.findByEmail(principal.getUsername());
-        var filenames = new ArrayList<String>();
-        for (var attachmentDto : attachments) {
-            var filename = generateFilename(Objects.requireNonNull(attachmentDto.getOriginalFilename()));
-            filenames.add(filename);
-            var attachment = Attachment.builder()
-                    .fileName(filename)
-                    .contentType(attachmentDto.getContentType())
-                    .student(profile.get())
-                    .build();
-            fileStorageService.save(attachmentDto, filename);
-            attachmentRepository.save(attachment);
-        }
-        return filenames;
-    }
 }

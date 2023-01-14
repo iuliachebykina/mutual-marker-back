@@ -32,13 +32,6 @@ public class AttachmentApi {
         return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), attachments);
     }
 
-    //TODO удалить нужно, так для простого теста делалось
-    @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
-    @PostMapping(value = "/v1/attachments/upload")
-    public List<String> uploadAttachmentsV1(Authentication authentication, @RequestParam("files") MultipartFile[] attachments) {
-        return attachmentService.uploadAttachmentsV1((UserDetails) authentication.getPrincipal(), attachments);
-    }
-
     @Operation(summary = "Удалить вложение")
     @DeleteMapping(value = "/attachments/delete/{filename}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
