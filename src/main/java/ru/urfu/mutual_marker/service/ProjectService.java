@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.ProjectMapper;
 import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
 import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
@@ -21,6 +22,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +35,7 @@ public class ProjectService {
     TaskRepository taskRepository;
     MarkRepository markRepository;
     ProfileRepository profileRepository;
-    AttachmentRepository attachmentRepository;
+    AttachmentService attachmentService;
     ProjectMapper projectMapper;
 
     public ProjectInfo getProject(Long projectId) {
@@ -103,7 +105,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResultDto createProject(UserDetails principal, ProjectCreationInfo creationInfo, Long taskId) {
+    public ProjectCreationResultDto createProject(UserDetails principal, ProjectCreationInfo creationInfo,
+                                                  Long taskId,
+                                                  Boolean appendAttachments) {
         var profile = profileRepository.findByEmail(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
@@ -114,7 +118,7 @@ public class ProjectService {
                     .isOverdue(true)
                     .build();
         }
-        var attachments = attachmentRepository.findAllByFileNames(creationInfo.getAttachments());
+
         var project = Project.builder()
                 .student(profile.get())
                 .task(task)
@@ -122,7 +126,11 @@ public class ProjectService {
                 .description(creationInfo.getDescription())
                 .completionDate(LocalDateTime.now())
                 .build();
-        attachments.forEach(project::addAttachment);
+
+        if (appendAttachments) {
+            attachmentService.appendExistingAttachmentsToProject(creationInfo.getAttachments(), project);
+        }
+
         Project save = projectRepository.save(project);
         return ProjectCreationResultDto.builder()
                 .id(save.getId())
@@ -162,5 +170,9 @@ public class ProjectService {
             projectInfos.add(projectMapper.entityToInfo(project));
         }
         return projectInfos;
+    }
+
+    public ProjectInfo appendNewAttachmentsToExistingProject(UserDetails principal, List<MultipartFile> files, Long projectId){
+        return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(principal, files, projectId));
     }
 }

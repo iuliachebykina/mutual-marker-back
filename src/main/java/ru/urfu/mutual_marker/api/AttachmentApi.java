@@ -13,7 +13,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.urfu.mutual_marker.dto.AttachmentDto;
 import ru.urfu.mutual_marker.service.AttachmentService;
 
 import java.util.List;
@@ -29,15 +28,8 @@ public class AttachmentApi {
 
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
-    public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") AttachmentDto[] attachments) {
+    public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") List<MultipartFile> attachments) {
         return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), attachments);
-    }
-
-    //TODO удалить нужно, так для простого теста делалось
-    @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
-    @PostMapping(value = "/v1/attachments/upload")
-    public List<String> uploadAttachmentsV1(Authentication authentication, @RequestParam("files") MultipartFile[] attachments) {
-        return attachmentService.uploadAttachmentsV1((UserDetails) authentication.getPrincipal(), attachments);
     }
 
     @Operation(summary = "Удалить вложение")
@@ -47,20 +39,20 @@ public class AttachmentApi {
         attachmentService.deleteAttachment((UserDetails) authentication.getPrincipal(), filename );
     }
 
-    @Operation(summary = "Добавление вложений", description = "Добавляет вложения в уже созданный проект")
+    @Operation(summary = "Добавление вложений в проект студента", description = "Добавляет вложения в уже созданный проект")
     @PostMapping(value = "/project/{project_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachments(Authentication authentication,
-                                  @RequestParam("attachments") AttachmentDto[] attachments,
+                                  @RequestParam("attachments") List<MultipartFile> attachments,
                                   @PathVariable("project_id") Long projectId) {
-        attachmentService.appendAttachmentsToProject((UserDetails) authentication.getPrincipal(), attachments, projectId);
+        attachmentService.appendNewAttachmentsToProject((UserDetails) authentication.getPrincipal(), attachments, projectId);
     }
 
-    @Operation(summary = "Добавление вложений", description = "Добавляет вложения в созданное задание")
+    @Operation(summary = "Добавление вложений в созданное задание", description = "Добавляет вложения в созданное задание")
     @PostMapping(value = "/task/{task_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachmentsTask(Authentication authentication,
-                                  @RequestParam("attachments") AttachmentDto[] attachments,
+                                  @RequestParam("attachments") List<MultipartFile> attachments,
                                   @PathVariable("task_id") Long taskId) {
-        attachmentService.appendAttachmentsToTask((UserDetails) authentication.getPrincipal(), attachments, taskId);
+        attachmentService.apppendNewAttachmentsToTask((UserDetails) authentication.getPrincipal(), attachments, taskId);
     }
 
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")

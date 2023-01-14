@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
 import ru.urfu.mutual_marker.dto.TaskCreationRequest;
@@ -75,10 +76,6 @@ public class TaskService {
         }
 
         TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
-        for (AttachmentInfoDto attachment : taskFullInfo.getAttachments()) {
-            String description = attachmentService.getDescription(attachment.getDescription());
-            attachment.setDescription(description);
-        }
 
         UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
@@ -90,7 +87,7 @@ public class TaskService {
     }
 
     @Transactional
-    public TaskInfo saveTask(TaskCreationRequest request) {
+    public TaskInfo saveTask(TaskCreationRequest request, Boolean appendAttachments) {
 
         var room  = roomRepository.findById(request.getRoomId());
 
@@ -102,13 +99,18 @@ public class TaskService {
         var task = taskMapper.creationRequestToEntity(request, owner);
         task.setRoom(room.get());
 
-        Task save = taskRepository.save(task);
         var markSteps = markStepRepository.saveAll(task.getMarkSteps());
         markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
             value.setMarkStep(markStep);
             value.setDeleted(false);
             markStepValueRepository.save(value);
         }));
+
+        if (appendAttachments){
+            attachmentService.appendExistingAttachmentsToTask(request.getAttachments(), task);
+        }
+
+        Task save = taskRepository.save(task);
 
         log.info("Create task with id: {}", save.getId());
         return taskMapper.entityToInfo(save);
@@ -137,5 +139,9 @@ public class TaskService {
 
         Task save = taskRepository.save(taskMapper.creationRequestToExistingEntity(task.get(), request, owner));
         return taskMapper.entityToInfo(save);
+    }
+
+    public TaskInfo appendNewAttachmentsToTask(UserDetails principal, Long taskId, List<MultipartFile> files){
+        return taskMapper.entityToInfo(attachmentService.apppendNewAttachmentsToTask(principal, files, taskId));
     }
 }
