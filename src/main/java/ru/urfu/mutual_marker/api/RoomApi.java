@@ -83,7 +83,7 @@ public class RoomApi {
 
     @Operation(summary = "Удаление комнаты, необходимо быть преподавателем, находящимся в комнате или админом")
     @DeleteMapping("/room/{code}")
-    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
     // todo
 //    @PreAuthorize("(hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#code)) or hasRole('ROLE_ADMIN')")
     public ResponseEntity<Room> deleteRoom(@PathVariable String code) {
