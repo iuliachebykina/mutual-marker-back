@@ -47,6 +47,15 @@ public class AttachmentApi {
         attachmentService.appendNewAttachmentsToProject((UserDetails) authentication.getPrincipal(), attachments, projectId);
     }
 
+    @Operation(summary = "Удаляет вложение из проекта", description = "Удаляет вложение из проекта")
+    @DeleteMapping(value = "/project/{project_id}/attachments/{filename}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void unpinAttachments(Authentication authentication,
+                                  @PathVariable("project_id") Long projectId,
+                                  @PathVariable("filename") String filename) {
+        attachmentService.unpinAttachment((UserDetails) authentication.getPrincipal(), projectId, filename);
+    }
+
     @Operation(summary = "Добавление вложений в созданное задание", description = "Добавляет вложения в созданное задание")
     @PostMapping(value = "/task/{task_id}/attachments/append", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void appendAttachmentsTask(Authentication authentication,
