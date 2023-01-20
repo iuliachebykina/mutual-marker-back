@@ -40,7 +40,7 @@ services:
 #      timeout: 20s
 #      retries: 3
     networks:
-      - front_some-net
+      - some-net
 
 
   psql:
@@ -52,5 +52,5 @@ services:
     ports:
       - "5433:5432"
 networks:
-  front_some-net:
+  some-net:
     external: true
