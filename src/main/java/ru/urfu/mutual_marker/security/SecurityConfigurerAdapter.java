@@ -68,7 +68,8 @@ public class SecurityConfigurerAdapter {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 
-        http.csrf().disable()
+        http.cors().and().csrf().disable()
+
                 .userDetailsService(profileDetailsService)
                 .authenticationProvider(customAuthenticationProvider)
                 .sessionManagement().disable()
@@ -79,7 +80,8 @@ public class SecurityConfigurerAdapter {
                 .and()
                 .logout()
                 .logoutUrl("/api/logout")
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
+                ;
         return http.build();
     }
 
