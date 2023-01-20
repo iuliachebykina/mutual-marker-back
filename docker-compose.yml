@@ -39,6 +39,9 @@ services:
 #      interval: 30s
 #      timeout: 20s
 #      retries: 3
+    networks:
+      - front_some-net
+
 
   psql:
     image: 'postgres:13.1-alpine'
@@ -48,3 +51,6 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
+networks:
+  front_some-net:
+    external: true
