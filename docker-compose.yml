@@ -53,4 +53,5 @@ services:
       - "5433:5432"
 networks:
   some-net:
-    external: true
+    external:
+      name: some-net
