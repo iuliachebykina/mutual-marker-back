@@ -10,6 +10,8 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    networks:
+      - mutual-marker-front_some-net
 
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -51,6 +53,8 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
+    networks:
+      - mutual-marker-front_some-net
 
 networks:
   mutual-marker-front_some-net:
