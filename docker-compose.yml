@@ -40,7 +40,7 @@ services:
 #      timeout: 20s
 #      retries: 3
     networks:
-      - some-net
+      - mutual-marker-front_some-net
 
 
   psql:
@@ -51,7 +51,7 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
+
 networks:
-  some-net:
-    external:
-      name: some-net
+  mutual-marker-front_some-net:
+    external: true
