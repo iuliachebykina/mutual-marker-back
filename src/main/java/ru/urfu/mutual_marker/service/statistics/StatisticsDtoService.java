@@ -41,13 +41,12 @@ public class StatisticsDtoService {
                 log.error("Error while processing statistics for project with id {}", project.getId());
                 continue;
             }
-            List<String> attachments = student.getAttachments().stream().map(Attachment::getFileName).collect(Collectors.toList());
             StatisticsDto dto = StatisticsDto.builder()
                     .fullName(initialsString)
                     .group(student.getStudentGroup())
                     .mark(calculatedMark.toString())
                     .project(project.getTitle())
-                    .attachments(attachments)
+                    .projectId(project.getId())
                     .build();
             res.add(dto);
         }

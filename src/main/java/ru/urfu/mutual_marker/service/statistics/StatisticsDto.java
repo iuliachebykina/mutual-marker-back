@@ -17,5 +17,5 @@ public class StatisticsDto {
     String group;
     String fullName;
     String mark;
-    List<String> attachments;
+    Long projectId;
 }
