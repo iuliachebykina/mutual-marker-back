@@ -10,8 +10,8 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-    networks:
-      - mutual-marker-front_some-net
+#    networks:
+#      - mutual-marker-front_some-net
 
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -41,10 +41,19 @@ services:
 #      interval: 30s
 #      timeout: 20s
 #      retries: 3
-    networks:
-      - mutual-marker-front_some-net
+#    networks:
+#      - mutual-marker-front_some-net
 
-
+  mutual-marker-front:
+    container_name: mutual-marker-front
+    build:
+      context: ../mutual-marker-front/.
+    image: mutual-marker-front:latest
+    volumes:
+      - '.:/main'
+      - '/main/node_modules'
+    ports:
+      - "4000:80"
   psql:
     image: 'postgres:13.1-alpine'
     container_name: psql
@@ -53,9 +62,9 @@ services:
       POSTGRES_PASSWORD: postgres
     ports:
       - "5433:5432"
-    networks:
-      - mutual-marker-front_some-net
+#    networks:
+#      - mutual-marker-front_some-net
 
-networks:
-  mutual-marker-front_some-net:
-    external: true
+#networks:
+#  mutual-marker-front_some-net:
+#    external: true
