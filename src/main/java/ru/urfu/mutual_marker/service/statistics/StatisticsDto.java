@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -15,4 +17,5 @@ public class StatisticsDto {
     String group;
     String fullName;
     String mark;
+    List<String> attachments;
 }

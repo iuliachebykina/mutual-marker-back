@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
@@ -13,6 +14,7 @@ import ru.urfu.mutual_marker.service.MarkService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +41,13 @@ public class StatisticsDtoService {
                 log.error("Error while processing statistics for project with id {}", project.getId());
                 continue;
             }
+            List<String> attachments = student.getAttachments().stream().map(Attachment::getFileName).collect(Collectors.toList());
             StatisticsDto dto = StatisticsDto.builder()
                     .fullName(initialsString)
                     .group(student.getStudentGroup())
                     .mark(calculatedMark.toString())
                     .project(project.getTitle())
+                    .attachments(attachments)
                     .build();
             res.add(dto);
         }
