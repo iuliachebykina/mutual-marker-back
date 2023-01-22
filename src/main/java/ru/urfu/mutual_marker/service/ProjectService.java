@@ -9,12 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.ProjectMapper;
-import ru.urfu.mutual_marker.dto.*;
+import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
+import ru.urfu.mutual_marker.dto.ProjectInfo;
+import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.repository.MarkRepository;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
-import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
-import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
@@ -22,6 +22,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +37,6 @@ public class ProjectService {
     ProfileRepository profileRepository;
     AttachmentService attachmentService;
     ProjectMapper projectMapper;
-    MarkService markService;
 
     public ProjectInfo getProject(Long projectId) {
 
@@ -163,19 +163,11 @@ public class ProjectService {
         return projectRepository.findAllByTask_Id(taskId);
     }
 
-    public List<ProjectFullInfo> getProjects(Long taskId) {
+    public List<ProjectInfo> getProjects(Long taskId) {
         List<Project> allByTask_id = findAllProjectsByTaskId(taskId);
-        List<ProjectFullInfo> projectInfos = new ArrayList<>();
+        List<ProjectInfo> projectInfos = new ArrayList<>();
         for (Project project : allByTask_id) {
-            Double mark = 0d;
-            try {
-                mark = markService.calculateMarkForProject(project.getId(), project.getStudent().getId(), 2);
-            } catch (Exception e) {
-                log.error("Failed to calc mark", e);
-            }
-            ProjectFullInfo projectFullInfo = projectMapper.entityToFullInfo(project);
-            projectFullInfo.setMark(mark);
-            projectInfos.add(projectFullInfo);
+            projectInfos.add(projectMapper.entityToInfo(project));
         }
         return projectInfos;
     }

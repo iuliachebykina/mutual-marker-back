@@ -11,7 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.urfu.mutual_marker.dto.*;
+import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
+import ru.urfu.mutual_marker.dto.ProjectInfo;
+import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.service.AttachmentService;
 import ru.urfu.mutual_marker.service.ProjectService;
 
@@ -53,7 +56,7 @@ public class ProjectApi {
     @Operation(summary = "Все проекты в задании", description = "Возвращает все проекты в задании")
     @GetMapping(value = "/task/{task_id}/projects")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
-    public List<ProjectFullInfo> getProjects(@PathVariable("task_id") Long taskId) {
+    public List<ProjectInfo> getProjects(@PathVariable("task_id") Long taskId) {
         return projectService.getProjects(taskId);
     }
 
