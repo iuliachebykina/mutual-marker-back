@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
@@ -13,6 +14,7 @@ import ru.urfu.mutual_marker.service.MarkService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +46,7 @@ public class StatisticsDtoService {
                     .group(student.getStudentGroup())
                     .mark(calculatedMark.toString())
                     .project(project.getTitle())
+                    .projectId(project.getId())
                     .build();
             res.add(dto);
         }
