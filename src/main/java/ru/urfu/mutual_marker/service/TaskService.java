@@ -55,8 +55,8 @@ public class TaskService {
         infos.forEach(info -> {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
             Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
-            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
-            info.setFinalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2));
+            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                    .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2)).build();
         });
         return infos;
     }
@@ -77,7 +77,7 @@ public class TaskService {
                             .build();
                 })
                 .collect(Collectors.toList());
-        return infos;
+        return result;
     }
 
     public TaskFullInfo findTask(Long taskId) {
