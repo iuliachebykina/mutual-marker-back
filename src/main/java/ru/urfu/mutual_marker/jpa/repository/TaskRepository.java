@@ -14,7 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByRoom_Id(Long roomId, Pageable pageable);
 
-    @Query(value = "select * from task t where t.min_graded <= " +
+    @Query(value = "select t.* from {h-schema}.task t where t.min_graded <= " +
             "(select count(*) from mark m where m.owner_id = :profileId " +
             "and m.task_id in (select t2.id from task t2 where t2.room_id = :roomId))",
     nativeQuery = true)
