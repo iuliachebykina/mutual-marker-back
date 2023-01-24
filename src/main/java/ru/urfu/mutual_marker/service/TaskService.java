@@ -41,6 +41,7 @@ public class TaskService {
     ProfileService profileService;
     MarkRepository markRepository;
     AttachmentService attachmentService;
+    MarkCalculator markCalculator;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -54,6 +55,7 @@ public class TaskService {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
             Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
             info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+            info.setFinalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 100));
         });
         return infos;
     }
@@ -64,7 +66,9 @@ public class TaskService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
-        return taskMapper.entitiesToInfos(tasks);
+        var infos = taskMapper.entitiesToInfos(tasks);
+        infos.forEach(info -> info.setFinalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 100)));
+        return infos;
     }
 
     public TaskFullInfo findTask(Long taskId) {
@@ -82,7 +86,8 @@ public class TaskService {
 
         Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
         Long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
-        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                .finalMark(markCalculator.calculateMarkForProjectByTask(task.get().getId(), currentUserId, 100)).build();
         return taskFullInfo;
     }
 
