@@ -100,10 +100,12 @@ public class TestController {
                     .collect(Collectors.toList());
 
             String code = generateString(8);
+            String description = generateString(50);
 
 
             Room room = Room.builder()
                     .title(title)
+                    .description(description)
                     .code(code)
                     .deleted(false)
                     .teachers(new HashSet<>())

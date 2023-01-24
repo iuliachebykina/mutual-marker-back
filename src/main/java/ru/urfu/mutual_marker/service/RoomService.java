@@ -81,6 +81,7 @@ public class RoomService {
                     .id(room.getId())
                     .code(room.getCode())
                     .title(room.getTitle())
+                    .description(room.getDescription())
                     .membersCount(profileService.getCountOfMembersInRoom(room.getId()))
                     .build());
         }
@@ -117,6 +118,10 @@ public class RoomService {
             toAdd.getTeachers().add(teacher);
             teacher.addRoom(toAdd);
         }
+        if (addRoomDto.getDescription() != null) {
+            toAdd.setDescription(addRoomDto.getDescription());
+        }
+
         return roomRepository.save(toAdd);
     }
 

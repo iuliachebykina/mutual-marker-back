@@ -15,4 +15,6 @@ public class AddRoomDto {
     Long teacherId;
     @Schema(title = "Код комнаты")
     String code;
+    @Schema(title = "Название комнаты", required = true)
+    String description;
 }
