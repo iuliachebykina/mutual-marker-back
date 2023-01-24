@@ -23,6 +23,7 @@ import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,7 +68,15 @@ public class TaskService {
         }
         var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
         var infos = taskMapper.entitiesToInfos(tasks);
-        infos.forEach(info -> info.setFinalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 2)));
+        var result = infos.stream()
+                .map(info -> {
+                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 2);
+                    log.info("Mark {} task {} student {}", mark, info.getId(), profile.get().getId());
+                    return info.toBuilder()
+                            .finalMark(mark)
+                            .build();
+                })
+                .collect(Collectors.toList());
         return infos;
     }
 

@@ -31,7 +31,6 @@ public class MarkCalculator {
 
     ProjectRepository projectRepository;
     ProjectService projectService;
-    ProfileService profileService;
     MarkRepository markRepository;
 
     public Double calculateMarkForProjectByTask(Long taskId, Long student, int precision) {
