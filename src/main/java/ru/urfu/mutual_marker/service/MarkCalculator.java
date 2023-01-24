@@ -49,12 +49,12 @@ public class MarkCalculator {
             }
             return calculateAfterCloseDate(project, task, student, precision);
         }
-        return 0.0;
+        return Double.NaN;
     }
 
     @Transactional
     public Double calculateMarkForProject(Long projectId, Long studentId, int precision){
-        double res;
+
         try {
             Project project = projectService.findProjectById(projectId);
             Task task = project.getTask();
@@ -126,6 +126,7 @@ public class MarkCalculator {
         if(studentMarks.size() != 0){
             studentsMark = studentsMark * (1d - teacherCoefficient);
         }
+        log.info("teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
 
         return BigDecimal.valueOf(teachersMark + studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
     }
