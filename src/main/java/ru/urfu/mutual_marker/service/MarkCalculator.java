@@ -38,6 +38,7 @@ public class MarkCalculator {
         Optional<Project> projectOptional = projectRepository.findByStudentIdAndTaskId(student, taskId);
         if (projectOptional.isPresent()) {
             var project = projectOptional.get();
+            log.info("calculate mark for project {} student {}", project.getId(), student);
             Task task = project.getTask();
             if (task == null){
                 log.error("Failed to calculate mark, not task found for project with id {}", project.getId());
@@ -56,7 +57,6 @@ public class MarkCalculator {
         double res;
         try {
             Project project = projectService.findProjectById(projectId);
-            Profile student = profileService.findById(studentId);
             Task task = project.getTask();
             if (task == null){
                 log.error("Failed to calculate mark, not task found for project with id {}", projectId);
