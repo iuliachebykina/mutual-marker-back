@@ -58,7 +58,16 @@ public class TaskService {
             info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
                     .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2)).build();
         });
-        return infos;
+        var result = infos.stream()
+                .map(info -> {
+                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2);
+                    log.info("Mark {} task {} student {}", mark, info.getId(), currentUserId);
+                    return info.toBuilder()
+                            .finalMark(mark)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return result;
     }
 
     public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
