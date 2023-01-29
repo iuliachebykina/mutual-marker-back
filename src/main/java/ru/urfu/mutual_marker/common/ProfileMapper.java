@@ -1,10 +1,10 @@
 package ru.urfu.mutual_marker.common;
 
 import org.mapstruct.*;
-import ru.urfu.mutual_marker.dto.RegistrationInfo;
-import ru.urfu.mutual_marker.dto.profileInfo.AdminInfo;
-import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
-import ru.urfu.mutual_marker.dto.profileInfo.TeacherInfo;
+import ru.urfu.mutual_marker.dto.registration.RegistrationInfo;
+import ru.urfu.mutual_marker.dto.profile.profileInfo.AdminInfo;
+import ru.urfu.mutual_marker.dto.profile.profileInfo.StudentInfo;
+import ru.urfu.mutual_marker.dto.profile.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 
 @Mapper(componentModel = "spring",

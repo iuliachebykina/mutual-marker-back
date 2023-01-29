@@ -21,7 +21,7 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
-import ru.urfu.mutual_marker.service.MarkService;
+import ru.urfu.mutual_marker.service.mark.MarkService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

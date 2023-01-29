@@ -13,10 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.urfu.mutual_marker.dto.ProjectInfo;
-import ru.urfu.mutual_marker.dto.TaskCreationRequest;
-import ru.urfu.mutual_marker.dto.TaskFullInfo;
-import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
+import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
+import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.service.TaskService;
 
 import java.util.List;

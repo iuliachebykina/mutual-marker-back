@@ -9,12 +9,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.ProjectMapper;
-import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
-import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
-import ru.urfu.mutual_marker.dto.ProjectInfo;
-import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectCreationResultDto;
+import ru.urfu.mutual_marker.dto.project.ProjectInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
@@ -22,7 +23,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

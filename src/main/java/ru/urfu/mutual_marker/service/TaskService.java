@@ -10,12 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.TaskMapper;
-import ru.urfu.mutual_marker.dto.AttachmentInfoDto;
-import ru.urfu.mutual_marker.dto.TaskCreationRequest;
-import ru.urfu.mutual_marker.dto.TaskFullInfo;
-import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
+import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
+import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
@@ -49,7 +51,7 @@ public class TaskService {
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
         tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
 
-        List<TaskInfo> infos = taskMapper.entitiesToInfos(tasks);
+        List<TaskInfo> infos = taskMapper.listOfEntitiesToDtos(tasks);
         infos.forEach(info -> {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
             Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
@@ -64,7 +66,7 @@ public class TaskService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
-        return taskMapper.entitiesToInfos(tasks);
+        return taskMapper.listOfEntitiesToDtos(tasks);
     }
 
     public TaskFullInfo findTask(Long taskId) {
@@ -75,7 +77,7 @@ public class TaskService {
             throw new NotFoundException("Task was not found");
         }
 
-        TaskFullInfo taskFullInfo = taskMapper.entityToFullInfo(task.get());
+        TaskFullInfo taskFullInfo = taskMapper.entityToFullInfoDto(task.get());
 
         UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();

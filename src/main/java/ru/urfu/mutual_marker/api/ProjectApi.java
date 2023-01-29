@@ -11,10 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.urfu.mutual_marker.dto.ProjectCreationInfo;
-import ru.urfu.mutual_marker.dto.ProjectCreationResultDto;
-import ru.urfu.mutual_marker.dto.ProjectInfo;
-import ru.urfu.mutual_marker.dto.ProjectUpdateInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectCreationInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectCreationResultDto;
+import ru.urfu.mutual_marker.dto.project.ProjectInfo;
+import ru.urfu.mutual_marker.dto.project.ProjectUpdateInfo;
 import ru.urfu.mutual_marker.service.AttachmentService;
 import ru.urfu.mutual_marker.service.ProjectService;
 

@@ -9,14 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import ru.urfu.mutual_marker.dto.AddMarkStepDto;
-import ru.urfu.mutual_marker.dto.AddMarkDto;
-import ru.urfu.mutual_marker.dto.AddTeacherMarkDto;
-import ru.urfu.mutual_marker.dto.MarkDto;
+import ru.urfu.mutual_marker.dto.mark.AddMarkStepDto;
+import ru.urfu.mutual_marker.dto.mark.AddMarkDto;
+import ru.urfu.mutual_marker.dto.mark.AddTeacherMarkDto;
+import ru.urfu.mutual_marker.dto.mark.MarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
-import ru.urfu.mutual_marker.service.MarkService;
-import ru.urfu.mutual_marker.service.MarkStepService;
+import ru.urfu.mutual_marker.service.mark.MarkService;
+import ru.urfu.mutual_marker.service.mark.MarkStepService;
 
 import java.util.List;
 

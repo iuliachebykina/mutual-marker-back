@@ -1,9 +1,9 @@
 package ru.urfu.mutual_marker.common;
 
 import org.mapstruct.*;
-import ru.urfu.mutual_marker.dto.TaskCreationRequest;
-import ru.urfu.mutual_marker.dto.TaskFullInfo;
-import ru.urfu.mutual_marker.dto.TaskInfo;
+import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
+import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
+import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
 import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -30,10 +30,10 @@ public interface TaskMapper {
     @Mapping(source = "room.id", target = "roomId")
     TaskInfo entityToInfo(Task task);
 
-    List<TaskInfo> entitiesToInfos(List<Task> tasks);
+    List<TaskInfo> listOfEntitiesToDtos(List<Task> tasks);
 
     @Mapping(source = "room.id", target = "roomId")
-    TaskFullInfo entityToFullInfo(Task task);
+    TaskFullInfo entityToFullInfoDto(Task task);
 
     default String attachmentToString(Attachment attachment) {
         return attachment.getFileName();
