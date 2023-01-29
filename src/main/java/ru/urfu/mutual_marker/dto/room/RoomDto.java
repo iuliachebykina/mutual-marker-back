@@ -15,5 +15,5 @@ public class RoomDto {
     String title;
     String code;
     Long membersCount;
-
+    String description;
 }

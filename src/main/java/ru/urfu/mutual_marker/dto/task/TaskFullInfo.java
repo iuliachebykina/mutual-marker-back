@@ -11,7 +11,6 @@ import java.util.Set;
 
 @Value
 @Builder(toBuilder = true)
-@Data
 public class TaskFullInfo {
 
     @Schema(title = "ИД задания", example = "1")
@@ -46,6 +45,9 @@ public class TaskFullInfo {
 
     @Schema(title = "Количество работ, которое осталось оценить")
     Long numberOfWorksLeftToGrade;
+
+    @Schema(title = "Оценка")
+    Double finalMark;
 
     @Value
     public static class MarkStep {

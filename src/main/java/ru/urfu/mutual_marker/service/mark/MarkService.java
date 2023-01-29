@@ -1,7 +1,7 @@
 package ru.urfu.mutual_marker.service.mark;
 
 import lombok.AccessLevel;
-import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,11 +29,12 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Data
+@RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @Slf4j
 public class MarkService {
@@ -41,8 +42,8 @@ public class MarkService {
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
-    TaskService taskService;
     MarkMapper markMapper;
+    MarkCalculator markCalculator;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
@@ -139,81 +140,7 @@ public class MarkService {
 
     @Transactional
     public Double calculateMarkForProject(Long projectId, Long studentId, int precision){
-        double res;
-        try {
-            Project project = projectService.findProjectById(projectId);
-            Profile student = profileService.findById(studentId);
-            Task task = project.getTask();
-            if (task == null){
-                log.error("Failed to calculate mark, not task found for project with id {}", projectId);
-                throw new MarkServiceException(String.format("Failed to find task for project with id %s", projectId));
-            }
-            if (task.getCloseDate().isAfter(LocalDateTime.now())){
-                return calculateBeforeCloseDate(project, task, studentId, precision);
-            }
-            return calculateAfterCloseDate(project, task, studentId, precision);
-//            NumberOfGraded number = student.getNumberOfGradedSet().stream()
-//                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
-
-//            if (number == null){
-////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-////                        owner.getId()));
-//                number = NumberOfGraded.builder()
-//                        .task(project.getTask())
-//                        .profile(student)
-//                        .graded(0).build();
-//            }
-
-        } catch (NotFoundException e){
-            log.error("Failed to calculate mark, project not found");
-            throw new MarkServiceException(e.getLocalizedMessage());
-        } catch (UserNotExistingException e){
-            log.error("Failed to calculate mark, user not found");
-            throw new MarkServiceException(e.getLocalizedMessage());
-        }
-    }
-
-    public double calculateBeforeCloseDate(Project project, Task task, Long studentId, int precision){
-        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
-        if (numberOfMarkedByStudent >= task.getMinNumberOfGraded()){
-            return calculate(project, precision);
-        }
-        return Double.NaN;
-    }
-
-    public double calculateAfterCloseDate(Project project, Task task, Long studentId, int precision){
-        if (task.getCloseDate().isAfter(project.getCompletionDate())){
-            if (project.getMarks().size() < task.getMinNumberOfGraded()) {
-                return Double.NaN;
-            } else{
-                return calculate(project, precision);
-            }
-        } else {
-            return Double.NaN;
-        }
-    }
-
-    public double calculate(Project project, int precision){
-        double teachersMark = 0;
-        double studentsMark = 0;
-        double teacherCoefficient = 0;
-        Set<Mark> teacherMarks = project.getMarks().stream().filter(Mark::getIsTeacherMark).collect(Collectors.toSet());
-        Set<Mark> studentMarks = project.getMarks().stream().filter(mark -> !mark.getIsTeacherMark()).collect(Collectors.toSet());
-        for (Mark mark : teacherMarks) {
-            teachersMark += mark.getMarkValue();
-            teacherCoefficient+=mark.getCoefficient();
-        }
-        studentsMark = studentMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(0);
-        teachersMark = teacherMarks.stream().mapToInt(Mark::getMarkValue).average().orElse(0);
-        if(teacherMarks.size() != 0){
-            teacherCoefficient = (teacherCoefficient/teacherMarks.size());
-            teachersMark = teachersMark * teacherCoefficient;
-        }
-        if(studentMarks.size() != 0){
-            studentsMark = studentsMark * (1d - teacherCoefficient);
-        }
-
-        return BigDecimal.valueOf(teachersMark + studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
+        return markCalculator.calculateMarkForProject(projectId, studentId, precision);
     }
 
     @Transactional

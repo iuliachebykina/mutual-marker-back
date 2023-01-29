@@ -32,6 +32,9 @@ public class Room {
     Long id;
     @NotNull
     String title;
+
+    String description;
+
     @Size(min = 8, max = 8)
     @NotBlank
     @NotNull

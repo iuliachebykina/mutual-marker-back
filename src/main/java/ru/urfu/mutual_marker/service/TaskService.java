@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +44,7 @@ public class TaskService {
     ProfileService profileService;
     MarkRepository markRepository;
     AttachmentService attachmentService;
+    MarkCalculator markCalculator;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -55,9 +57,19 @@ public class TaskService {
         infos.forEach(info -> {
             Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
             Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
-            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                    .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2)).build();
         });
-        return infos;
+        var result = infos.stream()
+                .map(info -> {
+                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2);
+                    log.info("Mark {} task {} student {}", mark, info.getId(), currentUserId);
+                    return info.toBuilder()
+                            .finalMark(mark)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return result;
     }
 
     public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
@@ -66,7 +78,17 @@ public class TaskService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
-        return taskMapper.listOfEntitiesToDtos(tasks);
+        var infos = taskMapper.entitiesToInfos(tasks);
+        var result = infos.stream()
+                .map(info -> {
+                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 2);
+                    log.info("Mark {} task {} student {}", mark, info.getId(), profile.get().getId());
+                    return info.toBuilder()
+                            .finalMark(mark)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        return result;
     }
 
     public TaskFullInfo findTask(Long taskId) {
@@ -84,7 +106,8 @@ public class TaskService {
 
         Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
         Long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
-        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0).build();
+        taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                .finalMark(markCalculator.calculateMarkForProjectByTask(task.get().getId(), currentUserId, 2)).build();
         return taskFullInfo;
     }
 

@@ -1,11 +1,12 @@
 package ru.urfu.mutual_marker.dto.project;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Value;
+import lombok.Data;
+import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
 
 import java.util.Set;
 
-@Value
+@Data
 public class ProjectInfo {
 
     @Schema(title = "ИД проекта")
@@ -16,6 +17,9 @@ public class ProjectInfo {
 
     @Schema(title = "Описание проекта")
     String description;
+
+    @Schema(title = "Студент")
+    StudentInfo student;
 
     @Schema(title = "Вложения")
     Set<String> attachments;
