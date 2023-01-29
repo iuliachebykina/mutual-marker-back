@@ -14,7 +14,9 @@ import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.Task;
-import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
+import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
+import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
@@ -78,7 +80,7 @@ public class TaskService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
-        var infos = taskMapper.entitiesToInfos(tasks);
+        var infos = taskMapper.listOfEntitiesToDtos(tasks);
         var result = infos.stream()
                 .map(info -> {
                     var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 2);

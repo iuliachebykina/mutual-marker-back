@@ -2,7 +2,7 @@ package ru.urfu.mutual_marker.dto.project;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import ru.urfu.mutual_marker.dto.profileInfo.StudentInfo;
+import ru.urfu.mutual_marker.dto.profile.profileInfo.StudentInfo;
 
 import java.util.Set;
 
