@@ -22,6 +22,7 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.mark.MarkCalculator;
 
 import javax.transaction.Transactional;
 import java.util.Comparator;

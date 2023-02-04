@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.mark;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +11,7 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.service.ProjectService;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 

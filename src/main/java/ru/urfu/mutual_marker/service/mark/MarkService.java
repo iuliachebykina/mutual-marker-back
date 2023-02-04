@@ -13,16 +13,12 @@ import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
-import ru.urfu.mutual_marker.service.MarkCalculator;
 import ru.urfu.mutual_marker.service.ProfileService;
 import ru.urfu.mutual_marker.service.ProjectService;
-import ru.urfu.mutual_marker.service.TaskService;
 import ru.urfu.mutual_marker.service.exception.MarkServiceException;
-import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -30,8 +26,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
