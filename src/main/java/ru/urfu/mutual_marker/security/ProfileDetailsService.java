@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.security.exception.InvalidRoleException;
 import ru.urfu.mutual_marker.service.ProfileService;
 
 import javax.transaction.Transactional;
@@ -43,7 +44,7 @@ public class ProfileDetailsService implements UserDetailsService {
         }
         if(!user.getRole().toString().equals(role)){
             log.error("Invalid role\nactual: {}, but expected: {}", user.getRole(), role);
-            throw new UsernameNotFoundException(String.format("Invalid role\nactual: %s, but expected: %s", user.getRole(), role));
+            throw new InvalidRoleException(String.format("Invalid role\nactual: %s, but expected: %s", user.getRole(), role));
         }
         boolean enabled = true;
         boolean accountNonExpired = true;
