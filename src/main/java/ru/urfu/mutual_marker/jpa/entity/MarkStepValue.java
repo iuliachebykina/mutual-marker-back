@@ -16,6 +16,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @Where(clause="deleted=false")
+@ToString
 public class MarkStepValue {
     @Id
     @SequenceGenerator(name = "markStepValueSeq", sequenceName = "markStepValueSeq")
