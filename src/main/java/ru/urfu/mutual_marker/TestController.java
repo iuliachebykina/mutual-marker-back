@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.urfu.mutual_marker.dto.registration.RegistrationInfo;
@@ -44,6 +45,13 @@ public class TestController {
     ProfileService profileService;
 
     Random rand = new Random();
+
+    @GetMapping("/query")
+    @Transactional
+    @PermitAll
+    public String testQuery(){
+        return profileRepository.findByNameEmailOrPatronymicIgnoreCase("123", "123", "123", "123", Pageable.ofSize(123), Role.ROLE_STUDENT).toString();
+    }
 
     @GetMapping("/test")
     @PermitAll

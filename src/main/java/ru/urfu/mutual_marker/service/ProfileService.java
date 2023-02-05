@@ -255,7 +255,7 @@ public class ProfileService {
         String[] searchWords = search.split(" ");
         Set<Profile> teachers = new HashSet<>();
         for (String searchWord : searchWords) {
-            teachers.addAll(profileRepository.findByEmailContainingIgnoreCaseOrNameFirstNameContainingIgnoreCaseOrNameLastNameContainingIgnoreCaseOrNamePatronymicContainingIgnoreCaseAndRole(searchWord, searchWord, searchWord, searchWord, pageable, Role.ROLE_TEACHER));
+            teachers.addAll(profileRepository.findByNameEmailOrPatronymicIgnoreCase(searchWord, searchWord, searchWord, searchWord, pageable, Role.ROLE_TEACHER));
         }
 
         return teachers.stream()
@@ -268,7 +268,7 @@ public class ProfileService {
         String[] searchWords = search.split(" ");
         Set<Profile> students = new HashSet<>();
         for (String searchWord : searchWords) {
-            students.addAll(profileRepository.findByEmailContainingIgnoreCaseOrNameFirstNameContainingIgnoreCaseOrNameLastNameContainingIgnoreCaseOrNamePatronymicContainingIgnoreCaseAndRole(searchWord, searchWord, searchWord, searchWord, pageable, Role.ROLE_STUDENT));
+            students.addAll(profileRepository.findByNameEmailOrPatronymicIgnoreCase(searchWord, searchWord, searchWord, searchWord, pageable, Role.ROLE_STUDENT));
         }
 
         return students.stream()
