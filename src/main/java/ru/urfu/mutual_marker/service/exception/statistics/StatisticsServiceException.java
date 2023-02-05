@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.exception.statistics;
 
 public class StatisticsServiceException extends RuntimeException{
     public StatisticsServiceException() {

@@ -6,6 +6,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.urfu.mutual_marker.service.exception.file.FileStorageException;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -50,10 +51,10 @@ public class FileStorageServiceImpl implements FileStorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Could not read the file!");
+                throw new FileStorageException("Could not read the file!");
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+            throw new FileStorageException("Failed to read file", e);
         }
     }
 
@@ -67,7 +68,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         try {
             Files.deleteIfExists(root.resolve(filename));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileStorageException("Failed to delete file", e);
         }
     }
 }

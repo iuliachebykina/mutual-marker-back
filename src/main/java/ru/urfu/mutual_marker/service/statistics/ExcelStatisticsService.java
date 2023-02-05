@@ -21,6 +21,7 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.service.exception.statistics.StatisticsServiceException;
 import ru.urfu.mutual_marker.service.mark.MarkService;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +55,7 @@ public class ExcelStatisticsService {
                 statsFont.setFontName("Times New Roman");
                 statsFont.setFontHeightInPoints((short) 14);
                 statsStyle.setFont(statsFont);
-                Sheet sheet = workbook.getSheet("TaskName");
+                Sheet sheet = workbook.getSheet(task.getTitle());
 
                 Row stats = sheet.createRow(i);
 
@@ -115,7 +116,7 @@ public class ExcelStatisticsService {
                     .body(resource);
         } catch (IOException e) {
             log.error("Error while trying to build excel report", e);
-            throw new RuntimeException(e);
+            throw new StatisticsServiceException("Failed to build excel report", e);
         }
     }
 }

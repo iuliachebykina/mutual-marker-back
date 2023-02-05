@@ -11,7 +11,7 @@ import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
-import ru.urfu.mutual_marker.service.exception.MarkStepServiceException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkStepServiceException;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -30,13 +30,14 @@ public class MarkStepService { //TODO add error handling for repository methods
 
     @Transactional
     public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
-        MarkStep toAdd = MarkStep.builder().build();
+        MarkStep toAdd = MarkStep.builder()
+                .description(addMarkStepDto.getDescription())
+                .owner(profileRepository.getById(addMarkStepDto.getProfileId()))
+                .title(addMarkStepDto.getTitle())
+                .build();
         addMarkStepDto.getValues().forEach(value ->
                 toAdd.getValues().add(MarkStepValue.builder().markStep(toAdd).value(value).build()));
         toAdd.addTask(taskRepository.getById(addMarkStepDto.getTaskId()));
-        toAdd.setDescription(addMarkStepDto.getDescription());
-        toAdd.setOwner(profileRepository.getById(addMarkStepDto.getProfileId()));
-        toAdd.setTitle(addMarkStepDto.getTitle());
         return markStepRepository.save(toAdd);
     }
 

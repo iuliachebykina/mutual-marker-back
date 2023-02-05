@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
@@ -12,7 +13,7 @@ import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.ProjectService;
-import ru.urfu.mutual_marker.service.exception.MarkServiceException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import javax.transaction.Transactional;
@@ -24,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Service
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class MarkCalculator {
@@ -65,17 +66,6 @@ public class MarkCalculator {
                 return calculateBeforeCloseDate(project, task, studentId, precision);
             }
             return calculateAfterCloseDate(project, task, studentId, precision);
-//            NumberOfGraded number = student.getNumberOfGradedSet().stream()
-//                    .filter(n -> Objects.equals(n.getTask().getId(), task.getId())).findFirst().orElse(null);
-
-//            if (number == null){
-////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-////                        owner.getId()));
-//                number = NumberOfGraded.builder()
-//                        .task(project.getTask())
-//                        .profile(student)
-//                        .graded(0).build();
-//            }
 
         } catch (NotFoundException e){
             log.error("Failed to calculate mark, project not found");
@@ -91,17 +81,20 @@ public class MarkCalculator {
         if (numberOfMarkedByStudent >= task.getMinNumberOfGraded()){
             return calculate(project, precision);
         }
+        log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
         return Double.NaN;
     }
 
     public double calculateAfterCloseDate(Project project, Task task, Long studentId, int precision){
         if (task.getCloseDate().isAfter(project.getCompletionDate())){
             if (project.getMarks().size() < task.getMinNumberOfGraded()) {
+                log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
                 return Double.NaN;
             } else{
                 return calculate(project, precision);
             }
         } else {
+            log.debug("Project with id {} is created after task close date", project.getId());
             return Double.NaN;
         }
     }
@@ -125,7 +118,7 @@ public class MarkCalculator {
         if(studentMarks.size() != 0){
             studentsMark = studentsMark * (1d - teacherCoefficient);
         }
-        log.info("teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
+        log.info("[MARK SERVICE] Calculated mark: teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
 
         return BigDecimal.valueOf(teachersMark + studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
     }
