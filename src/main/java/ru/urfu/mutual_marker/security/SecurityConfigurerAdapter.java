@@ -13,11 +13,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.service.ProfileService;
 
@@ -32,9 +34,10 @@ import ru.urfu.mutual_marker.service.ProfileService;
 public class SecurityConfigurerAdapter {
 
     ProfileDetailsService profileDetailsService;
-    PasswordEncoder passwordEncoder;
     CustomAuthenticationProvider customAuthenticationProvider;
     ProfileService profileService;
+    JwtTokenRepository jwtTokenRepository;
+    HandlerExceptionResolver handlerExceptionResolver;
 
     static Gson gson = createProfileGsonBuilder();
 
@@ -68,11 +71,23 @@ public class SecurityConfigurerAdapter {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
 
-        http.csrf().disable()
-
+        http
                 .userDetailsService(profileDetailsService)
                 .authenticationProvider(customAuthenticationProvider)
-                .sessionManagement().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .and()
+                .addFilterAt(new JwtCsrfFilter(jwtTokenRepository, handlerExceptionResolver), CsrfFilter.class)
+                .csrf()
+                .ignoringAntMatchers("/**")
+                .and()
+                .authorizeRequests()
+                .antMatchers("/api/login")
+                .authenticated()
+                .and()
+                .httpBasic()
+                .authenticationEntryPoint(((request, response, e) -> handlerExceptionResolver.resolveException(request, response, null, e)))
+                .and()
                 .formLogin()
                 .loginProcessingUrl("/api/login")
                 .successHandler(successHandler())
@@ -81,7 +96,7 @@ public class SecurityConfigurerAdapter {
                 .logout()
                 .logoutUrl("/api/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-                ;
+        ;
         return http.build();
     }
 
