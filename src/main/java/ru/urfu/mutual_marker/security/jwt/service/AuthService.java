@@ -53,7 +53,7 @@ public class AuthService {
                 final Profile user = profileRepository.findByEmail(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
-                return new JwtResponse(accessToken, null);
+                return new JwtResponse(accessToken, refreshToken);
             }
         }
         return new JwtResponse(null, null);
