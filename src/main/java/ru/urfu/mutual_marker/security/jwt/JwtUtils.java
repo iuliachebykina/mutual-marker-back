@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.security;
+package ru.urfu.mutual_marker.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;

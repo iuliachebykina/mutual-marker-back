@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.security;
+package ru.urfu.mutual_marker.security.jwt.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -6,6 +6,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.urfu.mutual_marker.security.RefreshJwtRequest;
+import ru.urfu.mutual_marker.security.jwt.dto.JwtRequest;
+import ru.urfu.mutual_marker.security.jwt.dto.JwtResponse;
+import ru.urfu.mutual_marker.security.jwt.service.AuthService;
 
 @RestController
 @RequestMapping("api")

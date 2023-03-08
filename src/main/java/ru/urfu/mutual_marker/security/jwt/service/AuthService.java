@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.security;
+package ru.urfu.mutual_marker.security.jwt.service;
 
 import io.jsonwebtoken.Claims;
 import lombok.NonNull;
@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.security.exception.InvalidRoleException;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
+import ru.urfu.mutual_marker.security.jwt.JwtProvider;
+import ru.urfu.mutual_marker.security.jwt.dto.JwtRequest;
+import ru.urfu.mutual_marker.security.jwt.dto.JwtResponse;
 
 import javax.security.auth.message.AuthException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +23,8 @@ public class AuthService {
 
     private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
-    private final Map<String, String> refreshStorage = new HashMap<>();
     private final JwtProvider jwtProvider;
+    private final TokenService tokenService;
 
     @SneakyThrows
     public JwtResponse login(@NonNull JwtRequest authRequest) {
@@ -34,7 +36,7 @@ public class AuthService {
         if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
-            refreshStorage.put(user.getEmail(), refreshToken);
+            tokenService.put(user.getEmail(), refreshToken);
             return new JwtResponse(accessToken, refreshToken);
         } else {
             throw new AuthException("Неправильный логин или пароль");
@@ -46,7 +48,7 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
-            final String saveRefreshToken = refreshStorage.get(login);
+            final String saveRefreshToken = tokenService.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final Profile user = profileRepository.findByEmail(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
@@ -62,13 +64,13 @@ public class AuthService {
         if (jwtProvider.validateRefreshToken(refreshToken)) {
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
             final String login = claims.getSubject();
-            final String saveRefreshToken = refreshStorage.get(login);
+            final String saveRefreshToken = tokenService.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
                 final Profile user = profileRepository.findByEmail(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
-                refreshStorage.put(user.getEmail(), newRefreshToken);
+                tokenService.put(user.getEmail(), newRefreshToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }

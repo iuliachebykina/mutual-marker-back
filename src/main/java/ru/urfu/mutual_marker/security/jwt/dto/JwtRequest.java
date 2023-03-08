@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.security;
+package ru.urfu.mutual_marker.security.jwt.dto;
 
 import lombok.Getter;
 import lombok.Setter;
