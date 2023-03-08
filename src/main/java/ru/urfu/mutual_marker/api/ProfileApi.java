@@ -151,7 +151,7 @@ public class ProfileApi {
     @Operation(summary = "Получение информации о себе")
     @GetMapping("/self")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Profile> getProfile(@CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+    public ResponseEntity<Profile> getProfile(@CurrentSecurityContext(expression = "authentication.principal") String email) {
         Profile profile = profileService.getProfileByEmail(email);
         log.info("Get self profile with id: {}", profile.getId());
         return new ResponseEntity<>(profile, HttpStatus.OK);

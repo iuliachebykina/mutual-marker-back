@@ -1,9 +1,5 @@
 package ru.urfu.mutual_marker.security;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -15,13 +11,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
-import org.springframework.security.web.csrf.CsrfFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.service.ProfileService;
 
 
 @Configuration
@@ -32,92 +23,80 @@ import ru.urfu.mutual_marker.service.ProfileService;
         prePostEnabled = true,
         jsr250Enabled = true)
 public class SecurityConfigurerAdapter {
+//
+//    ProfileDetailsService profileDetailsService;
+//    CustomAuthenticationProvider customAuthenticationProvider;
+//    ProfileService profileService;
+//    HandlerExceptionResolver handlerExceptionResolver;
+//    JwtProvider jwtProvider;
+    JwtFilter jwtFilter;
+//
+//    static Gson gson = createProfileGsonBuilder();
 
-    ProfileDetailsService profileDetailsService;
-    CustomAuthenticationProvider customAuthenticationProvider;
-    ProfileService profileService;
-    JwtTokenRepository jwtTokenRepository;
-    HandlerExceptionResolver handlerExceptionResolver;
-
-    static Gson gson = createProfileGsonBuilder();
-
-    private static Gson createProfileGsonBuilder(){
-        GsonBuilder profileBuilder = new GsonBuilder();
-        profileBuilder.addSerializationExclusionStrategy(new ExclusionStrategy() {
-
-            @Override
-            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-
-                return fieldAttributes.getName().equals("deleted")
-                        || fieldAttributes.getName().equals("password")
-                        || fieldAttributes.getName().equals("attachments")
-                        || fieldAttributes.getName().equals("rooms")
-                        || fieldAttributes.getName().equals("numberOfGradedSet");
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> arg0) {
-                return false;
-            }
-        });
-
-        return profileBuilder.create();
-    }
-
-
+//    private static Gson createProfileGsonBuilder(){
+//        GsonBuilder profileBuilder = new GsonBuilder();
+//        profileBuilder.addSerializationExclusionStrategy(new ExclusionStrategy() {
+//
+//            @Override
+//            public boolean shouldSkipField(FieldAttributes fieldAttributes) {
+//
+//                return fieldAttributes.getName().equals("deleted")
+//                        || fieldAttributes.getName().equals("password")
+//                        || fieldAttributes.getName().equals("attachments")
+//                        || fieldAttributes.getName().equals("rooms")
+//                        || fieldAttributes.getName().equals("numberOfGradedSet");
+//            }
+//
+//            @Override
+//            public boolean shouldSkipClass(Class<?> arg0) {
+//                return false;
+//            }
+//        });
+//
+//        return profileBuilder.create();
+//    }
+//
+//
 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-
         http
-                .userDetailsService(profileDetailsService)
-                .authenticationProvider(customAuthenticationProvider)
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER)
+                .httpBasic().disable()
+                .csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilterAt(new JwtCsrfFilter(jwtTokenRepository, handlerExceptionResolver), CsrfFilter.class)
-                .csrf()
-                .ignoringAntMatchers("/**")
-                .and()
-                .authorizeRequests()
-                .antMatchers("/api/login")
-                .authenticated()
-                .and()
-                .httpBasic()
-                .authenticationEntryPoint(((request, response, e) -> handlerExceptionResolver.resolveException(request, response, null, e)))
-                .and()
-                .formLogin()
-                .loginProcessingUrl("/api/login")
-                .successHandler(successHandler())
-                .failureHandler(failureHandler())
-                .and()
+                .authorizeHttpRequests(
+                        authz -> authz
+                                .antMatchers("/api/login", "/api/token").permitAll()
+                                .anyRequest().authenticated()
+                                .and()
+                                .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                )
                 .logout()
                 .logoutUrl("/api/logout")
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))
-        ;
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK));
         return http.build();
     }
 
 
 
 
-
-    private AuthenticationSuccessHandler successHandler() {
-        return (httpServletRequest, httpServletResponse, authentication) -> {
-            Profile profile = profileService.getProfileByEmail(authentication.getName());
-            httpServletResponse.setCharacterEncoding("UTF-8");
-            httpServletResponse.getWriter().append(gson.toJson(profile));
-            httpServletResponse.setStatus(200);
-        };
-    }
-
-    private AuthenticationFailureHandler failureHandler() {
-        return (httpServletRequest, httpServletResponse, e) -> {
-            httpServletResponse.getWriter().append("Authentication failure");
-            httpServletResponse.setStatus(401);
-        };
-    }
+//
+//    private AuthenticationSuccessHandler successHandler() {
+//        return (httpServletRequest, httpServletResponse, authentication) -> {
+//            Profile profile = profileService.getProfileByEmail(authentication.getName());
+//            httpServletResponse.setCharacterEncoding("UTF-8");
+//            httpServletResponse.getWriter().append(gson.toJson(profile));
+//            httpServletResponse.setStatus(200);
+//        };
+//    }
+//
+//    private AuthenticationFailureHandler failureHandler() {
+//        return (httpServletRequest, httpServletResponse, e) -> {
+//            httpServletResponse.getWriter().append("Authentication failure");
+//            httpServletResponse.setStatus(401);
+//        };
+//    }
 
 }
