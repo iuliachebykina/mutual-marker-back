@@ -16,6 +16,7 @@ import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
+import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
@@ -49,6 +50,7 @@ public class TaskService {
     MarkRepository markRepository;
     AttachmentService attachmentService;
     MarkCalculator markCalculator;
+    ProjectRepository projectRepository;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -98,9 +100,13 @@ public class TaskService {
         return infos.stream()
                 .map(info -> {
                     Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(profile.getId(), info.getId());
+                    boolean isUploadProject = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile, info.getId()).isPresent();
                     long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
-                    return info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
-                            .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.getId(), 2)).build();
+                    return info.toBuilder()
+                            .isUploadProject(isUploadProject)
+                            .numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                            .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.getId(), 2))
+                            .build();
                 })
                 .collect(Collectors.toList());
     }

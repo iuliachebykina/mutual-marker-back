@@ -150,7 +150,7 @@ public class ProjectService {
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
-        var project = projectRepository.findByStudentAndTaskAndDeletedIsFalse(profile.get(), task)
+        var project = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile.get(), task.getId())
                 .orElse(null);
         return projectMapper.entityToInfo(project);
     }

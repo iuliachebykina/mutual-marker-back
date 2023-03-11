@@ -14,7 +14,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     List<Project> findAllByTask_IdAndDeletedIsFalse(Long taskId);
 
-    Optional<Project> findByStudentAndTaskAndDeletedIsFalse(Profile student, Task task);
+    Optional<Project> findByStudentAndTask_IdAndDeletedIsFalse(Profile student, Long taskId);
 
     Optional<Project> findByStudentIdAndTaskIdAndDeletedIsFalse(Long studentId, Long taskId);
 
