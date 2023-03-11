@@ -100,10 +100,10 @@ public class TaskService {
         return infos.stream()
                 .map(info -> {
                     Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(profile.getId(), info.getId());
-                    boolean isUploadProject = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile, info.getId()).isPresent();
+                    boolean isUploadedProject = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile, info.getId()).isPresent();
                     long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
                     return info.toBuilder()
-                            .isUploadProject(isUploadProject)
+                            .isUploadedProject(isUploadedProject)
                             .numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
                             .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.getId(), 2))
                             .build();

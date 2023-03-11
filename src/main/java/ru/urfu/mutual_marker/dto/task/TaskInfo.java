@@ -38,7 +38,7 @@ public class TaskInfo {
     Long numberOfWorksLeftToGrade;
 
     @Schema(title = "Загружена ли работа студентом", description = "Признак загружена ли работа студентом", example = "true")
-    Boolean isUploadProject;
+    Boolean isUploadedProject;
 
     @Schema(title = "Оценка за задание", example = "100")
     Double finalMark;
