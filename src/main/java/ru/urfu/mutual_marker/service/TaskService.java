@@ -55,26 +55,15 @@ public class TaskService {
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_IdAndDeletedIsFalse(roomId, pageable);
-        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
         tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
 
         List<TaskInfo> infos = taskMapper.listOfEntitiesToDtos(tasks);
-        infos.stream().map(info -> {
-            Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
-            long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
-            return info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
-                    .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2)).build();
-        });
-        return infos.stream()
-                .map(info -> {
-                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2);
-                    log.info("Mark {} task {} student {}", mark, info.getId(), currentUserId);
-                    return info.toBuilder()
-                            .finalMark(mark)
-                            .build();
-                })
-                .collect(Collectors.toList());
+        return getTaskInfos(profile.get(), tasks);
     }
 
     public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
