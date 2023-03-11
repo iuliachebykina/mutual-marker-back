@@ -22,7 +22,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "       where m.owner_id = :profileId and m.task_id = t.id" +
             "    ) " +
             "and t.room_id = :roomId " +
-            "and r.deleted = false ",
+            "and r.deleted = false " +
+            "and t.deleted = false ",
     nativeQuery = true)
     List<Task> findCompletedTask(@Param("roomId") Long roomId, @Param("profileId") Long profileId, Pageable pageable);
 
@@ -35,7 +36,8 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             "       where m.owner_id = :profileId and m.task_id = t.id "  +
             "    ) " +
             "and t.room_id = :roomId " +
-            "and r.deleted = false ",
+            "and r.deleted = false " +
+            "and t.deleted = false ",
             nativeQuery = true)
     List<Task> findUncompletedTask(@Param("roomId") Long roomId, @Param("profileId") Long profileId, Pageable pageable);
 
