@@ -44,16 +44,16 @@ services:
 #    networks:
 #      - mutual-marker-front_some-net
 
-  mutual-marker-front:
-    container_name: mutual-marker-front
-    build:
-      context: ../mutual-marker-front/.
-    image: mutual-marker-front:latest
-    volumes:
-      - '.:/main'
-      - '/main/node_modules'
-    ports:
-      - "80:80"
+#  mutual-marker-front:
+#    container_name: mutual-marker-front
+#    build:
+#      context: ../mutual-marker-front/.
+#    image: mutual-marker-front:latest
+#    volumes:
+#      - '.:/main'
+#      - '/main/node_modules'
+#    ports:
+#      - "80:80"
   psql:
     image: 'postgres:13.1-alpine'
     container_name: psql
