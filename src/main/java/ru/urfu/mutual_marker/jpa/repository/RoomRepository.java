@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
-    List<Room> findAllByStudentsEmail(String email, Pageable pageable);
-    List<Room> findAllByTeachersEmail(String email, Pageable pageable);
-    Optional<Room> findByCode(String code);
+    List<Room> findAllByStudentsEmailAndDeletedIsFalse(String email, Pageable pageable);
+    List<Room> findAllByTeachersEmailAndDeletedIsFalse(String email, Pageable pageable);
+    Optional<Room> findByCodeAndDeletedIsFalse(String code);
 }

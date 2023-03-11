@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    List<Project> findAllByTask(Task task);
+    List<Project> findAllByTaskAndDeletedIsFalse(Task task);
 
-    List<Project> findAllByTask_Id(Long taskId);
+    List<Project> findAllByTask_IdAndDeletedIsFalse(Long taskId);
 
-    Optional<Project> findByStudentAndTask(Profile student, Task task);
+    Optional<Project> findByStudentAndTaskAndDeletedIsFalse(Profile student, Task task);
 
-    Optional<Project> findByStudentIdAndTaskId(Long studentId, Long taskId);
+    Optional<Project> findByStudentIdAndTaskIdAndDeletedIsFalse(Long studentId, Long taskId);
 
-    Optional<Project> findByStudentAndId(Profile student, Long projectId);
+    Optional<Project> findByStudentAndIdAndDeletedIsFalse(Profile student, Long projectId);
 
-    Boolean existsByStudentIdAndTaskId(Long studentId, Long taskId);
+    Boolean existsByStudentIdAndTaskIdAndDeletedIsFalse(Long studentId, Long taskId);
 }

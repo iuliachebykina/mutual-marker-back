@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Table(schema = "mutual_marker")
 @Getter
 @Setter
-@Where(clause="deleted=false")
+
 @ToString
 public class MarkStepValue {
     @Id

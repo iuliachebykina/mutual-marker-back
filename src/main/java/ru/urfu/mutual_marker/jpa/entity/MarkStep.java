@@ -22,7 +22,7 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 public class MarkStep {
     @Id
     @SequenceGenerator(name = "markStepSeq", sequenceName = "markStepSeq")

@@ -40,7 +40,7 @@ public class ProfileService {
 
     @Transactional
     public Profile getProfileByEmail(String email, Role role) {
-        Optional<Profile> profile = profileRepository.findByEmail(email);
+        Optional<Profile> profile = profileRepository.findByEmailAndDeletedIsFalse(email);
         profile.ifPresent(value -> checkRole(value.getRole(), role));
         return profile.orElseThrow(() -> {
             throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
@@ -99,7 +99,7 @@ public class ProfileService {
 
     @Transactional
     public Profile getProfileByEmail(String email) {
-        return profileRepository.findByEmail(email).orElseThrow(() -> {
+        return profileRepository.findByEmailAndDeletedIsFalse(email).orElseThrow(() -> {
             log.error("Not found profile with email: {}", email);
             throw new UserNotExistingException(String.format("Not found profile with email: %s", email));
 
@@ -108,7 +108,7 @@ public class ProfileService {
 
     @Transactional
     List<Profile> getAllProfilesByRole(Role role, Pageable pageable) {
-        return profileRepository.findAllByRole(role, pageable);
+        return profileRepository.findAllByRoleAndDeletedIsFalse(role, pageable);
     }
 
 
@@ -135,7 +135,7 @@ public class ProfileService {
 
     @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) {
-        Optional<Profile> opt = profileRepository.findByEmail(registrationInfo.getEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(registrationInfo.getEmail());
         if (opt.isPresent()) {
             log.error("Failed to register new user. User with email: {} already existing", registrationInfo.getEmail());
             throw new UserExistingException(String.format("User with email: %s already existing", registrationInfo.getEmail()));
@@ -158,7 +158,7 @@ public class ProfileService {
 
     @Transactional
     public void deleteProfile(String email) {
-        Optional<Profile> opt = profileRepository.findByEmail(email);
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email);
         if (opt.isEmpty()) {
             log.error("Filed to delete profile. Profile with email: {} does not existing", email);
             throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
@@ -177,7 +177,7 @@ public class ProfileService {
 
     @Transactional
     public void updatePassword(ChangePassword changePassword) {
-        Optional<Profile> opt = profileRepository.findByEmail(changePassword.getEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changePassword.getEmail());
         if (opt.isEmpty()) {
             log.error("User with email: {} does not existing", changePassword.getEmail());
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changePassword.getEmail()));
@@ -194,12 +194,12 @@ public class ProfileService {
 
     @Transactional
     public void updateEmail(ChangeEmail changeEmail) {
-        if (profileRepository.getByEmail(changeEmail.getNewEmail()).isPresent()) {
+        if (profileRepository.getByEmailAndDeletedIsFalse(changeEmail.getNewEmail()).isPresent()) {
             log.error("User with email: {} already existing", changeEmail.getNewEmail());
             throw new UserExistingException(String.format("User with email: %s already existing", changeEmail.getNewEmail()));
         }
 
-        Optional<Profile> opt = profileRepository.findByEmail(changeEmail.getOldEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changeEmail.getOldEmail());
         if (opt.isEmpty()) {
             log.error("User with email: {} does not existing", changeEmail.getOldEmail());
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changeEmail.getOldEmail()));
@@ -212,7 +212,7 @@ public class ProfileService {
 
     @Transactional
     public Profile updateProfile(Profile updatedProfile, String email) {
-        Optional<Profile> opt = profileRepository.findByEmail(email);
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email);
         if (opt.isEmpty()) {
             log.error("User with id: {} does not existing", updatedProfile.getId());
             throw new UserNotExistingException(String.format("User with id: %s does not existing", updatedProfile.getId()));
@@ -233,7 +233,7 @@ public class ProfileService {
 
     @Transactional
     List<Profile> getProfilesInRoom(Long roomId, Role role, Pageable pageable) {
-        return profileRepository.findAllByRoomsIdAndRole(roomId, role, pageable);
+        return profileRepository.findAllByRoomsIdAndRoleAndDeletedIsFalse(roomId, role, pageable);
     }
 
     public List<StudentInfo> getStudentsInRoom(Long roomId, Pageable pageable) {
@@ -278,6 +278,6 @@ public class ProfileService {
     }
 
     public Long getCountOfMembersInRoom(Long roomId) {
-        return profileRepository.countByRoomsId(roomId);
+        return profileRepository.countByRoomsIdAndDeletedIsFalse(roomId);
     }
 }

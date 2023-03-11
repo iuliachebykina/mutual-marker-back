@@ -22,7 +22,7 @@ import java.util.Objects;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 @EntityListeners(AuditingEntityListener.class)
 public class Mark {
     @Id

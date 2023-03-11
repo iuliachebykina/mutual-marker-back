@@ -64,13 +64,13 @@ public class RoomService {
 
     @Transactional
     public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail){
-        List<Room> allByStudentsEmail = roomRepository.findAllByStudentsEmail(studentEmail, pageable);
+        List<Room> allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalse(studentEmail, pageable);
         return getRoomsDto(allByStudentsEmail);
     }
 
     @Transactional
     public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
-        List<Room> allByTeachersEmail = roomRepository.findAllByTeachersEmail(teacherEmail, pageable);
+        List<Room> allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalse(teacherEmail, pageable);
         return getRoomsDto(allByTeachersEmail);
     }
 
@@ -90,7 +90,7 @@ public class RoomService {
 
     @Transactional
     public Room getRoomByCode(String roomCode){
-        Optional<Room> room = roomRepository.findByCode(roomCode);
+        Optional<Room> room = roomRepository.findByCodeAndDeletedIsFalse(roomCode);
         if (room.isEmpty()){
             log.error("Failed to find room with code {}", roomCode);
             throw new RoomServiceException(String.format("Failed to find room by code %s", roomCode));
@@ -104,7 +104,7 @@ public class RoomService {
         toAdd.setTitle(addRoomDto.getTitle());
         if(addRoomDto.getCode() != null
                 && !addRoomDto.getCode().isBlank()){
-            if(roomRepository.findByCode(addRoomDto.getCode()).isPresent()){
+            if(roomRepository.findByCodeAndDeletedIsFalse(addRoomDto.getCode()).isPresent()){
                 return null;
             }
             toAdd.setCode(addRoomDto.getCode());
@@ -138,7 +138,7 @@ public class RoomService {
 
     @Transactional
     public Room deleteRoom(String code){
-        Room room = roomRepository.findByCode(code).orElse(null);
+        Room room = roomRepository.findByCodeAndDeletedIsFalse(code).orElse(null);
         if (room == null){
             log.error("Failed to delete room with code{}", code);
             throw new RoomServiceException("Failed to delete room with code" + code);

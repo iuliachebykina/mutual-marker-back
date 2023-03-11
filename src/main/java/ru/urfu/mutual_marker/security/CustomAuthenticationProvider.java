@@ -38,7 +38,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     private boolean findUserInDb(String name, String password) {
-        Optional<Profile> byEmail = profileRepository.findByEmail(name);
+        Optional<Profile> byEmail = profileRepository.findByEmailAndDeletedIsFalse(name);
         if(byEmail.isEmpty())
             return false;
         Profile profile = byEmail.get();
