@@ -6,16 +6,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
-import ru.urfu.mutual_marker.dto.mark.AddMarkDto;
-import ru.urfu.mutual_marker.dto.mark.AddTeacherMarkDto;
-import ru.urfu.mutual_marker.dto.mark.MarkDto;
-import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
+import ru.urfu.mutual_marker.dto.mark.*;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.service.MarkStepFeedbackService;
 import ru.urfu.mutual_marker.service.ProfileService;
 import ru.urfu.mutual_marker.service.ProjectService;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
@@ -39,6 +37,7 @@ public class MarkService {
     ProjectService projectService;
     MarkMapper markMapper;
     MarkCalculator markCalculator;
+    MarkStepFeedbackService markStepFeedbackService;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
@@ -53,7 +52,7 @@ public class MarkService {
     Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
-            Double res = addMarkDto.getMarkStepValues().stream().mapToInt(m -> m).average().orElse(Double.NaN);
+            Double res = addMarkDto.getMarkStepDtos().stream().mapToInt(MarkStepDto::getValue).average().orElse(Double.NaN);
             if (res.equals(Double.NaN)){
                 log.error("Failed to process components to calculate final mark");
                 throw new MarkServiceException("Failed to process markComponents");
@@ -97,6 +96,7 @@ public class MarkService {
             log.error("Failed to find student with id {}", addMarkDto.getProfileId());
             throw new MarkServiceException(String.format("Failed to find student with id %s", addMarkDto.getProfileId()));
         }
+        markStepFeedbackService.addMarkStepFeedbacksForMark(addMarkDto);
         return markRepository.save(mark);
     }
 
