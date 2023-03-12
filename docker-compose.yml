@@ -43,6 +43,8 @@ services:
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "5434"
     ports:
       - "5434:5432"
 
