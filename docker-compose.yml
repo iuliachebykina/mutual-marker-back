@@ -39,12 +39,12 @@ services:
     image: 'postgres:13.1-alpine'
     container_name: psql
     volumes:
-      - init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "5433:5432"
+      - "1975:5432"
 
 #  mutual-marker-front:
 #    container_name: mutual-marker-front
