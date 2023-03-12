@@ -36,7 +36,7 @@ services:
       FILE-SIZE-THRESHOLD: 2KB
 
   psql:
-    image: 'postgres'
+    image: 'postgres:13.1-alpine'
     container_name: psql
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
