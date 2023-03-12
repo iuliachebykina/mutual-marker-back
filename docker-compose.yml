@@ -10,8 +10,6 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-#    networks:
-#      - mutual-marker-front_some-net
 
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -24,25 +22,29 @@ services:
       - psql
       - minio
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://psql:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://psql:5432/${DB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      FILE_STORAGE: ../mutual-marker
+      FILE_STORAGE: ${FILE_STORAGE}
       MINIO_URL: http://minio:9000
-      MINIO_BUCKET: 202301-urfu-rtf
-      MINIO_ACCESS_KEY: user
-      MINIO_SECRET_KEY: password
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MAX_FILE_SIZE: 20MB
       MAX_REQUEST_SIZE: 20MB
       FILE-SIZE-THRESHOLD: 2KB
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-#      interval: 30s
-#      timeout: 20s
-#      retries: 3
-#    networks:
-#      - mutual-marker-front_some-net
+
+  psql:
+    image: 'postgres:13.1-alpine'
+    container_name: psql
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1976:5432"
 
 #  mutual-marker-front:
 #    container_name: mutual-marker-front
@@ -54,17 +56,3 @@ services:
 #      - '/main/node_modules'
 #    ports:
 #      - "80:80"
-  psql:
-    image: 'postgres:13.1-alpine'
-    container_name: psql
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-#    networks:
-#      - mutual-marker-front_some-net
-
-#networks:
-#  mutual-marker-front_some-net:
-#    external: true
