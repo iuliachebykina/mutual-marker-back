@@ -44,7 +44,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "1976:5432"
+      - "5434:5432"
 
 #  mutual-marker-front:
 #    container_name: mutual-marker-front
