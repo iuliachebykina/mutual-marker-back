@@ -23,7 +23,6 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
 public class Task {
     @Id
     @SequenceGenerator(name = "taskSeq", sequenceName = "taskSeq")

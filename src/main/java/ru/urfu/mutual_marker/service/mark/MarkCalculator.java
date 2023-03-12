@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Project;
@@ -35,7 +34,7 @@ public class MarkCalculator {
     MarkRepository markRepository;
 
     public Double calculateMarkForProjectByTask(Long taskId, Long student, int precision) {
-        Optional<Project> projectOptional = projectRepository.findByStudentIdAndTaskId(student, taskId);
+        Optional<Project> projectOptional = projectRepository.findByStudentIdAndTaskIdAndDeletedIsFalse(student, taskId);
         if (projectOptional.isPresent()) {
             var project = projectOptional.get();
             log.info("calculate mark for project {} student {}", project.getId(), student);

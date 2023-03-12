@@ -96,14 +96,14 @@ public class TestController {
             String title = generateString(10);
             int teachersCount = 3;
             List<Profile> teachers = profileRepository
-                    .findAllByRole(Role.ROLE_TEACHER,  PageRequest.of(0, 10))
+                    .findAllByRoleAndDeletedIsFalse(Role.ROLE_TEACHER,  PageRequest.of(0, 10))
                     .stream()
                     .limit(teachersCount)
                     .collect(Collectors.toList());
 
             int studentsCount =10;
             List<Profile> students = profileRepository
-                    .findAllByRole(Role.ROLE_STUDENT,  PageRequest.of(0, 10))
+                    .findAllByRoleAndDeletedIsFalse(Role.ROLE_STUDENT,  PageRequest.of(0, 10))
                     .stream()
                     .limit(studentsCount)
                     .collect(Collectors.toList());

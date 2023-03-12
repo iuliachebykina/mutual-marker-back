@@ -52,6 +52,18 @@ public class TasksApi {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Получение невыполненных заданий")
+    @GetMapping(value = "/task/uncompleted", params = { "page", "size" })
+    public List<TaskInfo> getUncompletedTasks(Authentication authentication,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("size") int size,
+                                            @RequestParam("room_id") Long id) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return taskService.findUncompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Получение подробной инфы по заданию")
     @GetMapping(value = "/task/{task_id}")
     public TaskFullInfo getTaskInfo(@PathVariable("task_id") Long id) {

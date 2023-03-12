@@ -13,8 +13,10 @@ import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
+import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
@@ -48,50 +50,54 @@ public class TaskService {
     MarkRepository markRepository;
     AttachmentService attachmentService;
     MarkCalculator markCalculator;
+    ProjectRepository projectRepository;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
-        var tasks = taskRepository.findAllByRoom_Id(roomId, pageable);
-        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
-        tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
-
-        List<TaskInfo> infos = taskMapper.listOfEntitiesToDtos(tasks);
-        infos.forEach(info -> {
-            Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, info.getId());
-            Long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
-            info = info.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
-                    .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2)).build();
-        });
-        var result = infos.stream()
-                .map(info -> {
-                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), currentUserId, 2);
-                    log.info("Mark {} task {} student {}", mark, info.getId(), currentUserId);
-                    return info.toBuilder()
-                            .finalMark(mark)
-                            .build();
-                })
-                .collect(Collectors.toList());
-        return result;
-    }
-
-    public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var tasks = taskRepository.findAllByRoom_IdAndDeletedIsFalse(roomId, pageable);
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
-        var tasks = taskRepository.findCompletedByRoom(roomId, profile.get().getId(), pageable);
+        tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
+
+        List<TaskInfo> infos = taskMapper.listOfEntitiesToDtos(tasks);
+        return getTaskInfos(profile.get(), tasks);
+    }
+
+    public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
+        var tasks = taskRepository.findCompletedTask(roomId, profile.get().getId(), pageable);
+        return getTaskInfos(profile.get(), tasks);
+    }
+
+    public List<TaskInfo> findUncompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        if(profile.isEmpty()){
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+        }
+        var tasks = taskRepository.findUncompletedTask(roomId, profile.get().getId(), pageable);
+        return getTaskInfos(profile.get(), tasks);
+    }
+
+    private List<TaskInfo> getTaskInfos(Profile profile, List<Task> tasks) {
         var infos = taskMapper.listOfEntitiesToDtos(tasks);
-        var result = infos.stream()
+        return infos.stream()
                 .map(info -> {
-                    var mark = markCalculator.calculateMarkForProjectByTask(info.getId(), profile.get().getId(), 2);
-                    log.info("Mark {} task {} student {}", mark, info.getId(), profile.get().getId());
+                    Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(profile.getId(), info.getId());
+                    boolean isUploadedProject = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile, info.getId()).isPresent();
+                    long leftToGrade = info.getMinNumberOfGraded() - numberOfGradedWorks;
                     return info.toBuilder()
-                            .finalMark(mark)
+                            .isUploadedProject(isUploadedProject)
+                            .numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
+                            .finalMark(markCalculator.calculateMarkForProjectByTask(info.getId(), profile.getId(), 2))
                             .build();
                 })
                 .collect(Collectors.toList());
-        return result;
     }
 
     public TaskFullInfo findTask(Long taskId) {
@@ -108,7 +114,7 @@ public class TaskService {
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
 
         Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
-        Long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
+        long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
         taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
                 .finalMark(markCalculator.calculateMarkForProjectByTask(task.get().getId(), currentUserId, 2)).build();
         return taskFullInfo;
@@ -123,7 +129,7 @@ public class TaskService {
             throw new NotFoundException("Room is not found");
         }
 
-        var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
+        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
         task.setRoom(room.get());
 
@@ -163,7 +169,7 @@ public class TaskService {
         if (task.isEmpty()) {
             throw new IllegalArgumentException("Task was not found");
         }
-        var owner = profileRepository.findByEmail(request.getOwner()).orElse(null);
+        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
 
         Task save = taskRepository.save(taskMapper.creationRequestToExistingEntity(task.get(), request, owner));
         return taskMapper.entityToInfo(save);
