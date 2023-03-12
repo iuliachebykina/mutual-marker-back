@@ -75,20 +75,6 @@ public class MarkService {
                     .markValue(truncation.intValue())
                     .build();
 
-//            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
-//                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
-//                    .orElse(null);
-//            if (numberOfGraded == null){
-////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-////                        owner.getId()));
-//                numberOfGraded = NumberOfGraded.builder()
-//                        .task(project.getTask())
-//                        .profile(owner)
-//                        .graded(0).build();
-//            }
-//            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
-//            numberOfGradedRepository.save(numberOfGraded);
-
         } catch (EntityNotFoundException e){
             log.error("Failed to find project with id {}", addMarkDto.getProjectId());
             throw new MarkServiceException(String.format("Failed to find project with id %s", addMarkDto.getProjectId()));

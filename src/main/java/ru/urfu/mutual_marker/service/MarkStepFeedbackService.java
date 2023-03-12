@@ -43,6 +43,7 @@ public class MarkStepFeedbackService {
                     .markStep(markStep)
                     .owner(owner)
                     .comment(ms.getComment())
+                    .value(ms.getValue())
                     .build();
             owner.addMarkStepFeedback(markStepFeedback);
             feedbacks.add(markStepFeedback);

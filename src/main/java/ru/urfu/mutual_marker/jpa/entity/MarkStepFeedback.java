@@ -32,6 +32,9 @@ public class MarkStepFeedback {
     @ManyToOne
     Profile owner;
 
+    @Column
+    Integer value;
+
     @JsonIgnore
     @Builder.Default
     @Column(columnDefinition = "boolean default false")
