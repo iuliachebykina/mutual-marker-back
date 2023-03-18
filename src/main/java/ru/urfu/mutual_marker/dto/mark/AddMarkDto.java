@@ -16,6 +16,6 @@ public class AddMarkDto {
     Long profileId;
     @Schema(title = "Отзыв к оценке")
     String comment;
-    @Schema(title = "Выставленные значения для каждого шага оценки", required = true)
-    List<Integer> markStepValues;
+    @Schema(title = "Выставленные значения для каждого шага оценки и отзыв на шаг", required = true)
+    List<MarkStepDto> markStepDtos;
 }
