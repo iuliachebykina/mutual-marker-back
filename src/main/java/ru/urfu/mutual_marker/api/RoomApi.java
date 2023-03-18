@@ -56,7 +56,7 @@ public class RoomApi {
         SimpleGrantedAuthority role = roles.stream().findFirst().orElseThrow(() -> {
             throw new NotFoundException("Not found roles for authorize");
         });
-        return roomService.getAllRoomsForProfile(pageable, email, Role.valueOf(role.getAuthority()), false);
+        return roomService.getAllRoomsForProfile(pageable, email, Role.valueOf(role.getAuthority()));
     }
 
     @Operation(summary = "Добавление комнаты, доступно преподавателям и админам")

@@ -52,13 +52,13 @@ public class RoomService {
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForProfile(Pageable pageable, String email, Role role, boolean isGrouped){
+    public List<RoomDto> getAllRoomsForProfile(Pageable pageable, String email, Role role){
         try {
             switch (role){
                 case ROLE_STUDENT:
-                    return getAllRoomsForStudent(pageable, email, isGrouped);
+                    return getAllRoomsForStudent(pageable, email);
                 case ROLE_TEACHER:
-                    return getAllRoomsForTeacher(pageable, email, isGrouped);
+                    return getAllRoomsForTeacher(pageable, email);
                 default:
                     throw new RoomServiceException("Role is not recognized");
             }
@@ -69,22 +69,14 @@ public class RoomService {
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail, boolean isGrouped){
-        List<Room> allByStudentsEmail;
-        if(isGrouped){
-            allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalseAndRoomGroupIsNull(studentEmail, pageable);
-        } else
-            allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalse(studentEmail, pageable);
+    public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail){
+        List<Room> allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalse(studentEmail, pageable);
         return getRoomsDto(allByStudentsEmail);
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail, boolean isGrouped){
-        List<Room> allByTeachersEmail;
-        if(isGrouped){
-            allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalseAndRoomGroupIsNull(teacherEmail, pageable);
-        } else
-            allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalse(teacherEmail, pageable);
+    public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
+        List<Room> allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalse(teacherEmail, pageable);
         return getRoomsDto(allByTeachersEmail);
     }
 
@@ -327,6 +319,6 @@ public class RoomService {
     }
 
     public List<RoomDto> getAllRoomsWithoutGroupForProfile(Pageable pageable, String email, Role role) {
-        return getAllRoomsForProfile(pageable, email, role, true);
+        return getRoomsDto(roomRepository.findAllByDeletedIsFalseAndNotInGroup(email, pageable));
     }
 }

@@ -34,8 +34,12 @@ public class RoomGroup {
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
 
-
-    @OneToMany(mappedBy = "roomGroup")
+    @OneToMany
+    @JoinTable(
+            name = "roomgroup_rooms",
+            schema = "mutual_marker",
+            joinColumns = @JoinColumn(name = "roomgroup_id"),
+            inverseJoinColumns = @JoinColumn(name = "room_id"))
     @Builder.Default
     @ToString.Exclude
     @JsonIgnore
@@ -46,7 +50,7 @@ public class RoomGroup {
         if(rooms == null)
             rooms = new HashSet<>();
         rooms.add(room);
-        room.setRoomGroup(this);
+
     }
 
 
@@ -54,7 +58,7 @@ public class RoomGroup {
         if(rooms == null)
             return;
         this.rooms.stream().filter(a -> Objects.equals(a.getId(), room.getId())).findFirst().ifPresent(r -> this.rooms.remove(r));
-        room.setRoomGroup(null);
+
     }
 
     @Override
