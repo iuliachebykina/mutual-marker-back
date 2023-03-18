@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Value;
 
+import java.util.List;
+
 @Data
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -12,6 +14,7 @@ import lombok.Value;
 public class MarkDto {
     Double coefficient;
     Boolean isTeacherMark;
-    Integer markValue;
+    Integer finalMark;
     String comment;
+    List<MarkStepDto> markSteps;
 }

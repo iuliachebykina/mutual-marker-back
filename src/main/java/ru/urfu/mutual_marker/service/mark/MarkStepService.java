@@ -31,7 +31,7 @@ public class MarkStepService { //TODO add error handling for repository methods
     @Transactional
     public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder()
-                .description(addMarkStepDto.getDescription())
+                .teacherDescription(addMarkStepDto.getDescription())
                 .owner(profileRepository.getById(addMarkStepDto.getProfileId()))
                 .title(addMarkStepDto.getTitle())
                 .build();
