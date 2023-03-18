@@ -9,11 +9,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.RoomMapper;
 import ru.urfu.mutual_marker.dto.room.AddRoomDto;
+import ru.urfu.mutual_marker.dto.room.RoomAndRoomGroupDto;
 import ru.urfu.mutual_marker.dto.room.RoomDto;
+import ru.urfu.mutual_marker.dto.room.RoomGroupDto;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
+import ru.urfu.mutual_marker.jpa.entity.RoomGroup;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.jpa.repository.RoomGroupRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
@@ -24,6 +28,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Data
@@ -34,6 +39,7 @@ public class RoomService {
     ProfileService profileService;
     RoomMapper roomMapper;
     TaskRepository taskRepository;
+    RoomGroupRepository roomGroupRepository;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -46,13 +52,13 @@ public class RoomService {
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForProfile(Pageable pageable, String email, Role role){
+    public List<RoomDto> getAllRoomsForProfile(Pageable pageable, String email, Role role, boolean isGrouped){
         try {
             switch (role){
                 case ROLE_STUDENT:
-                    return getAllRoomsForStudent(pageable, email);
+                    return getAllRoomsForStudent(pageable, email, isGrouped);
                 case ROLE_TEACHER:
-                    return getAllRoomsForTeacher(pageable, email);
+                    return getAllRoomsForTeacher(pageable, email, isGrouped);
                 default:
                     throw new RoomServiceException("Role is not recognized");
             }
@@ -63,14 +69,22 @@ public class RoomService {
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail){
-        List<Room> allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalse(studentEmail, pageable);
+    public List<RoomDto> getAllRoomsForStudent(Pageable pageable, String studentEmail, boolean isGrouped){
+        List<Room> allByStudentsEmail;
+        if(isGrouped){
+            allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalseAndRoomGroupIsNull(studentEmail, pageable);
+        } else
+            allByStudentsEmail = roomRepository.findAllByStudentsEmailAndDeletedIsFalse(studentEmail, pageable);
         return getRoomsDto(allByStudentsEmail);
     }
 
     @Transactional
-    public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail){
-        List<Room> allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalse(teacherEmail, pageable);
+    public List<RoomDto> getAllRoomsForTeacher(Pageable pageable, String teacherEmail, boolean isGrouped){
+        List<Room> allByTeachersEmail;
+        if(isGrouped){
+            allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalseAndRoomGroupIsNull(teacherEmail, pageable);
+        } else
+            allByTeachersEmail = roomRepository.findAllByTeachersEmailAndDeletedIsFalse(teacherEmail, pageable);
         return getRoomsDto(allByTeachersEmail);
     }
 
@@ -250,5 +264,69 @@ public class RoomService {
                     room.getId(), e.getLocalizedMessage(), e.getStackTrace());
             throw new RoomServiceException("Failed to add task");
         }
+    }
+
+    public RoomGroupDto createRoomGroup(String roomGroupName, String email) {
+        Profile profile = profileService.getProfileByEmail(email);
+        RoomGroup roomGroup = RoomGroup.builder()
+                .profile(profile)
+                .title(roomGroupName)
+                .build();
+        return getRoomGroupDto(roomGroupRepository.save(roomGroup));
+    }
+
+    private RoomGroupDto getRoomGroupDto(RoomGroup roomGroup){
+        List<Room> rooms = new ArrayList<>(roomGroup.getRooms());
+        return RoomGroupDto.builder()
+                .roomGroupId(roomGroup.getId())
+                .roomGroupName(roomGroup.getTitle())
+                .rooms(getRoomsDto(rooms))
+                .build();
+    }
+
+    public RoomGroupDto addRoomToRoomGroup(RoomAndRoomGroupDto roomAndRoomGroupDto) {
+        Optional<RoomGroup> roomGroup = roomGroupRepository.findByIdAndDeletedIsFalse(roomAndRoomGroupDto.getRoomGroupId());
+        if(roomGroup.isEmpty()){
+            throw  new RoomServiceException(String.format("Failed to find room group by id: %s", roomAndRoomGroupDto.getRoomGroupId()));
+        }
+        Optional<Room> room = roomRepository.findById(roomAndRoomGroupDto.getRoomId());
+        if(room.isEmpty()){
+            throw  new RoomServiceException(String.format("Failed to find room  by id: %s", roomAndRoomGroupDto.getRoomId()));
+        }
+        roomGroup.get().addRoom(room.get());
+        return getRoomGroupDto(roomGroupRepository.save(roomGroup.get()));
+    }
+
+    public RoomGroupDto deleteRoomFromRoomGroup(RoomAndRoomGroupDto roomAndRoomGroupDto) {
+        Optional<RoomGroup> roomGroup = roomGroupRepository.findByIdAndDeletedIsFalse(roomAndRoomGroupDto.getRoomGroupId());
+        if(roomGroup.isEmpty()){
+            throw  new RoomServiceException(String.format("Failed to find room group by id: %s", roomAndRoomGroupDto.getRoomGroupId()));
+        }
+        Optional<Room> room = roomRepository.findById(roomAndRoomGroupDto.getRoomId());
+        if(room.isEmpty()){
+            throw  new RoomServiceException(String.format("Failed to find room  by id: %s", roomAndRoomGroupDto.getRoomId()));
+        }
+        roomGroup.get().removeRoom(room.get());
+        return getRoomGroupDto(roomGroupRepository.save(roomGroup.get()));
+    }
+
+    public List<RoomGroupDto> getRoomGroups(String email, Pageable pageable) {
+        Profile profile = profileService.getProfileByEmail(email);
+        return roomGroupRepository.findByProfile_IdAndDeletedIsFalse(profile.getId(), pageable)
+                .stream().map(this::getRoomGroupDto)
+                .collect(Collectors.toList());
+    }
+
+    public void deleteRoomGroup(Long id) {
+        Optional<RoomGroup> roomGroup = roomGroupRepository.findById(id);
+        if(roomGroup.isEmpty()){
+            throw  new RoomServiceException(String.format("Failed to find room group by id: %s", id));
+        }
+        roomGroup.get().setDeleted(true);
+        roomGroupRepository.save(roomGroup.get());
+    }
+
+    public List<RoomDto> getAllRoomsWithoutGroupForProfile(Pageable pageable, String email, Role role) {
+        return getAllRoomsForProfile(pageable, email, role, true);
     }
 }

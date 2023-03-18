@@ -41,6 +41,9 @@ public class Room {
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
 
+    @ManyToOne
+    RoomGroup roomGroup;
+
 
     @ManyToMany(mappedBy = "rooms")
     @Builder.Default
@@ -65,6 +68,7 @@ public class Room {
         teachers.add(teacher);
         teacher.addRoom(this);
     }
+
 
     public void addStudent(Profile student){
         if(students == null)
