@@ -69,7 +69,7 @@ public class Profile {
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     @JsonIgnore
     @Builder.Default
     @ToString.Exclude

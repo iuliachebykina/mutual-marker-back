@@ -6,17 +6,17 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
-@RequiredArgsConstructor
-@AllArgsConstructor
-@Builder(toBuilder = true)
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(schema = "mutual_marker")
 @Getter
 @Setter
-@Where(clause="deleted=false")
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(schema = "mutual_marker")
 public class MarkStepFeedback {
     @Id
     @SequenceGenerator(name = "markStepFeedbackSeq", sequenceName = "markStepFeedbackSeq")
@@ -29,6 +29,7 @@ public class MarkStepFeedback {
     @Column
     String comment;
 
+    @NotNull
     @ManyToOne
     Profile owner;
 
@@ -37,6 +38,5 @@ public class MarkStepFeedback {
 
     @JsonIgnore
     @Builder.Default
-    @Column(columnDefinition = "boolean default false")
     Boolean deleted = Boolean.FALSE;
 }
