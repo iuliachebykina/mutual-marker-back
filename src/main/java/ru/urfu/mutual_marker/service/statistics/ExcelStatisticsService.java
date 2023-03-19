@@ -23,6 +23,7 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.statistics.StatisticsServiceException;
 import ru.urfu.mutual_marker.service.mark.MarkService;
+import ru.urfu.mutual_marker.service.statistics.anomaly.AnomalyDiscoveryService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

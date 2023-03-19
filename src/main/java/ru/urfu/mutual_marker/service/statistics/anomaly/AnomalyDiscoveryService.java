@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.statistics.anomaly;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,6 @@ import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 
 import javax.transaction.Transactional;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

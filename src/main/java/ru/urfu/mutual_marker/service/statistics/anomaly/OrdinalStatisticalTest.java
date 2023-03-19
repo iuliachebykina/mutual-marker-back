@@ -1,4 +1,6 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.statistics.anomaly;
+
+import ru.urfu.mutual_marker.service.statistics.anomaly.observation.RankedObservation;
 
 import java.io.Serializable;
 import java.util.ArrayList;

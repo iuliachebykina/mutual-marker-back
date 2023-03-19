@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.statistics.anomaly.observation;
 
 public class Observation {
     /**

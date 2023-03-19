@@ -1,6 +1,7 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.statistics.anomaly;
 
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
+import ru.urfu.mutual_marker.service.statistics.anomaly.observation.RankedObservation;
 
 public class KruskalWallisTest extends OrdinalStatisticalTest{
     /**

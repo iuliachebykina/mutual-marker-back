@@ -1,6 +1,6 @@
-package ru.urfu.mutual_marker.service.statistics;
+package ru.urfu.mutual_marker.service.statistics.anomaly.observation;
 
-public class RankedObservation extends Observation{
+public class RankedObservation extends Observation {
     /**
      * The rank of this observation.
      */
