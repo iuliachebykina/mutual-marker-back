@@ -35,6 +35,10 @@ springdoc:
   api-docs:
     path: /api-docs
 
+anomaly:
+  kruskalWallis:
+    alpha: 0.5
+
 jwt:
   secret:
     access: qBTmv4oXFFR2GwjexDJ4t6fsIUIUhhXqlktXjXdkcyygs8nPVEwMfo29VDRRepYDVV5IkIxBMzr7OEHXEHd37w==

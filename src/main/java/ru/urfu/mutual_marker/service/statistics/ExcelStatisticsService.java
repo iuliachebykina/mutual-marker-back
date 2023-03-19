@@ -37,6 +37,8 @@ public class ExcelStatisticsService {
     final TaskRepository taskRepository;
     final ResourceLoader resourceLoader;
 
+    final AnomalyDiscoveryService anomalyDiscoveryService;
+
     public ResponseEntity<Resource> statisticsForProject(Long taskId) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(resourceLoader.getResource("classpath:/statistics-template.xlsx").getInputStream())) {
             Task task = taskRepository.findById(taskId).orElse(null);
@@ -85,6 +87,12 @@ public class ExcelStatisticsService {
                 } catch (Exception e) {
                     log.error("Error while filling excel for project. Project: {}", project);
                     mark.setBlank();
+                }
+                Boolean detectedAnomaly = anomalyDiscoveryService.kruskalWallisDetectAnomaly(project);
+                Cell anomalyDetectedFlag = stats.createCell(4);
+                if (detectedAnomaly){
+                    anomalyDetectedFlag.setCellStyle(statsStyle);
+                    anomalyDetectedFlag.setCellValue("Замечена аномалия оценивания!");
                 }
                 i++;
             }
