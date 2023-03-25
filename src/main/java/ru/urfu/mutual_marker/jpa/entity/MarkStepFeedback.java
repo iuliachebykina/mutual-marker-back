@@ -23,7 +23,7 @@ public class MarkStepFeedback {
     @GeneratedValue(generator = "markStepFeedbackSeq")
     Long id;
 
-    @OneToOne
+    @ManyToOne
     MarkStep markStep;
 
     @Column
