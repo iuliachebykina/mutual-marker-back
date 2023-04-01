@@ -3,6 +3,8 @@ services:
   minio:
     image: bitnami/minio:2022
     container_name: minio
+    volumes:
+      - minio:/data
     environment:
       MINIO_ROOT_USER: "user"
       MINIO_ROOT_PASSWORD: "password"
@@ -40,6 +42,7 @@ services:
     container_name: psql
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -56,3 +59,10 @@ services:
 #      - '/main/node_modules'
 #    ports:
 #      - "80:80"
+
+
+volumes:
+  pgdata:
+    external: false
+  minio:
+    external: false
