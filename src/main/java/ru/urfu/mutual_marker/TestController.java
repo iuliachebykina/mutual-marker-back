@@ -17,7 +17,7 @@ import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.*;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.annotation.security.PermitAll;
 import javax.transaction.Transactional;

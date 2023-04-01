@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.file;
+package ru.urfu.mutual_marker.service.attachment;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;

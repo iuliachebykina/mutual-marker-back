@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.room;
 
 import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 import lombok.AccessLevel;
@@ -20,6 +20,7 @@ import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.RoomGroupRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
 import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;

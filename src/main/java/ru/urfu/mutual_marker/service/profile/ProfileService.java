@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.profile;
 
 
 import lombok.AccessLevel;

@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.attachment;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
-import ru.urfu.mutual_marker.service.file.FileStorageService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;

@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 
 @Configuration

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.room.*;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.service.RoomService;
+import ru.urfu.mutual_marker.service.room.RoomService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import java.util.List;

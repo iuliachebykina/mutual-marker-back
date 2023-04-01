@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.security.exception.InvalidRoleException;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;

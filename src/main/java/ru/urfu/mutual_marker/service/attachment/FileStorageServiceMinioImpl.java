@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.file;
+package ru.urfu.mutual_marker.service.attachment;
 
 import com.jlefebure.spring.boot.minio.MinioException;
 import com.jlefebure.spring.boot.minio.MinioService;

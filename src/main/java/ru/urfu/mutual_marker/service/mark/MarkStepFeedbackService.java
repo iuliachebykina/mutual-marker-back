@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.mark;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import ru.urfu.mutual_marker.jpa.repository.MarkStepFeedbackRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;

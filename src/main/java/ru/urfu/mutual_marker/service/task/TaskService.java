@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.task;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,10 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 import ru.urfu.mutual_marker.service.mark.MarkCalculator;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.transaction.Transactional;
 import java.util.Comparator;

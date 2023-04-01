@@ -11,7 +11,7 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
-import ru.urfu.mutual_marker.service.ProjectService;
+import ru.urfu.mutual_marker.service.project.ProjectService;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 

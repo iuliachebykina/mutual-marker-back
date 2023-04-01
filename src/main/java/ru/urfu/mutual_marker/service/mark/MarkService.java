@@ -13,9 +13,8 @@ import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
-import ru.urfu.mutual_marker.service.MarkStepFeedbackService;
-import ru.urfu.mutual_marker.service.ProfileService;
-import ru.urfu.mutual_marker.service.ProjectService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
+import ru.urfu.mutual_marker.service.project.ProjectService;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 
 import javax.persistence.EntityNotFoundException;

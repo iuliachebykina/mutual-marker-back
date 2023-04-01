@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service.file;
+package ru.urfu.mutual_marker.service.attachment;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

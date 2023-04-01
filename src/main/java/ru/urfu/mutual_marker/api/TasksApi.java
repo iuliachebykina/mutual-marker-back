@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
-import ru.urfu.mutual_marker.service.TaskService;
+import ru.urfu.mutual_marker.service.task.TaskService;
 
 import java.util.List;
 

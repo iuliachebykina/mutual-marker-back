@@ -15,8 +15,8 @@ import ru.urfu.mutual_marker.dto.project.ProjectCreationInfo;
 import ru.urfu.mutual_marker.dto.project.ProjectCreationResultDto;
 import ru.urfu.mutual_marker.dto.project.ProjectInfo;
 import ru.urfu.mutual_marker.dto.project.ProjectUpdateInfo;
-import ru.urfu.mutual_marker.service.AttachmentService;
-import ru.urfu.mutual_marker.service.ProjectService;
+import ru.urfu.mutual_marker.service.attachment.AttachmentService;
+import ru.urfu.mutual_marker.service.project.ProjectService;
 
 import java.util.List;
 
