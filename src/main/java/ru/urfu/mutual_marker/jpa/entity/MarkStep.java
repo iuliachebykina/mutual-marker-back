@@ -35,7 +35,7 @@ public class MarkStep {
     String title;
     @Column(length = 1000)
     @NotNull
-    String teacherDescription;
+    String description;
 
     @JsonIgnore
     @Builder.Default
