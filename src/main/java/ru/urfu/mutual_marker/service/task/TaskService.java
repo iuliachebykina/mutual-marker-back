@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.TaskMapper;
+import ru.urfu.mutual_marker.dto.task.MarkStep;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
@@ -26,6 +27,7 @@ import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 import ru.urfu.mutual_marker.service.mark.MarkCalculator;
+import ru.urfu.mutual_marker.service.mark.MarkStepService;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.transaction.Transactional;
@@ -53,6 +55,7 @@ public class TaskService {
     AttachmentService attachmentService;
     MarkCalculator markCalculator;
     ProjectRepository projectRepository;
+    MarkStepService markStepService;
 
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
@@ -114,11 +117,13 @@ public class TaskService {
 
         UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
-
+        List<MarkStep> markSteps = markStepService.getAllMarkStepsByTask(task.get());
         Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
         long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
         taskFullInfo = taskFullInfo.toBuilder().numberOfWorksLeftToGrade(leftToGrade > 0 ? leftToGrade : 0)
-                .finalMark(markCalculator.calculateMarkForProjectByTask(task.get().getId(), currentUserId, 2)).build();
+                .finalMark(markCalculator.calculateMarkForProjectByTask(task.get().getId(), currentUserId, 2))
+                .markSteps(markSteps)
+                .build();
         return taskFullInfo;
     }
 
@@ -134,13 +139,9 @@ public class TaskService {
         var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
         task.setRoom(room.get());
-
-        var markSteps = markStepRepository.saveAll(task.getMarkSteps());
-        markSteps.forEach(markStep -> markStep.getValues().forEach(value -> {
-            value.setMarkStep(markStep);
-            value.setDeleted(false);
-            markStepValueRepository.save(value);
-        }));
+        List<ru.urfu.mutual_marker.jpa.entity.MarkStep> markSteps = markStepService.toEntity(request.getMarkSteps(), task);
+        markStepRepository.saveAll(markSteps);
+        markSteps.forEach(s -> markStepValueRepository.saveAll(s.getValues()));
 
         if (appendAttachments){
             attachmentService.appendExistingAttachmentsToTask(request.getAttachments(), task);

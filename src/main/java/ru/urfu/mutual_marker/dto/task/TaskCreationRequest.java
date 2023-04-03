@@ -5,6 +5,7 @@ import lombok.Value;
 
 import javax.validation.constraints.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Value
@@ -38,7 +39,7 @@ public class TaskCreationRequest {
 
     @NotEmpty
     @Schema(title = "Ступени оценивания", description = "Этапы всестороннего оценивания задания", required = true)
-    Set<MarkStep> markSteps;
+    List<MarkStep> markSteps;
 
     @NotBlank
     @Email
@@ -48,19 +49,4 @@ public class TaskCreationRequest {
     @Schema(title = "Имена вложений", example = "example.pdf")
     Set<String> attachments;
 
-    @Value
-    public static class MarkStep {
-
-        @NotBlank
-        @Schema(title = "Заголовок шага", example = "Наличие файла", required = true)
-        String title;
-
-        @NotBlank
-        @Schema(title = "Описание шага", description = "Что должно быть в работе", example = "Файл загружен", required = true)
-        String description;
-
-        @NotEmpty
-        @Schema(title = "Градация оценки", description = "Как можно оценить", required = true)
-        Set<Integer> values;
-    }
 }
