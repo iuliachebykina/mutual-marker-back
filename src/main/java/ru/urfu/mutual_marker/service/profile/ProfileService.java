@@ -285,4 +285,9 @@ public class ProfileService {
         profile.removeRoom(roomId);
         profileRepository.save(profile);
     }
+
+    public void deleteRoomFromProfile(Long roomId, Long profileId) {
+        Profile profile = findById(profileId);
+        deleteRoomFromProfile(roomId, profile);
+    }
 }

@@ -194,6 +194,7 @@ public class RoomService {
 
     private Room deleteTeacher(Long teacherId, Room room){
         try{
+            profileService.deleteRoomFromProfile(room.getId(), teacherId);
             room.removeTeacher(teacherId);
             return roomRepository.save(room);
         } catch (Exception e){
@@ -205,6 +206,7 @@ public class RoomService {
 
     private Room deleteStudent(Long studentId, Room room){
         try{
+            profileService.deleteRoomFromProfile(room.getId(), studentId);
             room.removeStudent(studentId);
             return roomRepository.save(room);
         } catch (Exception e){
