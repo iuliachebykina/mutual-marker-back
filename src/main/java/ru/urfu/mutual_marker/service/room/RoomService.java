@@ -327,6 +327,10 @@ public class RoomService {
 
 
     public void deleteRoomByStudent(Long roomId, String email) {
-        profileService.deleteRoomFromProfile(roomId, email);
+        Profile profile = profileService.getProfileByEmail(email);
+        profileService.deleteRoomFromProfile(roomId, profile);
+        Room room = getRoomById(roomId);
+        room.removeStudent(profile.getId());
+        roomRepository.save(room);
     }
 }

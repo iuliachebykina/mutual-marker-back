@@ -281,8 +281,7 @@ public class ProfileService {
         return profileRepository.countByRoomsIdAndDeletedIsFalse(roomId);
     }
 
-    public void deleteRoomFromProfile(Long roomId, String email) {
-        Profile profile = getProfileByEmail(email);
+    public void deleteRoomFromProfile(Long roomId, Profile profile) {
         profile.removeRoom(roomId);
         profileRepository.save(profile);
     }
