@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.RoomGroup;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomGroupRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
@@ -41,6 +42,7 @@ public class RoomService {
     RoomMapper roomMapper;
     TaskRepository taskRepository;
     RoomGroupRepository roomGroupRepository;
+    ProfileRepository profileRepository;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -321,5 +323,10 @@ public class RoomService {
 
     public List<RoomDto> getAllRoomsWithoutGroupForProfile(Pageable pageable, String email, Role role) {
         return getRoomsDto(roomRepository.findAllByDeletedIsFalseAndNotInGroup(email, pageable));
+    }
+
+
+    public void deleteRoomByStudent(Long roomId, String email) {
+        profileService.deleteRoomFromProfile(roomId, email);
     }
 }

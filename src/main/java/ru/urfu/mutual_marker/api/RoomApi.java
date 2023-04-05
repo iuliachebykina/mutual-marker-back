@@ -156,6 +156,14 @@ public class RoomApi {
 
     }
 
+    @Operation(summary = "Удаление комнаты студенту")
+    @DeleteMapping("/room-by-student/{room_id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRoomByStudent(@PathVariable("room_id") Long roomId, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+        roomService.deleteRoomByStudent(roomId, email);
+    }
+
     @Operation(summary = "Удаление задания, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/task")
     //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#addEntityToRoomDto.roomCode)) or hasRole('ROLE_ADMIN')")
