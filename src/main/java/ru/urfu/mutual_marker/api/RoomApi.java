@@ -213,7 +213,7 @@ public class RoomApi {
 
     }
 
-    @Operation(summary = "Удаление комнаты в группу")
+    @Operation(summary = "Удаление комнаты в группе")
     @PostMapping("/delete-room-group")
     //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomGroup.roomId)) or hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")

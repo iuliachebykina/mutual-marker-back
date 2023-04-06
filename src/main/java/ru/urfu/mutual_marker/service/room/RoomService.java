@@ -320,6 +320,7 @@ public class RoomService {
             throw  new RoomServiceException(String.format("Failed to find room group by id: %s", id));
         }
         roomGroup.get().setDeleted(true);
+        roomGroup.get().getRooms().forEach(g -> roomGroup.get().removeRoom(g));
         roomGroupRepository.save(roomGroup.get());
     }
 
