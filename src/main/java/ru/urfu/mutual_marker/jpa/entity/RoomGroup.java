@@ -34,7 +34,7 @@ public class RoomGroup {
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
 
-    @OneToMany
+    @ManyToMany
     @JoinTable(
             name = "roomgroup_rooms",
             schema = "mutual_marker",
