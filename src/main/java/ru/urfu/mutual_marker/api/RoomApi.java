@@ -176,7 +176,7 @@ public class RoomApi {
 
     @Operation(summary = "Создание группы комнат")
     @GetMapping("/create-room-group/{room-group-name}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     public ResponseEntity<RoomGroupDto> createRoomGroup(@PathVariable(name = "room-group-name") String roomGroupName, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
 
         return new ResponseEntity<>(roomService.createRoomGroup(roomGroupName, email), HttpStatus.OK);
