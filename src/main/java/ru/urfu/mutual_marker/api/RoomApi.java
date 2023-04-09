@@ -156,6 +156,14 @@ public class RoomApi {
 
     }
 
+    @Operation(summary = "Удаление комнаты студенту")
+    @DeleteMapping("/room-by-student/{room_id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRoomByStudent(@PathVariable("room_id") Long roomId, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+        roomService.deleteRoomByStudent(roomId, email);
+    }
+
     @Operation(summary = "Удаление задания, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/task")
     //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#addEntityToRoomDto.roomCode)) or hasRole('ROLE_ADMIN')")
@@ -168,7 +176,7 @@ public class RoomApi {
 
     @Operation(summary = "Создание группы комнат")
     @GetMapping("/create-room-group/{room-group-name}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     public ResponseEntity<RoomGroupDto> createRoomGroup(@PathVariable(name = "room-group-name") String roomGroupName, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
 
         return new ResponseEntity<>(roomService.createRoomGroup(roomGroupName, email), HttpStatus.OK);
@@ -205,7 +213,7 @@ public class RoomApi {
 
     }
 
-    @Operation(summary = "Удаление комнаты в группу")
+    @Operation(summary = "Удаление комнаты в группе")
     @PostMapping("/delete-room-group")
     //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomGroup.roomId)) or hasRole('ROLE_ADMIN')")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")

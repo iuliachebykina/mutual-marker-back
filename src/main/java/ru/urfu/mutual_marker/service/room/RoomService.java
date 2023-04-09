@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.RoomGroup;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
+import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomGroupRepository;
 import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
@@ -41,6 +42,7 @@ public class RoomService {
     RoomMapper roomMapper;
     TaskRepository taskRepository;
     RoomGroupRepository roomGroupRepository;
+    ProfileRepository profileRepository;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -192,6 +194,7 @@ public class RoomService {
 
     private Room deleteTeacher(Long teacherId, Room room){
         try{
+            profileService.deleteRoomFromProfile(room.getId(), teacherId);
             room.removeTeacher(teacherId);
             return roomRepository.save(room);
         } catch (Exception e){
@@ -203,6 +206,7 @@ public class RoomService {
 
     private Room deleteStudent(Long studentId, Room room){
         try{
+            profileService.deleteRoomFromProfile(room.getId(), studentId);
             room.removeStudent(studentId);
             return roomRepository.save(room);
         } catch (Exception e){
@@ -316,10 +320,20 @@ public class RoomService {
             throw  new RoomServiceException(String.format("Failed to find room group by id: %s", id));
         }
         roomGroup.get().setDeleted(true);
+        roomGroup.get().getRooms().forEach(g -> roomGroup.get().removeRoom(g));
         roomGroupRepository.save(roomGroup.get());
     }
 
     public List<RoomDto> getAllRoomsWithoutGroupForProfile(Pageable pageable, String email, Role role) {
         return getRoomsDto(roomRepository.findAllByDeletedIsFalseAndNotInGroup(email, pageable));
+    }
+
+
+    public void deleteRoomByStudent(Long roomId, String email) {
+        Profile profile = profileService.getProfileByEmail(email);
+        profileService.deleteRoomFromProfile(roomId, profile);
+        Room room = getRoomById(roomId);
+        room.removeStudent(profile.getId());
+        roomRepository.save(room);
     }
 }

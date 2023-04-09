@@ -280,4 +280,14 @@ public class ProfileService {
     public Long getCountOfMembersInRoom(Long roomId) {
         return profileRepository.countByRoomsIdAndDeletedIsFalse(roomId);
     }
+
+    public void deleteRoomFromProfile(Long roomId, Profile profile) {
+        profile.removeRoom(roomId);
+        profileRepository.save(profile);
+    }
+
+    public void deleteRoomFromProfile(Long roomId, Long profileId) {
+        Profile profile = findById(profileId);
+        deleteRoomFromProfile(roomId, profile);
+    }
 }
