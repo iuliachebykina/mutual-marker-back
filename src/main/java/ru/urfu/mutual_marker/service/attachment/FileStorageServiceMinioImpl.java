@@ -27,8 +27,6 @@ public class FileStorageServiceMinioImpl implements FileStorageService {
 
     MinioService minioService;
 
-
-
     @Override
     public void save(MultipartFile file, String filename) {
 

@@ -25,6 +25,6 @@ public class AnomalyDiscoveryService {
             kruskalWallisTest.add(mark.getMarkValue(), i);
             i++;
         }
-        return kruskalWallisTest.test(kruskalWallisAlpha);
+        return kruskalWallisTest.calculateAnomaly(kruskalWallisAlpha);
     }
 }

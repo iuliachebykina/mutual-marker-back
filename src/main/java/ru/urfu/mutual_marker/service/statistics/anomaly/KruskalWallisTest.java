@@ -92,7 +92,7 @@ public class KruskalWallisTest extends OrdinalStatisticalTest{
      * @param alpha - константа, определяющая на сколько точно надо считать
      */
     @Override
-    public boolean test(double alpha) {
+    public boolean calculateAnomaly(double alpha) {
         update();
 
         ChiSquaredDistribution dist = new ChiSquaredDistribution(

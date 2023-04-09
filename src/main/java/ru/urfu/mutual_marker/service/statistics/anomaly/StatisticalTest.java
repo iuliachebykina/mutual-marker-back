@@ -15,5 +15,5 @@ public interface StatisticalTest {
      * @return {@code true} if the null hypothesis is rejected; {@code false}
      *         otherwise
      */
-    public boolean test(double alpha);
+    public boolean calculateAnomaly(double alpha);
 }

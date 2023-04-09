@@ -28,15 +28,15 @@ public class MarkStepFeedbackService {
 
     @Transactional
     public void addMarkStepFeedbacksForMark(AddMarkDto addMarkDto){
-        if (addMarkDto.getMarkStepDtos().isEmpty()){
+        if (addMarkDto.getMarkStepFeedbackDtos().isEmpty()){
             return;
         }
         List<MarkStepFeedback> feedbacks = new ArrayList<>();
-        addMarkDto.getMarkStepDtos().forEach(ms -> {
+        addMarkDto.getMarkStepFeedbackDtos().forEach(ms -> {
             MarkStep markStep = markStepRepository.findById(ms.getMarkStepId())
                     .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти MarkStep с id %s", ms.getMarkStepId())));
-            Profile owner = profileRepository.findById(ms.getOwnerId())
-                    .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти Profile с id %s", ms.getOwnerId())));
+            Profile owner = profileRepository.findById(ms.getReviewerId())
+                    .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти Profile с id %s", ms.getReviewerId())));
             MarkStepFeedback markStepFeedback = MarkStepFeedback
                     .builder()
                     .markStep(markStep)

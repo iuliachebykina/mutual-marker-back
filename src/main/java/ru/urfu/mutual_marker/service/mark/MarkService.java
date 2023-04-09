@@ -51,7 +51,7 @@ public class MarkService {
     Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
-            Double res = addMarkDto.getMarkStepDtos().stream().mapToInt(MarkStepDto::getValue).average().orElse(Double.NaN);
+            Double res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepDto::getValue).average().orElse(Double.NaN);
             if (res.equals(Double.NaN)){
                 log.error("Failed to process components to calculate final mark");
                 throw new MarkServiceException("Failed to process markComponents");
