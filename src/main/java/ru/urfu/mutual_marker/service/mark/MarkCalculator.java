@@ -76,7 +76,7 @@ public class MarkCalculator {
     }
 
     public double calculateBeforeCloseDate(Project project, Task task, Long studentId, int precision){
-        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, project.getTask().getId());
+        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, task.getId());
         if (numberOfMarkedByStudent >= task.getMinNumberOfGraded()){
             return calculate(project, precision);
         }
@@ -117,7 +117,7 @@ public class MarkCalculator {
         if(studentMarks.size() != 0){
             studentsMark = studentsMark * (1d - teacherCoefficient);
         }
-        log.info("[MARK SERVICE] Calculated mark: teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
+        log.debug("[MARK SERVICE] Calculated mark: teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
 
         return BigDecimal.valueOf(teachersMark + studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
     }
