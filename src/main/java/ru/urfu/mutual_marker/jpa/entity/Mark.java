@@ -11,7 +11,9 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -45,6 +47,11 @@ public class Mark {
     @JsonIgnore
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
+
+    @OneToMany(mappedBy = "mark")
+    @ToString.Exclude
+    @Builder.Default
+    Set<MarkStepFeedback> feedbacks = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {

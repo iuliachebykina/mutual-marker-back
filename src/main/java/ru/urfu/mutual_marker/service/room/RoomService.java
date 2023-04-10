@@ -7,20 +7,19 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.common.RoomMapper;
+import ru.urfu.mutual_marker.common.TaskMapper;
+import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
+import ru.urfu.mutual_marker.dto.mark.MarkFeedbackDto;
+import ru.urfu.mutual_marker.dto.mark.MarkStepFeedbackDto;
 import ru.urfu.mutual_marker.dto.room.AddRoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomAndRoomGroupDto;
 import ru.urfu.mutual_marker.dto.room.RoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomGroupDto;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.Room;
-import ru.urfu.mutual_marker.jpa.entity.RoomGroup;
-import ru.urfu.mutual_marker.jpa.entity.Task;
+import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
-import ru.urfu.mutual_marker.jpa.repository.RoomGroupRepository;
-import ru.urfu.mutual_marker.jpa.repository.RoomRepository;
-import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.jpa.repository.*;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
 import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
@@ -43,6 +42,9 @@ public class RoomService {
     TaskRepository taskRepository;
     RoomGroupRepository roomGroupRepository;
     ProfileRepository profileRepository;
+    TaskMapper taskMapper;
+    ProjectRepository projectRepository;
+    MarkMapper markMapper;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -335,5 +337,37 @@ public class RoomService {
         Room room = getRoomById(roomId);
         room.removeStudent(profile.getId());
         roomRepository.save(room);
+    }
+
+    @Transactional
+    public List<FeedbacksForTaskDto> getAllFeedbacksByTaskForRoom(Long roomId, Long profileId){
+        Room room = getRoomById(roomId);
+        List<FeedbacksForTaskDto> result = new ArrayList<>();
+        for (Task task : room.getTasks()) {
+            FeedbacksForTaskDto feedbacksForTaskDto = new FeedbacksForTaskDto();
+            feedbacksForTaskDto.setTaskInfo(taskMapper.entityToInfo(task));
+            Project project = projectRepository.findByStudentIdAndTaskIdAndDeletedIsFalse(profileId, task.getId()).orElse(null);
+            if (project == null){
+                continue;
+            }
+
+            List<MarkFeedbackDto> markFeedbacks = new ArrayList<>();
+            for (Mark mark : project.getMarks()){
+                MarkFeedbackDto markFeedbackDto = new MarkFeedbackDto();
+                markFeedbackDto.setMark(markMapper.entityToDto(mark));
+                List<MarkStepFeedbackDto> markStepFeedbackDtos = new ArrayList<>();
+                mark.getFeedbacks().forEach(f -> {
+                    MarkStepFeedbackDto markStepFeedbackDto = new MarkStepFeedbackDto();
+                    markStepFeedbackDto.setComment(f.getComment());
+                    markStepFeedbackDto.setValue(f.getValue());
+                    markStepFeedbackDtos.add(markStepFeedbackDto);
+                });
+                markFeedbackDto.setFeedbacks(markStepFeedbackDtos);
+                markFeedbacks.add(markFeedbackDto);
+            }
+            feedbacksForTaskDto.setFeedbacks(markFeedbacks);
+            result.add(feedbacksForTaskDto);
+        }
+        return result;
     }
 }

@@ -6,22 +6,24 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
+import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.mark.*;
-import ru.urfu.mutual_marker.jpa.entity.Mark;
-import ru.urfu.mutual_marker.jpa.entity.Profile;
-import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
+import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
+import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.project.ProjectService;
-import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
+import ru.urfu.mutual_marker.service.room.RoomService;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +33,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MarkService {
     MarkRepository markRepository;
+    RoomService roomService;
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
     MarkMapper markMapper;
     MarkCalculator markCalculator;
     MarkStepFeedbackService markStepFeedbackService;
+    TaskRepository taskRepository;
+    TaskMapper taskMapper;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
@@ -51,7 +56,7 @@ public class MarkService {
     Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
-            Double res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepDto::getValue).average().orElse(Double.NaN);
+            Double res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepFeedbackDto::getValue).average().orElse(Double.NaN);
             if (res.equals(Double.NaN)){
                 log.error("Failed to process components to calculate final mark");
                 throw new MarkServiceException("Failed to process markComponents");

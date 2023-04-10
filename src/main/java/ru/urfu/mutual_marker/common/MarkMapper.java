@@ -16,4 +16,5 @@ public interface MarkMapper {
 
     List<MarkDto> listOfEntitiesToDtos(Set<Mark> marks);
 
+    MarkDto entityToDto(Mark mark);
 }

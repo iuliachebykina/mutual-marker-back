@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MarkStepDto {
+public class MarkStepFeedbackDto {
     @Schema(title = "Оценка за шаг", required = true)
     Integer value;
     @Schema(title = "Отзыв")

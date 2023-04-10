@@ -38,6 +38,9 @@ public class MarkStepFeedback {
     @Column
     Integer value;
 
+    @ManyToOne
+    Mark mark;
+
     @JsonIgnore
     @Builder.Default
     Boolean deleted = Boolean.FALSE;

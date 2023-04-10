@@ -12,6 +12,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
+import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
+import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.dto.room.*;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
@@ -234,5 +236,14 @@ public class RoomApi {
             throw new NotFoundException("Not found roles for authorize");
         });
         return roomService.getAllRoomsWithoutGroupForProfile(pageable, email, Role.valueOf(role.getAuthority()));
+    }
+
+    @Operation(summary = "Получение всех отзывов по комнате для студента")
+    @GetMapping(value = "/get-all-feedbacks", params = { "roomId", "profileId" })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<List<FeedbacksForTaskDto>> getAllFeedbacksInRoomForUser(@RequestParam("roomId") long roomId,
+                                                                                  @RequestParam("profileId") long profileId) {
+        return new ResponseEntity<>(roomService.getAllFeedbacksByTaskForRoom(roomId, profileId), HttpStatus.OK);
+
     }
 }

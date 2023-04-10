@@ -16,5 +16,5 @@ public class MarkDto {
     Boolean isTeacherMark;
     Integer finalMark;
     String comment;
-    List<MarkStepDto> markSteps;
+    List<MarkStepFeedbackDto> markSteps;
 }
