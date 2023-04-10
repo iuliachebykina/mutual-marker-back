@@ -49,7 +49,8 @@ public class SecurityConfigurerAdapter {
                         || fieldAttributes.getName().equals("password")
                         || fieldAttributes.getName().equals("attachments")
                         || fieldAttributes.getName().equals("rooms")
-                        || fieldAttributes.getName().equals("numberOfGradedSet");
+                        || fieldAttributes.getName().equals("numberOfGradedSet")
+                        || fieldAttributes.getName().equals("markStepFeedbacks");
             }
 
             @Override
