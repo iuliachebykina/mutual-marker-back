@@ -24,6 +24,8 @@ public class MarkStepFeedback {
     Long id;
 
     @ManyToOne
+    @JsonIgnore
+    @ToString.Exclude
     MarkStep markStep;
 
     @Column
