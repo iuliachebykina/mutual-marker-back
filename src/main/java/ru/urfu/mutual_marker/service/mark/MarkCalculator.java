@@ -5,9 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.urfu.mutual_marker.jpa.entity.Mark;
-import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.entity.Task;
+import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
@@ -78,7 +76,7 @@ public class MarkCalculator {
     public double calculateBeforeCloseDate(Project project, Task task, Long studentId, int precision){
         long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, task.getId());
         if (numberOfMarkedByStudent >= task.getMinNumberOfGraded()){
-            return calculate(project, precision);
+            return calculateAndScaleToHundred(project, precision);
         }
         log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
         return Double.NaN;
@@ -90,7 +88,7 @@ public class MarkCalculator {
                 log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
                 return Double.NaN;
             } else{
-                return calculate(project, precision);
+                return calculateAndScaleToHundred(project, precision);
             }
         } else {
             log.debug("Project with id {} is created after task close date", project.getId());
@@ -120,5 +118,16 @@ public class MarkCalculator {
         log.debug("[MARK SERVICE] Calculated mark: teachers mark: {} \n students mark: {}", teachersMark, studentsMark);
 
         return BigDecimal.valueOf(teachersMark + studentsMark).setScale(precision, RoundingMode.HALF_UP).doubleValue();
+    }
+
+    public double calculateAndScaleToHundred(Project project, int precision){
+        BigDecimal calculateResult = BigDecimal.valueOf(calculate(project, precision));
+        BigDecimal maxMark = BigDecimal.valueOf(project.getTask().getMarkSteps()
+                .stream()
+                .map(MarkStep::getValues)
+                .flatMapToInt(values -> values.stream().mapToInt(MarkStepValue::getValue))
+                .sum());
+        BigDecimal result = calculateResult.divide(maxMark, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+        return result.setScale(precision, RoundingMode.HALF_UP).doubleValue();
     }
 }
