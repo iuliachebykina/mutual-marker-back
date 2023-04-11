@@ -10,9 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.urfu.mutual_marker.jpa.entity.Mark;
-import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.entity.Task;
+import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.service.mark.MarkCalculator;
@@ -56,17 +54,27 @@ public class MarkCalculatorTest {
     @Test
     public void when_calculateBeforeCloseDate_with_no_teacher_marks_called_then_mark_calculated_correctly(){
         Mockito.when(markRepository.countAllByOwnerIdAndProjectTaskId(Mockito.any(Long.class), Mockito.any(Long.class))).thenReturn(Long.valueOf(5));
-        Mark mark1 = Mark.builder().markValue(10).isTeacherMark(false).build();
-        Mark mark2 = Mark.builder().markValue(11).isTeacherMark(false).build();
-        Mark mark3 = Mark.builder().markValue(14).isTeacherMark(false).build();
+        Mark mark1 = Mark.builder().markValue(30).isTeacherMark(false).build();
+        Mark mark2 = Mark.builder().markValue(40).isTeacherMark(false).build();
+        Mark mark3 = Mark.builder().markValue(20).isTeacherMark(false).build();
+        MarkStepValue val1 = MarkStepValue.builder().value(10).build();
+        MarkStepValue val2 = MarkStepValue.builder().value(15).build();
+        MarkStepValue val3 = MarkStepValue.builder().value(15).build();
+        MarkStep markStep1 = MarkStep.builder().values(Set.of(val1, val2)).build();
+        MarkStep markStep2 = MarkStep.builder().values(Set.of(val3)).build();
         Set<Mark> marks = Set.of(mark1, mark2, mark3);
+        Task task = Task.builder().id(1L).minNumberOfGraded(5).build();
         Project project = Project.builder().marks(marks).build();
+        project.setTask(task);
         Set<Project> projects = Set.of(project);
-        Task task = Task.builder().projects(projects).id(1L).minNumberOfGraded(5).build();
+        task.setProjects(projects);
+        task.setMarkSteps(Set.of(markStep1, markStep2));
+        markStep1.setTasks(Set.of(task));
+        markStep2.setTasks(Set.of(task));
 
         Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
 
-        Assertions.assertEquals(11.67, actual);
+        Assertions.assertEquals(75, actual);
     }
 
     @Test
@@ -75,15 +83,24 @@ public class MarkCalculatorTest {
         Mark mark1 = Mark.builder().markValue(10).isTeacherMark(false).build();
         Mark mark2 = Mark.builder().markValue(11).isTeacherMark(false).build();
         Mark mark3 = Mark.builder().markValue(14).isTeacherMark(false).build();
+        MarkStepValue val1 = MarkStepValue.builder().value(10).build();
+        MarkStepValue val2 = MarkStepValue.builder().value(15).build();
+        MarkStepValue val3 = MarkStepValue.builder().value(15).build();
+        MarkStep markStep1 = MarkStep.builder().values(Set.of(val1, val2)).build();
+        MarkStep markStep2 = MarkStep.builder().values(Set.of(val3)).build();
         Mark teacherMark = Mark.builder().markValue(10).isTeacherMark(true).coefficient(1d).build();
         Set<Mark> marks = Set.of(mark1, mark2, mark3, teacherMark);
-        Project project = Project.builder().marks(marks).build();
+        Task task = Task.builder().id(1L).minNumberOfGraded(5).build();
+        Project project = Project.builder().task(task).marks(marks).build();
         Set<Project> projects = Set.of(project);
-        Task task = Task.builder().projects(projects).id(1L).minNumberOfGraded(5).build();
+        task.setProjects(projects);
+        task.setMarkSteps(Set.of(markStep1, markStep2));
+        markStep1.setTasks(Set.of(task));
+        markStep2.setTasks(Set.of(task));
 
         Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
 
-        Assertions.assertEquals(10, actual);
+        Assertions.assertEquals(25, actual);
     }
 
     @Test
@@ -92,14 +109,23 @@ public class MarkCalculatorTest {
         Mark mark1 = Mark.builder().markValue(10).isTeacherMark(false).build();
         Mark mark2 = Mark.builder().markValue(11).isTeacherMark(false).build();
         Mark mark3 = Mark.builder().markValue(14).isTeacherMark(false).build();
+        MarkStepValue val1 = MarkStepValue.builder().value(10).build();
+        MarkStepValue val2 = MarkStepValue.builder().value(15).build();
+        MarkStepValue val3 = MarkStepValue.builder().value(15).build();
+        MarkStep markStep1 = MarkStep.builder().values(Set.of(val1, val2)).build();
+        MarkStep markStep2 = MarkStep.builder().values(Set.of(val3)).build();
         Mark teacherMark = Mark.builder().markValue(20).isTeacherMark(true).coefficient(0.5).build();
         Set<Mark> marks = Set.of(mark1, mark2, mark3, teacherMark);
-        Project project = Project.builder().marks(marks).build();
+        Task task = Task.builder().id(1L).minNumberOfGraded(5).build();
+        Project project = Project.builder().task(task).marks(marks).build();
         Set<Project> projects = Set.of(project);
-        Task task = Task.builder().projects(projects).id(1L).minNumberOfGraded(5).build();
+        task.setProjects(projects);
+        task.setMarkSteps(Set.of(markStep1, markStep2));
+        markStep1.setTasks(Set.of(task));
+        markStep2.setTasks(Set.of(task));
 
         Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
 
-        Assertions.assertEquals(15.83, actual);
+        Assertions.assertEquals(40, actual);
     }
 }

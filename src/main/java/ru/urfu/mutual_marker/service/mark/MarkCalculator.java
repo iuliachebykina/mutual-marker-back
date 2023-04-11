@@ -127,7 +127,7 @@ public class MarkCalculator {
                 .map(MarkStep::getValues)
                 .flatMapToInt(values -> values.stream().mapToInt(MarkStepValue::getValue))
                 .sum());
-        BigDecimal result = calculateResult.divide(maxMark, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+        BigDecimal result = calculateResult.divide(maxMark, precision, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
         return result.setScale(precision, RoundingMode.HALF_UP).doubleValue();
     }
 }

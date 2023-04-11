@@ -20,7 +20,7 @@ public class AnomalyDiscoveryService {
     @Transactional
     public boolean kruskalWallisDetectAnomaly(Project project){
         KruskalWallisTest kruskalWallisTest = new KruskalWallisTest(project.getMarks().size());
-        int i = 1;
+        int i = 0;
         for (Mark mark: project.getMarks()) {
             kruskalWallisTest.add(mark.getMarkValue(), i);
             i++;

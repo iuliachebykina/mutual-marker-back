@@ -49,16 +49,16 @@ public class ExcelStatisticsService {
 
             Set<Project> allTaskProjects = task.getProjects();
 
+            CellStyle statsStyle = workbook.createCellStyle();
+            XSSFFont statsFont = workbook.createFont();
+            statsFont.setFontName("Times New Roman");
+            statsFont.setFontHeightInPoints((short) 14);
+            statsStyle.setFont(statsFont);
+            Sheet sheet = workbook.createSheet(task.getTitle());
+
             int i = 1;
             for (Project project : allTaskProjects) {
                 Profile student = project.getStudent();
-
-                CellStyle statsStyle = workbook.createCellStyle();
-                XSSFFont statsFont = workbook.createFont();
-                statsFont.setFontName("Times New Roman");
-                statsFont.setFontHeightInPoints((short) 14);
-                statsStyle.setFont(statsFont);
-                Sheet sheet = workbook.getSheet(task.getTitle());
 
                 Row stats = sheet.createRow(i);
 
