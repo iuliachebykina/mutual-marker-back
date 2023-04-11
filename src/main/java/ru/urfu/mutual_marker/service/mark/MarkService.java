@@ -86,8 +86,9 @@ public class MarkService {
             log.error("Failed to find student with id {}", addMarkDto.getProfileId());
             throw new MarkServiceException(String.format("Failed to find student with id %s", addMarkDto.getProfileId()));
         }
-        markStepFeedbackService.addMarkStepFeedbacksForMark(addMarkDto);
-        return markRepository.save(mark);
+        Mark result = markRepository.save(mark);
+        markStepFeedbackService.addMarkStepFeedbacksForMark(addMarkDto, result);
+        return result;
     }
 
     @Transactional

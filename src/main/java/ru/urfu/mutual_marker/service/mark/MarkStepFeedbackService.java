@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.mark.AddMarkDto;
+import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
 import ru.urfu.mutual_marker.jpa.entity.MarkStepFeedback;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
@@ -27,7 +28,7 @@ public class MarkStepFeedbackService {
     final ProfileRepository profileRepository;
 
     @Transactional
-    public void addMarkStepFeedbacksForMark(AddMarkDto addMarkDto){
+    public void addMarkStepFeedbacksForMark(AddMarkDto addMarkDto, Mark mark){
         if (addMarkDto.getMarkStepFeedbackDtos().isEmpty()){
             return;
         }
@@ -40,6 +41,7 @@ public class MarkStepFeedbackService {
             MarkStepFeedback markStepFeedback = MarkStepFeedback
                     .builder()
                     .markStep(markStep)
+                    .mark(mark)
                     .owner(owner)
                     .comment(ms.getComment())
                     .value(ms.getValue())

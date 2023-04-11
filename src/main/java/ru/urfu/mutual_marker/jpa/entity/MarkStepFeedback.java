@@ -39,6 +39,8 @@ public class MarkStepFeedback {
     Integer value;
 
     @ManyToOne
+    @JsonIgnore
+    @ToString.Exclude
     Mark mark;
 
     @JsonIgnore
