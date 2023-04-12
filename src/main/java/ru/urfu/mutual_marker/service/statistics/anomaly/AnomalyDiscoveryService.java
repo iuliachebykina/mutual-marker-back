@@ -19,6 +19,9 @@ public class AnomalyDiscoveryService {
 
     @Transactional
     public boolean kruskalWallisDetectAnomaly(Project project){
+        if (project.getMarks().size() <= 1){
+            return Boolean.FALSE;
+        }
         KruskalWallisTest kruskalWallisTest = new KruskalWallisTest(project.getMarks().size());
         int i = 0;
         for (Mark mark: project.getMarks()) {
