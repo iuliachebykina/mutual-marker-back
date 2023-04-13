@@ -1,6 +1,7 @@
 package ru.urfu.mutual_marker.common;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 import ru.urfu.mutual_marker.dto.mark.MarkDto;
@@ -16,5 +17,6 @@ public interface MarkMapper {
 
     List<MarkDto> listOfEntitiesToDtos(Set<Mark> marks);
 
+    @Mapping(target = "finalMark", source = "markValue")
     MarkDto entityToDto(Mark mark);
 }
