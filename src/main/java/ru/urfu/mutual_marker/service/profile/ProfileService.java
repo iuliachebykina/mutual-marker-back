@@ -281,6 +281,7 @@ public class ProfileService {
         return profileRepository.countByRoomsIdAndDeletedIsFalse(roomId);
     }
 
+    @Transactional
     public void deleteRoomFromProfile(Long roomId, Profile profile) {
         profile.removeRoom(roomId);
         profileRepository.save(profile);

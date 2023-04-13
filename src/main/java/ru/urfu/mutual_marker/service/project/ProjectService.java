@@ -181,6 +181,7 @@ public class ProjectService {
         return projectInfos;
     }
 
+
     public ProjectInfo appendNewAttachmentsToExistingProject(UserDetails principal, List<MultipartFile> files, Long projectId){
         return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(principal, files, projectId));
     }

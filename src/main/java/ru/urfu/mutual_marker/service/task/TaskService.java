@@ -167,6 +167,7 @@ public class TaskService {
         task.delete();
     }
 
+    @Transactional
     public TaskInfo updateTask(Long taskId, TaskCreationRequest request) {
         Optional<Task> task = taskRepository.findById(taskId);
         if (task.isEmpty()) {

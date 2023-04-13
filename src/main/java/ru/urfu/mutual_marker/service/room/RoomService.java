@@ -194,7 +194,8 @@ public class RoomService {
         throw new IllegalArgumentException("Failed to recognize type of entity passed to delete entity");
     }
 
-    private Room deleteTeacher(Long teacherId, Room room){
+    @Transactional
+    Room deleteTeacher(Long teacherId, Room room){
         try{
             profileService.deleteRoomFromProfile(room.getId(), teacherId);
             room.removeTeacher(teacherId);
@@ -206,7 +207,8 @@ public class RoomService {
         }
     }
 
-    private Room deleteStudent(Long studentId, Room room){
+    @Transactional
+    Room deleteStudent(Long studentId, Room room){
         try{
             profileService.deleteRoomFromProfile(room.getId(), studentId);
             room.removeStudent(studentId);
@@ -218,7 +220,8 @@ public class RoomService {
         }
     }
 
-    private Room deleteTask(Long taskId, Room room){
+    @Transactional
+    Room deleteTask(Long taskId, Room room){
         try{
             room.removeTask(taskId);
             return roomRepository.save(room);
@@ -229,7 +232,8 @@ public class RoomService {
         }
     }
 
-    private Room addTeacher(Long teacherId, Room room){
+    @Transactional
+    Room addTeacher(Long teacherId, Room room){
         try{
             Profile teacher = profileService.getById(teacherId);
             room.addTeacher(teacher);
@@ -241,7 +245,8 @@ public class RoomService {
         }
     }
 
-    private Room addStudent(Long studentId, Room room){
+    @Transactional
+    Room addStudent(Long studentId, Room room){
         try{
             Profile student = profileService.getById(studentId);
             room.addStudent(student);
@@ -253,7 +258,8 @@ public class RoomService {
         }
     }
 
-    private Room addTask(Long taskId, Room room){
+    @Transactional
+    Room addTask(Long taskId, Room room){
         try{
             Task task = taskRepository.getById(taskId);
             room.addTask(task);
@@ -265,6 +271,7 @@ public class RoomService {
         }
     }
 
+    @Transactional
     public RoomGroupDto createRoomGroup(String roomGroupName, String email) {
         Profile profile = profileService.getProfileByEmail(email);
         RoomGroup roomGroup = RoomGroup.builder()
@@ -273,6 +280,7 @@ public class RoomService {
                 .build();
         return getRoomGroupDto(roomGroupRepository.save(roomGroup));
     }
+
 
     private RoomGroupDto getRoomGroupDto(RoomGroup roomGroup){
         List<Room> rooms = new ArrayList<>(roomGroup.getRooms());
@@ -283,6 +291,7 @@ public class RoomService {
                 .build();
     }
 
+    @Transactional
     public RoomGroupDto addRoomToRoomGroup(RoomAndRoomGroupDto roomAndRoomGroupDto) {
         Optional<RoomGroup> roomGroup = roomGroupRepository.findByIdAndDeletedIsFalse(roomAndRoomGroupDto.getRoomGroupId());
         if(roomGroup.isEmpty()){
@@ -296,6 +305,7 @@ public class RoomService {
         return getRoomGroupDto(roomGroupRepository.save(roomGroup.get()));
     }
 
+    @Transactional
     public RoomGroupDto deleteRoomFromRoomGroup(RoomAndRoomGroupDto roomAndRoomGroupDto) {
         Optional<RoomGroup> roomGroup = roomGroupRepository.findByIdAndDeletedIsFalse(roomAndRoomGroupDto.getRoomGroupId());
         if(roomGroup.isEmpty()){
@@ -316,6 +326,7 @@ public class RoomService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteRoomGroup(Long id) {
         Optional<RoomGroup> roomGroup = roomGroupRepository.findById(id);
         if(roomGroup.isEmpty()){
@@ -330,7 +341,7 @@ public class RoomService {
         return getRoomsDto(roomRepository.findAllByDeletedIsFalseAndNotInGroup(email, pageable));
     }
 
-
+    @Transactional
     public void deleteRoomByStudent(Long roomId, String email) {
         Profile profile = profileService.getProfileByEmail(email);
         profileService.deleteRoomFromProfile(roomId, profile);

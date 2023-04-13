@@ -89,7 +89,7 @@ public class MarksApi {
     @Operation(summary = "Оценка работы преподавателем")
     @PostMapping("/mark/teacher")
     public ResponseEntity<Object> addTeacherMark(@RequestBody AddTeacherMarkDto addTeacherMarkDto){
-        return new ResponseEntity<>(markService.addStudentMark(addTeacherMarkDto), HttpStatus.OK);
+        return new ResponseEntity<>(markService.addTeacherMark(addTeacherMarkDto), HttpStatus.OK);
     }
 
     @GetMapping(value = "/calculateFinalMark/{projectId}/{profileId}", params = {"precision"})
