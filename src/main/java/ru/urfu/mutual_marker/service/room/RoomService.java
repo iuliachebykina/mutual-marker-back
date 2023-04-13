@@ -18,9 +18,11 @@ import ru.urfu.mutual_marker.dto.room.AddRoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomAndRoomGroupDto;
 import ru.urfu.mutual_marker.dto.room.RoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomGroupDto;
+import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.service.mark.MarkCalculator;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
 import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
@@ -46,6 +48,7 @@ public class RoomService {
     TaskMapper taskMapper;
     ProjectRepository projectRepository;
     MarkMapper markMapper;
+    MarkCalculator markCalculator;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -357,11 +360,13 @@ public class RoomService {
         List<FeedbacksForTaskDto> result = new ArrayList<>();
         for (Task task : room.getTasks()) {
             FeedbacksForTaskDto feedbacksForTaskDto = new FeedbacksForTaskDto();
-            feedbacksForTaskDto.setTaskInfo(taskMapper.entityToInfo(task));
+            TaskInfo dto = taskMapper.entityToInfo(task);
+            feedbacksForTaskDto.setTaskInfo(dto);
             Project project = projectRepository.findByStudentIdAndTaskIdAndDeletedIsFalse(profileId, task.getId()).orElse(null);
             if (project == null){
                 continue;
             }
+            dto.setFinalMark(markCalculator.calculate(project, 2));
 
             List<MarkFeedbackDto> markFeedbacks = new ArrayList<>();
             for (Mark mark : project.getMarks()){

@@ -57,11 +57,11 @@ public class MarkService {
     Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
-            Double res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepFeedbackDto::getValue).average().orElse(Double.NaN);
-            if (res.equals(Double.NaN)){
-                log.error("Failed to process components to calculate final mark");
-                throw new MarkServiceException("Failed to process markComponents");
-            }
+            Integer res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepFeedbackDto::getValue).sum();
+//            if (res.equals(Double.NaN)){
+//                log.error("Failed to process components to calculate final mark");
+//                throw new MarkServiceException("Failed to process markComponents");
+//            }
             BigDecimal truncation = new BigDecimal(res);
             truncation = truncation.setScale(0, RoundingMode.HALF_UP);
             Profile owner = profileService.findById(addMarkDto.getProfileId());
