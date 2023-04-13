@@ -75,11 +75,10 @@ public class ProjectService {
 
         for (var project : projects) {
 
-            if (markedProjects.contains(project.getId()) ||
-                    project.getStudent().getEmail().equals(student.get().getEmail())) {
-                continue;
+            if (!markedProjects.contains(project.getId()) &&
+                    !project.getStudent().getEmail().equals(student.get().getEmail())) {
+                return project.getId();
             }
-            return project.getId();
         }
         log.info("Not found available project for rate for user with email: {}", principal.getUsername());
         return null;
