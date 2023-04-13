@@ -23,6 +23,7 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -58,6 +59,9 @@ public class ProjectService {
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
         var student = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
 
+        if(task.getCloseDate().isBefore(LocalDateTime.now())){
+            throw new MarkServiceException("Task is overdue");
+        }
         if(student.isEmpty()){
             throw new UserNotExistingException(String.format("Student with email: %s does not existing", principal.getUsername()));
         }
