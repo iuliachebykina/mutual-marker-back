@@ -372,12 +372,13 @@ public class RoomService {
                     MarkStepFeedbackDto markStepFeedbackDto = new MarkStepFeedbackDto();
                     markStepFeedbackDto.setComment(f.getComment());
                     markStepFeedbackDto.setValue(f.getValue());
-                    markStepFeedbackDtos.add(markStepFeedbackDto);
                     MarkStepDto markStepDto = new MarkStepDto();
                     List<Integer> sortedValues = f.getMarkStep().getValues().stream().map(MarkStepValue::getValue).sorted(Integer::compareTo).collect(Collectors.toList());
                     markStepDto.setValues(sortedValues);
                     markStepDto.setDescription(f.getMarkStep().getDescription());
                     markStepDto.setTitle(f.getMarkStep().getTitle());
+                    markStepFeedbackDto.setMarkStep(markStepDto);
+                    markStepFeedbackDtos.add(markStepFeedbackDto);
                 });
                 markFeedbackDto.setFeedbacks(markStepFeedbackDtos);
                 markFeedbacks.add(markFeedbackDto);
