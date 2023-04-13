@@ -3,7 +3,6 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -19,7 +18,7 @@ import javax.validation.constraints.NotNull;
 @Table(schema = "mutual_marker")
 public class MarkStepFeedback {
     @Id
-    @SequenceGenerator(name = "markStepFeedbackSeq", sequenceName = "markStepFeedbackSeq")
+    @SequenceGenerator(name = "markStepFeedbackSeq", sequenceName = "markStepFeedbackSeq", allocationSize = 1)
     @GeneratedValue(generator = "markStepFeedbackSeq")
     Long id;
 

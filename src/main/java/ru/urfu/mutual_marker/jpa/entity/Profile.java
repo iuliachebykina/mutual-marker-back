@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
@@ -28,7 +26,7 @@ import java.util.Set;
 
 public class Profile {
     @Id
-    @SequenceGenerator(name = "profileSeq", sequenceName = "profileSeq")
+    @SequenceGenerator(name = "profileSeq", sequenceName = "profileSeq", allocationSize = 1)
     @GeneratedValue(generator = "profileSeq")
     Long id;
     @Email

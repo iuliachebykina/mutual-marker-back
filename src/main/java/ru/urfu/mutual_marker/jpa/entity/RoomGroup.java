@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class RoomGroup {
     @Id
-    @SequenceGenerator(name = "roomGroupSeq", sequenceName = "roomGroupSeq")
+    @SequenceGenerator(name = "roomGroupSeq", sequenceName = "roomGroupSeq", allocationSize = 1)
     @GeneratedValue(generator = "roomGroupSeq")
     Long id;
     @NotNull

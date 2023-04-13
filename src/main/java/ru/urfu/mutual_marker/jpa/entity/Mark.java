@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -28,7 +27,7 @@ import java.util.Set;
 @EntityListeners(AuditingEntityListener.class)
 public class Mark {
     @Id
-    @SequenceGenerator(name = "markSeq", sequenceName = "markSeq")
+    @SequenceGenerator(name = "markSeq", sequenceName = "markSeq", allocationSize = 1)
     @GeneratedValue(generator = "markSeq")
     Long id;
     @ManyToOne

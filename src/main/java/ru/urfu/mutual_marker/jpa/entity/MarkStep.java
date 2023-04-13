@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,7 +23,7 @@ import java.util.Set;
 
 public class MarkStep {
     @Id
-    @SequenceGenerator(name = "markStepSeq", sequenceName = "markStepSeq")
+    @SequenceGenerator(name = "markStepSeq", sequenceName = "markStepSeq", allocationSize = 1)
     @GeneratedValue(generator = "markStepSeq")
     Long id;
     @ManyToOne

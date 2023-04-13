@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class Attachment {
     @Id
-    @SequenceGenerator(name = "attachmentSeq", sequenceName = "attachmentSeq")
+    @SequenceGenerator(name = "attachmentSeq", sequenceName = "attachmentSeq", allocationSize = 1)
     @GeneratedValue(generator = "attachmentSeq")
     Long id;
     @NotNull

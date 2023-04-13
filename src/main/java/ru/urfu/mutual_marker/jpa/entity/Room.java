@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class Room {
     @Id
-    @SequenceGenerator(name = "roomSeq", sequenceName = "roomSeq")
+    @SequenceGenerator(name = "roomSeq", sequenceName = "roomSeq", allocationSize = 1)
     @GeneratedValue(generator = "roomSeq")
     Long id;
     @NotNull

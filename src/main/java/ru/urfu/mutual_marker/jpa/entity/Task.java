@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -25,7 +23,7 @@ import java.util.Set;
 @Table(schema = "mutual_marker")
 public class Task {
     @Id
-    @SequenceGenerator(name = "taskSeq", sequenceName = "taskSeq")
+    @SequenceGenerator(name = "taskSeq", sequenceName = "taskSeq", allocationSize = 1)
     @GeneratedValue(generator = "taskSeq")
     Long id;
     @NotNull
