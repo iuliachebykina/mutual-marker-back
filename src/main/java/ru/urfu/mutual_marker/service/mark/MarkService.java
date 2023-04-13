@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.mark.*;
-import ru.urfu.mutual_marker.jpa.entity.*;
+import ru.urfu.mutual_marker.jpa.entity.Mark;
+import ru.urfu.mutual_marker.jpa.entity.Profile;
+import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
@@ -23,7 +25,6 @@ import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +67,7 @@ public class MarkService {
             Profile owner = profileService.findById(addMarkDto.getProfileId());
             Project project = projectService.findProjectById(addMarkDto.getProjectId());
             if(project.getTask().getCloseDate().isBefore(LocalDateTime.now()) && !isTeacherMark){
-                return null;
+                throw new MarkServiceException("Task is overdue");
             }
             mark = Mark
                     .builder()
