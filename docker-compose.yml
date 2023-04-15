@@ -12,6 +12,8 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+    networks:
+      - mutual_marker_network
 
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -36,6 +38,8 @@ services:
       MAX_FILE_SIZE: 20MB
       MAX_REQUEST_SIZE: 20MB
       FILE-SIZE-THRESHOLD: 2KB
+    networks:
+      - mutual_marker_network
 
   psql:
     image: 'postgres:13.1-alpine'
@@ -48,17 +52,21 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "1975:5432"
+    networks:
+      - mutual_marker_network
 
-#  mutual-marker-front:
-#    container_name: mutual-marker-front
-#    build:
-#      context: ../mutual-marker-front/.
-#    image: mutual-marker-front:latest
-#    volumes:
-#      - '.:/main'
-#      - '/main/node_modules'
-#    ports:
-#      - "80:80"
+  mutual-marker-front:
+    container_name: mutual-marker-front
+    build:
+      context: ../mutual-marker-front/.
+    image: mutual-marker-front:latest
+    ports:
+      - "80:80"
+    networks:
+      - mutual_marker_network
+    depends_on:
+      - mutual-marker-back
+
 
 
 volumes:
@@ -66,3 +74,6 @@ volumes:
     external: false
   minio:
     external: false
+
+networks:
+  mutual_marker_network:
