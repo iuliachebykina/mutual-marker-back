@@ -14,6 +14,7 @@ import ru.urfu.mutual_marker.dto.task.MarkStep;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
+import ru.urfu.mutual_marker.jpa.entity.MarkStepValue;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
@@ -141,7 +142,14 @@ public class TaskService {
         task.setRoom(room.get());
         List<ru.urfu.mutual_marker.jpa.entity.MarkStep> markSteps = markStepService.toEntity(request.getMarkSteps(), task);
         markStepRepository.saveAll(markSteps);
-        markSteps.forEach(s -> markStepValueRepository.saveAll(s.getValues()));
+        double maxGrade = 0d;
+        for (ru.urfu.mutual_marker.jpa.entity.MarkStep ms : task.getMarkSteps()) {
+            maxGrade += ms.getValues().stream().map(MarkStepValue::getValue).max(Integer::compareTo)
+                    .orElseThrow(() -> new RuntimeException("Ошибка при расчете максимальной оценки - не найдены шаги оценки"))
+                    .doubleValue();
+             markStepValueRepository.saveAll(ms.getValues());
+        }
+        task.setMaxGrade(maxGrade);
 
         if (appendAttachments){
             attachmentService.appendExistingAttachmentsToTask(request.getAttachments(), task);

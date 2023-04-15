@@ -43,6 +43,9 @@ public class Task {
     @Column(name = "min_graded")
     Integer minNumberOfGraded;
 
+    @Column(name = "max_grade")
+    Double maxGrade;
+
     @OneToMany(mappedBy = "task")
     @Builder.Default
     @ToString.Exclude

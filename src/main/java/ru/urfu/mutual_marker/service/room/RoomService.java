@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.common.RoomMapper;
 import ru.urfu.mutual_marker.common.TaskMapper;
-import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
-import ru.urfu.mutual_marker.dto.mark.MarkFeedbackDto;
-import ru.urfu.mutual_marker.dto.mark.MarkStepDto;
-import ru.urfu.mutual_marker.dto.mark.MarkStepFeedbackDto;
+import ru.urfu.mutual_marker.dto.mark.*;
 import ru.urfu.mutual_marker.dto.room.AddRoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomAndRoomGroupDto;
 import ru.urfu.mutual_marker.dto.room.RoomDto;
@@ -366,12 +363,13 @@ public class RoomService {
             if (project == null){
                 continue;
             }
-            dto.setFinalMark(markCalculator.calculate(project, 2));
+            dto.setFinalMark(markCalculator.calculateAndScaleToHundred(project, 2));
 
             List<MarkFeedbackDto> markFeedbacks = new ArrayList<>();
             for (Mark mark : project.getMarks()){
                 MarkFeedbackDto markFeedbackDto = new MarkFeedbackDto();
-                markFeedbackDto.setMark(markMapper.entityToDto(mark));
+                MarkDto markDto = markMapper.entityToDto(mark);
+                markFeedbackDto.setMark(markDto);
                 List<MarkStepFeedbackDto> markStepFeedbackDtos = new ArrayList<>();
                 mark.getFeedbacks().forEach(f -> {
                     MarkStepFeedbackDto markStepFeedbackDto = new MarkStepFeedbackDto();

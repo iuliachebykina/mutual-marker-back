@@ -1,11 +1,11 @@
 package ru.urfu.mutual_marker.common;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import org.mapstruct.ReportingPolicy;
+import lombok.RequiredArgsConstructor;
+import org.mapstruct.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import ru.urfu.mutual_marker.dto.mark.MarkDto;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
+import ru.urfu.mutual_marker.service.mark.MarkCalculator;
 
 import java.util.List;
 import java.util.Set;
@@ -13,10 +13,20 @@ import java.util.Set;
 @Mapper(componentModel = "spring",
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-public interface MarkMapper {
+public abstract class MarkMapper {
+    @Autowired
+    private MarkCalculator markCalculator;
 
-    List<MarkDto> listOfEntitiesToDtos(Set<Mark> marks);
+    public abstract List<MarkDto> listOfEntitiesToDtos(Set<Mark> marks);
 
-    @Mapping(target = "finalMark", source = "markValue")
-    MarkDto entityToDto(Mark mark);
+//    @Mapping(target = "finalMark", source = "markValue")
+    public abstract MarkDto entityToDto(Mark mark);
+
+    @AfterMapping
+    public MarkDto map(Mark mark, @MappingTarget MarkDto.MarkDtoBuilder markDto) {
+        markDto.scaledMark(markCalculator.calculateAndScaleToHundred(mark.getProject(), 2));
+        markDto.maxMarkValue(mark.getProject().getTask().getMaxGrade());
+        markDto.unscaledMark(markCalculator.calculate(mark.getProject(), 2));
+        return markDto.build();
+    }
 }
