@@ -16,4 +16,5 @@ public class MarkStepFeedbackDto {
     Long reviewerId;
     @Schema(title = "Id шага оценки", required = true)
     Long markStepId;
+    MarkStepDto markStep;
 }

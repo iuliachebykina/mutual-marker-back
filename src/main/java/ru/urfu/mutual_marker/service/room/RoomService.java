@@ -10,16 +10,16 @@ import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.common.RoomMapper;
 import ru.urfu.mutual_marker.common.TaskMapper;
-import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
-import ru.urfu.mutual_marker.dto.mark.MarkFeedbackDto;
-import ru.urfu.mutual_marker.dto.mark.MarkStepFeedbackDto;
+import ru.urfu.mutual_marker.dto.mark.*;
 import ru.urfu.mutual_marker.dto.room.AddRoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomAndRoomGroupDto;
 import ru.urfu.mutual_marker.dto.room.RoomDto;
 import ru.urfu.mutual_marker.dto.room.RoomGroupDto;
+import ru.urfu.mutual_marker.dto.task.TaskInfo;
 import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.*;
+import ru.urfu.mutual_marker.service.mark.MarkCalculator;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.enums.EntityPassedToRoom;
 import ru.urfu.mutual_marker.service.exception.InvalidArgumentException;
@@ -45,6 +45,7 @@ public class RoomService {
     TaskMapper taskMapper;
     ProjectRepository projectRepository;
     MarkMapper markMapper;
+    MarkCalculator markCalculator;
 
     @Transactional
     public Room getRoomById(Long roomId){
@@ -356,21 +357,30 @@ public class RoomService {
         List<FeedbacksForTaskDto> result = new ArrayList<>();
         for (Task task : room.getTasks()) {
             FeedbacksForTaskDto feedbacksForTaskDto = new FeedbacksForTaskDto();
-            feedbacksForTaskDto.setTaskInfo(taskMapper.entityToInfo(task));
+            TaskInfo dto = taskMapper.entityToInfo(task);
+            feedbacksForTaskDto.setTaskInfo(dto);
             Project project = projectRepository.findByStudentIdAndTaskIdAndDeletedIsFalse(profileId, task.getId()).orElse(null);
             if (project == null){
                 continue;
             }
+            dto.setFinalMark(markCalculator.calculateAndScaleToHundred(project, 2));
 
             List<MarkFeedbackDto> markFeedbacks = new ArrayList<>();
             for (Mark mark : project.getMarks()){
                 MarkFeedbackDto markFeedbackDto = new MarkFeedbackDto();
-                markFeedbackDto.setMark(markMapper.entityToDto(mark));
+                MarkDto markDto = markMapper.entityToDto(mark);
+                markFeedbackDto.setMark(markDto);
                 List<MarkStepFeedbackDto> markStepFeedbackDtos = new ArrayList<>();
                 mark.getFeedbacks().forEach(f -> {
                     MarkStepFeedbackDto markStepFeedbackDto = new MarkStepFeedbackDto();
                     markStepFeedbackDto.setComment(f.getComment());
                     markStepFeedbackDto.setValue(f.getValue());
+                    MarkStepDto markStepDto = new MarkStepDto();
+                    List<Integer> sortedValues = f.getMarkStep().getValues().stream().map(MarkStepValue::getValue).sorted(Integer::compareTo).collect(Collectors.toList());
+                    markStepDto.setValues(sortedValues);
+                    markStepDto.setDescription(f.getMarkStep().getDescription());
+                    markStepDto.setTitle(f.getMarkStep().getTitle());
+                    markStepFeedbackDto.setMarkStep(markStepDto);
                     markStepFeedbackDtos.add(markStepFeedbackDto);
                 });
                 markFeedbackDto.setFeedbacks(markStepFeedbackDtos);

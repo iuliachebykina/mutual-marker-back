@@ -40,6 +40,6 @@ public class TaskInfo {
     @Schema(title = "Загружена ли работа студентом", description = "Признак загружена ли работа студентом", example = "true")
     Boolean isUploadedProject;
 
-    @Schema(title = "Оценка за задание", example = "100")
+    @Schema(title = "Оценка за задание приведенная к стобальной шкале", example = "100")
     Double finalMark;
 }
