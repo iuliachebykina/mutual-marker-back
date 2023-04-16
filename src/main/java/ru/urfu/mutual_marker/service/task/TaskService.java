@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.TaskMapper;
@@ -25,6 +24,7 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 import ru.urfu.mutual_marker.service.mark.MarkCalculator;
@@ -61,10 +61,10 @@ public class TaskService {
     public List<TaskInfo> findAllTasks(Long roomId, Pageable pageable) {
 
         var tasks = taskRepository.findAllByRoom_IdAndDeletedIsFalse(roomId, pageable);
-        UserDetails principal = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        JwtAuthentication authentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(authentication.getUsername());
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", authentication.getUsername()));
         }
         tasks.sort(Comparator.comparing(Task::getCloseDate).reversed());
 
@@ -72,19 +72,19 @@ public class TaskService {
         return getTaskInfos(profile.get(), tasks);
     }
 
-    public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+    public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, String username) {
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
         var tasks = taskRepository.findCompletedTask(roomId, profile.get().getId(), pageable);
         return getTaskInfos(profile.get(), tasks);
     }
 
-    public List<TaskInfo> findUncompletedTasks(Long roomId, Pageable pageable, UserDetails principal) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+    public List<TaskInfo> findUncompletedTasks(Long roomId, Pageable pageable, String username) {
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
         var tasks = taskRepository.findUncompletedTask(roomId, profile.get().getId(), pageable);
         return getTaskInfos(profile.get(), tasks);
@@ -116,8 +116,8 @@ public class TaskService {
 
         TaskFullInfo taskFullInfo = taskMapper.entityToFullInfoDto(task.get());
 
-        UserDetails currentUserDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long currentUserId = profileService.getProfileByEmail(currentUserDetails.getUsername()).getId();
+        JwtAuthentication authentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        Long currentUserId = profileService.getProfileByEmail(authentication.getUsername()).getId();
         List<MarkStep> markSteps = markStepService.getAllMarkStepsByTask(task.get());
         Long numberOfGradedWorks = markRepository.countAllByOwnerIdAndProjectTaskId(currentUserId, taskFullInfo.getId());
         long leftToGrade = taskFullInfo.getMinNumberOfGraded() - numberOfGradedWorks;
@@ -187,7 +187,7 @@ public class TaskService {
         return taskMapper.entityToInfo(save);
     }
 
-    public TaskInfo appendNewAttachmentsToTask(UserDetails principal, Long taskId, List<MultipartFile> files){
-        return taskMapper.entityToInfo(attachmentService.apppendNewAttachmentsToTask(principal, files, taskId));
+    public TaskInfo appendNewAttachmentsToTask(String username, Long taskId, List<MultipartFile> files){
+        return taskMapper.entityToInfo(attachmentService.apppendNewAttachmentsToTask(username, files, taskId));
     }
 }

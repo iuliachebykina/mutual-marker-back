@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.jpa.entity.Attachment;
@@ -40,11 +39,11 @@ public class AttachmentService {
     TaskRepository taskRepository;
 
     @Transactional
-    public List<String> uploadAttachments(UserDetails principal, List<MultipartFile> files) {
+    public List<String> uploadAttachments(String username, List<MultipartFile> files) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if (profile.isEmpty()){
-            log.error("[AttachmentService] Ошибка при загрузке вложений - не найден профиль с email {}", principal.getUsername());
+            log.error("[AttachmentService] Ошибка при загрузке вложений - не найден профиль с email {}", username);
             throw new NotFoundException("Не удалось найти профиль");
         }
         var filenames = new ArrayList<String>();
@@ -73,9 +72,9 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void unpinAttachment(UserDetails principal, Long projectId, String filename) {
+    public void unpinAttachment(String username, Long projectId, String filename) {
 
-        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername()).orElseThrow(() -> new NotFoundException("User not found"));
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username).orElseThrow(() -> new NotFoundException("User not found"));
         Project project = projectRepository.findByStudentAndIdAndDeletedIsFalse(profile, projectId).orElseThrow(() -> new NotFoundException("Project not found"));
         Attachment attach = attachmentRepository.findByFileNameAndDeletedIsFalse(filename).orElseThrow(() -> new NotFoundException("File not found"));
         attach.getProjects().removeIf(prj -> Objects.equals(prj.getId(), projectId));
@@ -94,9 +93,9 @@ public class AttachmentService {
     }
 
     @Transactional
-    public void deleteAttachment(UserDetails principal, String filename) {
+    public void deleteAttachment(String username, String filename) {
         Optional<Attachment> attachment = attachmentRepository.findByFileNameAndDeletedIsFalse(filename);
-        if(attachment.isEmpty() || !attachment.get().getStudent().getEmail().equals(principal.getUsername())){
+        if(attachment.isEmpty() || !attachment.get().getStudent().getEmail().equals(username)){
             return;
         }
         attachmentRepository.deleteByFileName(filename);
@@ -114,9 +113,9 @@ public class AttachmentService {
     }
 
     @Transactional
-    public Project appendNewAttachmentsToProject(UserDetails principal, List<MultipartFile> files, Long projectId) {
+    public Project appendNewAttachmentsToProject(String username, List<MultipartFile> files, Long projectId) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         var project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project was not found."));
 
         if (!project.getStudent().equals(profile.get())) {
@@ -141,8 +140,8 @@ public class AttachmentService {
     }
 
     @Transactional
-    public Task apppendNewAttachmentsToTask(UserDetails principal, List<MultipartFile> files, Long taskId){
-        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername()).orElse(null);
+    public Task apppendNewAttachmentsToTask(String username, List<MultipartFile> files, Long taskId){
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username).orElse(null);
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found."));
 
         for (var file : files) {

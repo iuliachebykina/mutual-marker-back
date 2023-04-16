@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.common.ProfileMapper;
@@ -53,17 +52,17 @@ public class ProjectService {
     }
 
     @SneakyThrows
-    public Long getRandomProject(UserDetails principal, Long taskId) {
+    public Long getRandomProject(String username, Long taskId) {
 
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
-        var student = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var student = profileRepository.findByEmailAndDeletedIsFalse(username);
 
         if(task.getCloseDate().isBefore(LocalDateTime.now())){
             throw new MarkServiceException("Task is overdue");
         }
         if(student.isEmpty()){
-            throw new UserNotExistingException(String.format("Student with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Student with email: %s does not existing", username));
         }
         if(!projectRepository.existsByStudentIdAndTaskIdAndDeletedIsFalse(student.get().getId(), taskId)) {
             return null;
@@ -84,16 +83,16 @@ public class ProjectService {
                 return project.getId();
             }
         }
-        log.info("Not found available project for rate for user with email: {}", principal.getUsername());
+        log.info("Not found available project for rate for user with email: {}", username);
         return null;
     }
 
     @Transactional
-    public ProjectCreationResultDto updateProject(UserDetails principal, ProjectUpdateInfo updateInfo) {
+    public ProjectCreationResultDto updateProject(String username, ProjectUpdateInfo updateInfo) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
 
 
@@ -114,12 +113,12 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectCreationResultDto createProject(UserDetails principal, ProjectCreationInfo creationInfo,
+    public ProjectCreationResultDto createProject(String username, ProjectCreationInfo creationInfo,
                                                   Long taskId,
                                                   Boolean appendAttachments) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         if(task.getCloseDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())){
@@ -147,11 +146,11 @@ public class ProjectService {
                 .build();
     }
 
-    public ProjectInfo getSelfProject(UserDetails principal, Long taskId) {
+    public ProjectInfo getSelfProject(String username, Long taskId) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
         if(profile.isEmpty()){
-            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
+            throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         var project = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile.get(), task.getId())
@@ -185,7 +184,7 @@ public class ProjectService {
     }
 
 
-    public ProjectInfo appendNewAttachmentsToExistingProject(UserDetails principal, List<MultipartFile> files, Long projectId){
-        return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(principal, files, projectId));
+    public ProjectInfo appendNewAttachmentsToExistingProject(String username, List<MultipartFile> files, Long projectId){
+        return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(username, files, projectId));
     }
 }

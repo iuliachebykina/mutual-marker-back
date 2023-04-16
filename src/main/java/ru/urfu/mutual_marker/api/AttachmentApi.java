@@ -10,9 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 
 import java.util.List;
@@ -29,14 +29,14 @@ public class AttachmentApi {
     @Operation(summary = "Загрузка вложений", description = "Загружает лист с файликами")
     @PostMapping(value = "/attachments/upload")
     public List<String> uploadAttachments(Authentication authentication, @RequestParam("attachments") List<MultipartFile> attachments) {
-        return attachmentService.uploadAttachments((UserDetails) authentication.getPrincipal(), attachments);
+        return attachmentService.uploadAttachments(((JwtAuthentication) authentication).getUsername(), attachments);
     }
 
     @Operation(summary = "Удалить вложение")
     @DeleteMapping(value = "/attachments/delete/{filename}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAttachments(Authentication authentication, @PathVariable String filename) {
-        attachmentService.deleteAttachment((UserDetails) authentication.getPrincipal(), filename );
+        attachmentService.deleteAttachment(((JwtAuthentication) authentication).getUsername(), filename );
     }
 
     @Operation(summary = "Добавление вложений в проект студента", description = "Добавляет вложения в уже созданный проект")
@@ -44,7 +44,7 @@ public class AttachmentApi {
     public void appendAttachments(Authentication authentication,
                                   @RequestParam("attachments") List<MultipartFile> attachments,
                                   @PathVariable("project_id") Long projectId) {
-        attachmentService.appendNewAttachmentsToProject((UserDetails) authentication.getPrincipal(), attachments, projectId);
+        attachmentService.appendNewAttachmentsToProject(((JwtAuthentication) authentication).getUsername(), attachments, projectId);
     }
 
     @Operation(summary = "Удаляет вложение из проекта", description = "Удаляет вложение из проекта")
@@ -53,7 +53,7 @@ public class AttachmentApi {
     public void unpinAttachments(Authentication authentication,
                                   @PathVariable("project_id") Long projectId,
                                   @PathVariable("filename") String filename) {
-        attachmentService.unpinAttachment((UserDetails) authentication.getPrincipal(), projectId, filename);
+        attachmentService.unpinAttachment(((JwtAuthentication) authentication).getUsername(), projectId, filename);
     }
 
     @Operation(summary = "Добавление вложений в созданное задание", description = "Добавляет вложения в созданное задание")
@@ -61,7 +61,7 @@ public class AttachmentApi {
     public void appendAttachmentsTask(Authentication authentication,
                                   @RequestParam("attachments") List<MultipartFile> attachments,
                                   @PathVariable("task_id") Long taskId) {
-        attachmentService.apppendNewAttachmentsToTask((UserDetails) authentication.getPrincipal(), attachments, taskId);
+        attachmentService.apppendNewAttachmentsToTask(((JwtAuthentication) authentication).getUsername(), attachments, taskId);
     }
 
     @Operation(summary = "Открыть файл", description = "Возвращает содержимое файла по его имени")

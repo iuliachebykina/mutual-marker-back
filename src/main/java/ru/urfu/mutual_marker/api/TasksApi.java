@@ -10,12 +10,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.task.TaskService;
 
 import java.util.List;
@@ -48,7 +48,7 @@ public class TasksApi {
                                             @RequestParam("room_id") Long id) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return taskService.findCompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
+        return taskService.findCompletedTasks(id, pageable, ((JwtAuthentication) authentication).getUsername());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -60,7 +60,7 @@ public class TasksApi {
                                             @RequestParam("room_id") Long id) {
 
         Pageable pageable = PageRequest.of(page, size);
-        return taskService.findUncompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
+        return taskService.findUncompletedTasks(id, pageable, ((JwtAuthentication) authentication).getUsername());
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -101,6 +101,6 @@ public class TasksApi {
     @Operation(summary = "Привязка новых вложений", description = "Загрузка вложений и привязка к существующему заданию")
     @PostMapping(value = "/task/{task_id}/appendAttachments")
     public ResponseEntity<TaskInfo> appendAttachmentsToProject(Authentication authentication, @PathVariable("task_id") Long taskId, @RequestParam List<MultipartFile> files) {
-        return ResponseEntity.ok(taskService.appendNewAttachmentsToTask((UserDetails) authentication.getPrincipal(), taskId, files));
+        return ResponseEntity.ok(taskService.appendNewAttachmentsToTask(((JwtAuthentication) authentication).getUsername(), taskId, files));
     }
 }
