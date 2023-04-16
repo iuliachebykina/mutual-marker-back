@@ -13,12 +13,11 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
-import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
 import ru.urfu.mutual_marker.dto.room.*;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.service.room.RoomService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.room.RoomService;
 
 import java.util.List;
 
@@ -52,7 +51,7 @@ public class RoomApi {
     @GetMapping(value = "/rooms", params = { "page", "size" })
     public List<RoomDto> getAllRooms(@RequestParam("page") int page,
                                      @RequestParam("size") int size,
-                                     @CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                     @CurrentSecurityContext(expression = "authentication.principal") String email,
                                      @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
         Pageable pageable = PageRequest.of(page, size);
         SimpleGrantedAuthority role = roles.stream().findFirst().orElseThrow(() -> {
@@ -104,7 +103,7 @@ public class RoomApi {
 
     @Operation(summary = "Эндпоинт для преподавателей, добавляющихся самостоятельно по коду")
     @PostMapping("/teacher/{roomCode}")
-    public ResponseEntity<Room> selfAddTeacher(@CurrentSecurityContext(expression = "authentication.principal.username") String email, @PathVariable String roomCode) {
+    public ResponseEntity<Room> selfAddTeacher(@CurrentSecurityContext(expression = "authentication.principal") String email, @PathVariable String roomCode) {
 
         return new ResponseEntity<>(roomService.addProfile(email, roomCode, TEACHER), HttpStatus.OK);
 
@@ -122,7 +121,7 @@ public class RoomApi {
 
     @Operation(summary = "Эндпоинт для студентов, добавляющихся самостоятельно по коду")
     @PostMapping("/student/{roomCode}")
-    public ResponseEntity<Room> selfAddStudent(@PathVariable String roomCode, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+    public ResponseEntity<Room> selfAddStudent(@PathVariable String roomCode, @CurrentSecurityContext(expression = "authentication.principal") String email) {
 
         return new ResponseEntity<>(roomService.addProfile(email, roomCode, STUDENT), HttpStatus.OK);
 
@@ -162,7 +161,7 @@ public class RoomApi {
     @DeleteMapping("/room-by-student/{room_id}")
     @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteRoomByStudent(@PathVariable("room_id") Long roomId, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+    public void deleteRoomByStudent(@PathVariable("room_id") Long roomId, @CurrentSecurityContext(expression = "authentication.principal") String email) {
         roomService.deleteRoomByStudent(roomId, email);
     }
 
@@ -179,7 +178,7 @@ public class RoomApi {
     @Operation(summary = "Создание группы комнат")
     @GetMapping("/create-room-group/{room-group-name}")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
-    public ResponseEntity<RoomGroupDto> createRoomGroup(@PathVariable(name = "room-group-name") String roomGroupName, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+    public ResponseEntity<RoomGroupDto> createRoomGroup(@PathVariable(name = "room-group-name") String roomGroupName, @CurrentSecurityContext(expression = "authentication.principal") String email) {
 
         return new ResponseEntity<>(roomService.createRoomGroup(roomGroupName, email), HttpStatus.OK);
 
@@ -200,7 +199,7 @@ public class RoomApi {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     public ResponseEntity<List<RoomGroupDto>> getRoomGroups(@RequestParam("page") int page,
                                                             @RequestParam("size") int size,
-                                                            @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+                                                            @CurrentSecurityContext(expression = "authentication.principal") String email) {
         Pageable pageable = PageRequest.of(page, size);
         return new ResponseEntity<>(roomService.getRoomGroups(email, pageable), HttpStatus.OK);
 
@@ -229,7 +228,7 @@ public class RoomApi {
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
     public List<RoomDto> getAllRoomsWithoutGroup(@RequestParam("page") int page,
                                      @RequestParam("size") int size,
-                                     @CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                     @CurrentSecurityContext(expression = "authentication.principal") String email,
                                      @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
         Pageable pageable = PageRequest.of(page, size);
         SimpleGrantedAuthority role = roles.stream().findFirst().orElseThrow(() -> {

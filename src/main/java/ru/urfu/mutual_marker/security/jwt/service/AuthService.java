@@ -28,7 +28,7 @@ public class AuthService {
 
     @SneakyThrows
     public JwtResponse login(@NonNull JwtRequest authRequest) {
-        final Profile user = profileRepository.findByEmail(authRequest.getLogin())
+        final Profile user = profileRepository.findByEmailAndDeletedIsFalse(authRequest.getLogin())
                 .orElseThrow(() -> new AuthException("Пользователь не найден"));
         if(!user.getRole().toString().equals(authRequest.getRole())){
             throw new InvalidRoleException(String.format("Invalid role\nactual: %s, but expected: %s", user.getRole(), authRequest.getRole()));
@@ -50,7 +50,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = tokenService.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Profile user = profileRepository.findByEmail(login)
+                final Profile user = profileRepository.findByEmailAndDeletedIsFalse(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 return new JwtResponse(accessToken, refreshToken);
@@ -66,7 +66,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = tokenService.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final Profile user = profileRepository.findByEmail(login)
+                final Profile user = profileRepository.findByEmailAndDeletedIsFalse(login)
                         .orElseThrow(() -> new AuthException("Пользователь не найден"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);

@@ -141,7 +141,7 @@ public class ProfileApi {
     @Operation(summary = "Обновление профиля авторизованного пользователя. ОБНОВЛЯТЬ ПОЧТУ И ПАРОЛЬ В ЭТОМ МЕТОДЕ НЕЛЬЗЯ")
     @PatchMapping("/self")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile, @CurrentSecurityContext(expression = "authentication.principal.username") String email ) {
+    public ResponseEntity<Profile> updateProfile(@RequestBody Profile profile, @CurrentSecurityContext(expression = "authentication.principal") String email ) {
         Profile newProfile = profileService.updateProfile(profile, email);
         log.info("Updated profile with email: {}", profile.getEmail());
         return new ResponseEntity<>(newProfile, HttpStatus.OK);
@@ -161,7 +161,7 @@ public class ProfileApi {
 
     @Operation(summary = "Обновление пароля авторизованного пользователя")
     @PostMapping("/password")
-    @PreAuthorize("#changePassword.email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#changePassword.email == authentication.principal or hasAnyRole('ROLE_ADMIN')")
     private ResponseEntity<Profile> updatePassword(@RequestBody ChangePassword changePassword) {
         profileService.updatePassword(changePassword);
         log.info("Updated user's password with email: {}", changePassword.getEmail());
@@ -171,7 +171,7 @@ public class ProfileApi {
 
     @Operation(summary = "Обновление почты авторизованного пользователя")
     @PostMapping("/email")
-    @PreAuthorize("#changeEmail.oldEmail == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#changeEmail.oldEmail == authentication.principal or hasAnyRole('ROLE_ADMIN')")
     private ResponseEntity<Profile> updateEmail(@RequestBody ChangeEmail changeEmail) {
         profileService.updateEmail(changeEmail);
         log.info("Updated user's email: {}", changeEmail.getOldEmail());
@@ -181,7 +181,7 @@ public class ProfileApi {
 
     @Operation(summary = "Удаление профиля по почте. Может удалять сам пользователь или администратор")
     @DeleteMapping("/{email}")
-    @PreAuthorize("#email == authentication.principal.username or hasAnyRole('ROLE_ADMIN')")
+    @PreAuthorize("#email == authentication.principal or hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<Profile> deleteProfile(@PathVariable String email) {
         profileService.deleteProfile(email);
         log.info("Deleted user with email: {}", email);
