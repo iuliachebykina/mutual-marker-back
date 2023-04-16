@@ -35,14 +35,10 @@ public interface TaskMapper {
     @Mapping(source = "room.id", target = "roomId")
     TaskFullInfo entityToFullInfoDto(Task task);
 
-    default String attachmentToString(Attachment attachment) {
-        return attachment.getFileName();
-    }
-
     @Mapping(target = "deleted", defaultValue = "false")
     @Mapping(target = "attachments", ignore = true)
     Task creationRequestToEntity(TaskCreationRequest request, Profile owner);
 
-    @Mapping(target = "attachments", ignore = true) //TODO Check if overwrites existing attachments
+    @Mapping(target = "attachments", ignore = true)
     Task creationRequestToExistingEntity(@MappingTarget Task task, TaskCreationRequest request, Profile owner);
 }

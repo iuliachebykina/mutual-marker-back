@@ -19,7 +19,6 @@ public abstract class MarkMapper {
 
     public abstract List<MarkDto> listOfEntitiesToDtos(Set<Mark> marks);
 
-//    @Mapping(target = "finalMark", source = "markValue")
     public abstract MarkDto entityToDto(Mark mark);
 
     @AfterMapping

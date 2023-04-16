@@ -2,6 +2,7 @@ package ru.urfu.mutual_marker.service.attachment;
 
 import com.jlefebure.spring.boot.minio.MinioException;
 import com.jlefebure.spring.boot.minio.MinioService;
+import io.minio.ObjectStat;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -40,23 +41,31 @@ public class FileStorageServiceMinioImpl implements FileStorageService {
         }
     }
 
-    @SneakyThrows
     @Override
     public void delete(String filename) {
         Path path = Path.of(filename);
-        var metadata = minioService.getMetadata(path);
-        minioService.remove(path);
+        ObjectStat metadata = null;
+        try {
+            metadata = minioService.getMetadata(path);
+            minioService.remove(path);
+        } catch (MinioException e) {
+            log.error("[FileStorageServiceMinioImpl] Ошибка во время сохранения файла в объектное хранилище", e);
+            throw new ObjectStorageException("Ошибка во время сохранения файла в объектное хранилище", e);
+        }
         log.info("this file {} removed in bucket: {} on date: {}", metadata.name(), metadata.bucketName(), metadata.createdTime());
     }
 
-    @SneakyThrows
     @Override
-    public Resource load(String filename) {
+    public Resource load(String filename){
         Path path = Path.of(filename);
 
-        InputStream inputStream = minioService.get(path);
+        try (InputStream inputStream = minioService.get(path)) {
 
-        return new InputStreamResource(inputStream);
+            return new InputStreamResource(inputStream);
+        } catch (MinioException | IOException e){
+            log.error("[FileStorageServiceMinioImpl] Ошибка во время получения файла из объектного хранилища", e);
+            throw new ObjectStorageException("Ошибка во время получения файла из объектного хранилища", e);
+        }
     }
 
     @Override

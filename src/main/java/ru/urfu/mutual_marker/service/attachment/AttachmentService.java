@@ -3,6 +3,7 @@ package ru.urfu.mutual_marker.service.attachment;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class AttachmentService {
 
     private final String FILENAME_PATTERN = "^.*\\.";
@@ -41,6 +43,10 @@ public class AttachmentService {
     public List<String> uploadAttachments(UserDetails principal, List<MultipartFile> files) {
 
         var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        if (profile.isEmpty()){
+            log.error("[AttachmentService] Ошибка при загрузке вложений - не найден профиль с email {}", principal.getUsername());
+            throw new NotFoundException("Не удалось найти профиль");
+        }
         var filenames = new ArrayList<String>();
         for (var file : files) {
             var filename = generateFilename(Objects.requireNonNull(file.getOriginalFilename()));
