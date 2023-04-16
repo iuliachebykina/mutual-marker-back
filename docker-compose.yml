@@ -38,6 +38,8 @@ services:
       MAX_FILE_SIZE: 20MB
       MAX_REQUEST_SIZE: 20MB
       FILE-SIZE-THRESHOLD: 2KB
+      JWT_REFRESH: ${JWT_REFRESH}
+      JWT_ACCESS: ${JWT_ACCESS}
     networks:
       - mutual_marker_network
 
@@ -77,3 +79,5 @@ volumes:
 
 networks:
   mutual_marker_network:
+
+
