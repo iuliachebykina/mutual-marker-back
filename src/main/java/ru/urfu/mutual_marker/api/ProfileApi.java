@@ -21,7 +21,7 @@ import ru.urfu.mutual_marker.dto.profile.profileInfo.StudentInfo;
 import ru.urfu.mutual_marker.dto.profile.profileInfo.TeacherInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.security.RoomAccessEvaluator;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 
 import java.util.List;

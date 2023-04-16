@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.urfu.mutual_marker.dto.registration.RegistrationInfo;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 @RestController
 @RequestMapping(value = "/api/registration")

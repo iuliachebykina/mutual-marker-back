@@ -1,4 +1,4 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.project;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,9 @@ import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -55,18 +57,21 @@ public class ProjectService {
 
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
-        var student = profileRepository.findByEmail(principal.getUsername());
+        var student = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
 
+        if(task.getCloseDate().isBefore(LocalDateTime.now())){
+            throw new MarkServiceException("Task is overdue");
+        }
         if(student.isEmpty()){
             throw new UserNotExistingException(String.format("Student with email: %s does not existing", principal.getUsername()));
         }
-        if(!projectRepository.existsByStudentIdAndTaskId(student.get().getId(), taskId)) {
+        if(!projectRepository.existsByStudentIdAndTaskIdAndDeletedIsFalse(student.get().getId(), taskId)) {
             return null;
         }
         var markedProjects = markRepository.findAllByOwnerId(student.get().getId())
                 .stream().map(mark -> mark.getProject().getId())
                 .collect(Collectors.toList());
-        var projects = projectRepository.findAllByTask(task)
+        var projects = projectRepository.findAllByTaskAndDeletedIsFalse(task)
                 .stream()
                 .filter(project -> !project.getDeleted())
                 .sorted((p1, p2) -> p1.getMarks().size() <= p2.getMarks().size() ? -1 : 1)
@@ -74,11 +79,10 @@ public class ProjectService {
 
         for (var project : projects) {
 
-            if (markedProjects.contains(project.getId()) ||
-                    project.getStudent().getEmail().equals(student.get().getEmail())) {
-                continue;
+            if (!markedProjects.contains(project.getId()) &&
+                    !project.getStudent().getEmail().equals(student.get().getEmail())) {
+                return project.getId();
             }
-            return project.getId();
         }
         log.info("Not found available project for rate for user with email: {}", principal.getUsername());
         return null;
@@ -87,7 +91,7 @@ public class ProjectService {
     @Transactional
     public ProjectCreationResultDto updateProject(UserDetails principal, ProjectUpdateInfo updateInfo) {
 
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
@@ -113,7 +117,7 @@ public class ProjectService {
     public ProjectCreationResultDto createProject(UserDetails principal, ProjectCreationInfo creationInfo,
                                                   Long taskId,
                                                   Boolean appendAttachments) {
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
@@ -145,12 +149,12 @@ public class ProjectService {
 
     public ProjectInfo getSelfProject(UserDetails principal, Long taskId) {
 
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", principal.getUsername()));
         }
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
-        var project = projectRepository.findByStudentAndTask(profile.get(), task)
+        var project = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile.get(), task.getId())
                 .orElse(null);
         return projectMapper.entityToInfo(project);
     }
@@ -165,7 +169,7 @@ public class ProjectService {
     }
 
     public List<Project> findAllProjectsByTaskId(Long taskId){
-        return projectRepository.findAllByTask_Id(taskId);
+        return projectRepository.findAllByTask_IdAndDeletedIsFalse(taskId);
     }
 
     public List<ProjectInfo> getProjects(Long taskId) {
@@ -179,6 +183,7 @@ public class ProjectService {
         }
         return projectInfos;
     }
+
 
     public ProjectInfo appendNewAttachmentsToExistingProject(UserDetails principal, List<MultipartFile> files, Long projectId){
         return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(principal, files, projectId));

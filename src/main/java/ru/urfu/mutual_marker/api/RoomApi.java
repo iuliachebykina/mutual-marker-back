@@ -12,12 +12,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
-import ru.urfu.mutual_marker.dto.room.AddEntityToRoomDto;
-import ru.urfu.mutual_marker.dto.room.AddRoomDto;
-import ru.urfu.mutual_marker.dto.room.RoomDto;
+import ru.urfu.mutual_marker.dto.mark.FeedbacksForTaskDto;
+import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
+import ru.urfu.mutual_marker.dto.room.*;
 import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
-import ru.urfu.mutual_marker.service.RoomService;
+import ru.urfu.mutual_marker.service.room.RoomService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 
 import java.util.List;
@@ -158,6 +158,14 @@ public class RoomApi {
 
     }
 
+    @Operation(summary = "Удаление комнаты студенту")
+    @DeleteMapping("/room-by-student/{room_id}")
+    @PreAuthorize("hasAnyRole('ROLE_STUDENT')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteRoomByStudent(@PathVariable("room_id") Long roomId, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+        roomService.deleteRoomByStudent(roomId, email);
+    }
+
     @Operation(summary = "Удаление задания, доступно админам или преподавателям в данной комнате")
     @DeleteMapping("/task")
     //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomByRoomCode(#addEntityToRoomDto.roomCode)) or hasRole('ROLE_ADMIN')")
@@ -165,6 +173,77 @@ public class RoomApi {
     public ResponseEntity<Room> deleteTask(@RequestBody AddEntityToRoomDto addEntityToRoomDto) {
 
         return new ResponseEntity<>(roomService.deleteEntity(addEntityToRoomDto.getEntityId(), addEntityToRoomDto.getRoomCode(), TASK), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Создание группы комнат")
+    @GetMapping("/create-room-group/{room-group-name}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<RoomGroupDto> createRoomGroup(@PathVariable(name = "room-group-name") String roomGroupName, @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+
+        return new ResponseEntity<>(roomService.createRoomGroup(roomGroupName, email), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Удаление группы комнат")
+    @DeleteMapping("/delete-room-group/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#id)) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public void deleteRoomGroup(@PathVariable(name = "id") Long id) {
+        roomService.deleteRoomGroup(id);
+    }
+
+
+    @Operation(summary = "Получение всех групп комнат")
+    @GetMapping("/all-room-group")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<List<RoomGroupDto>> getRoomGroups(@RequestParam("page") int page,
+                                                            @RequestParam("size") int size,
+                                                            @CurrentSecurityContext(expression = "authentication.principal.username") String email) {
+        Pageable pageable = PageRequest.of(page, size);
+        return new ResponseEntity<>(roomService.getRoomGroups(email, pageable), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Добавление комнаты в группу")
+    @PostMapping("/add-room-group")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomGroup.roomId)) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<RoomGroupDto> addRoomToRoomGroup(@RequestBody RoomAndRoomGroupDto roomGroup) {
+        return new ResponseEntity<>(roomService.addRoomToRoomGroup(roomGroup), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Удаление комнаты в группе")
+    @PostMapping("/delete-room-group")
+    //@PreAuthorize("(hasRole('ROLE_TEACHER') and @roomAccessEvaluator.isMemberOfRoomById(#roomGroup.roomId)) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<RoomGroupDto> deleteRoomFromRoomGroup(@RequestBody RoomAndRoomGroupDto roomGroup) {
+        return new ResponseEntity<>(roomService.deleteRoomFromRoomGroup(roomGroup), HttpStatus.OK);
+
+    }
+
+    @Operation(summary = "Получение списка комнат, доступных пользователю, без групп")
+    @GetMapping(value = "/rooms-without-group", params = { "page", "size" })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public List<RoomDto> getAllRoomsWithoutGroup(@RequestParam("page") int page,
+                                     @RequestParam("size") int size,
+                                     @CurrentSecurityContext(expression = "authentication.principal.username") String email,
+                                     @CurrentSecurityContext(expression = "authentication.authorities") List<SimpleGrantedAuthority> roles) {
+        Pageable pageable = PageRequest.of(page, size);
+        SimpleGrantedAuthority role = roles.stream().findFirst().orElseThrow(() -> {
+            throw new NotFoundException("Not found roles for authorize");
+        });
+        return roomService.getAllRoomsWithoutGroupForProfile(pageable, email, Role.valueOf(role.getAuthority()));
+    }
+
+    @Operation(summary = "Получение всех отзывов по комнате для студента")
+    @GetMapping(value = "/get-all-feedbacks", params = { "roomId", "profileId" })
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER', 'ROLE_STUDENT')")
+    public ResponseEntity<List<FeedbacksForTaskDto>> getAllFeedbacksInRoomForUser(@RequestParam("roomId") long roomId,
+                                                                                  @RequestParam("profileId") long profileId) {
+        return new ResponseEntity<>(roomService.getAllFeedbacksByTaskForRoom(roomId, profileId), HttpStatus.OK);
 
     }
 }

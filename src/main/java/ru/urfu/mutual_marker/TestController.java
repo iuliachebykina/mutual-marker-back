@@ -17,7 +17,7 @@ import ru.urfu.mutual_marker.jpa.entity.Room;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 import ru.urfu.mutual_marker.jpa.repository.*;
-import ru.urfu.mutual_marker.service.ProfileService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.annotation.security.PermitAll;
 import javax.transaction.Transactional;
@@ -96,14 +96,14 @@ public class TestController {
             String title = generateString(10);
             int teachersCount = 3;
             List<Profile> teachers = profileRepository
-                    .findAllByRole(Role.ROLE_TEACHER,  PageRequest.of(0, 10))
+                    .findAllByRoleAndDeletedIsFalse(Role.ROLE_TEACHER,  PageRequest.of(0, 10))
                     .stream()
                     .limit(teachersCount)
                     .collect(Collectors.toList());
 
             int studentsCount =10;
             List<Profile> students = profileRepository
-                    .findAllByRole(Role.ROLE_STUDENT,  PageRequest.of(0, 10))
+                    .findAllByRoleAndDeletedIsFalse(Role.ROLE_STUDENT,  PageRequest.of(0, 10))
                     .stream()
                     .limit(studentsCount)
                     .collect(Collectors.toList());

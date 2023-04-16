@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.urfu.mutual_marker.dto.task.TaskCreationRequest;
 import ru.urfu.mutual_marker.dto.task.TaskFullInfo;
 import ru.urfu.mutual_marker.dto.task.TaskInfo;
-import ru.urfu.mutual_marker.service.TaskService;
+import ru.urfu.mutual_marker.service.task.TaskService;
 
 import java.util.List;
 
@@ -49,6 +49,18 @@ public class TasksApi {
 
         Pageable pageable = PageRequest.of(page, size);
         return taskService.findCompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Получение невыполненных заданий")
+    @GetMapping(value = "/task/uncompleted", params = { "page", "size" })
+    public List<TaskInfo> getUncompletedTasks(Authentication authentication,
+                                            @RequestParam("page") int page,
+                                            @RequestParam("size") int size,
+                                            @RequestParam("room_id") Long id) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return taskService.findUncompletedTasks(id, pageable, (UserDetails) authentication.getPrincipal());
     }
 
     @PreAuthorize("isAuthenticated()")

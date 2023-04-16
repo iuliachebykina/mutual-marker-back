@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -22,10 +20,10 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 public class MarkStep {
     @Id
-    @SequenceGenerator(name = "markStepSeq", sequenceName = "markStepSeq")
+    @SequenceGenerator(name = "markStepSeq", sequenceName = "markStepSeq", allocationSize = 1)
     @GeneratedValue(generator = "markStepSeq")
     Long id;
     @ManyToOne
@@ -59,6 +57,23 @@ public class MarkStep {
     @Builder.Default
     Set<MarkStepValue> values = new HashSet<>();
 
+    @OneToMany(mappedBy = "markStep")
+    @ToString.Exclude
+    @Builder.Default
+    Set<MarkStepFeedback> markStepFeedbacks = new HashSet<>();
+
+
+    public void markStepFeedback(MarkStepFeedback markStepFeedback) {
+        if(markStepFeedbacks == null)
+            markStepFeedbacks = new HashSet<>();
+        markStepFeedbacks.add(markStepFeedback);
+    }
+
+    public void removeMarkStepFeedback(long markStepFeedbackId){
+        if(markStepFeedbacks == null)
+            return;
+        this.markStepFeedbacks.stream().filter(a -> a.getId() == markStepFeedbackId).findFirst().ifPresent(msf -> this.markStepFeedbacks.remove(msf));
+    }
 
     public void addTask(Task task) {
         if(tasks == null)

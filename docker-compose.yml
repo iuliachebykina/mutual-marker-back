@@ -3,15 +3,17 @@ services:
   minio:
     image: bitnami/minio:2022
     container_name: minio
+    volumes:
+      - minio:/data
     environment:
-      MINIO_ROOT_USER: "user"
-      MINIO_ROOT_PASSWORD: "password"
-      MINIO_DEFAULT_BUCKETS: 202301-urfu-rtf
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY}
+      MINIO_DEFAULT_BUCKETS: ${MINIO_BUCKET}
     ports:
       - "9000:9000"
       - "9001:9001"
-#    networks:
-#      - mutual-marker-front_some-net
+    networks:
+      - mutual_marker_network
 
   mutual-marker-back:
     container_name: mutual-marker-back
@@ -24,47 +26,54 @@ services:
       - psql
       - minio
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://psql:5432/postgres
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://psql:5432/${DB_DATABASE}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      FILE_STORAGE: ../mutual-marker
+      FILE_STORAGE: ${FILE_STORAGE}
       MINIO_URL: http://minio:9000
-      MINIO_BUCKET: 202301-urfu-rtf
-      MINIO_ACCESS_KEY: user
-      MINIO_SECRET_KEY: password
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MAX_FILE_SIZE: 20MB
       MAX_REQUEST_SIZE: 20MB
       FILE-SIZE-THRESHOLD: 2KB
-#    healthcheck:
-#      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-#      interval: 30s
-#      timeout: 20s
-#      retries: 3
-#    networks:
-#      - mutual-marker-front_some-net
+    networks:
+      - mutual_marker_network
+
+  psql:
+    image: 'postgres:13.1-alpine'
+    container_name: psql
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1975:5432"
+    networks:
+      - mutual_marker_network
 
   mutual-marker-front:
     container_name: mutual-marker-front
     build:
       context: ../mutual-marker-front/.
     image: mutual-marker-front:latest
-    volumes:
-      - '.:/main'
-      - '/main/node_modules'
     ports:
       - "80:80"
-  psql:
-    image: 'postgres:13.1-alpine'
-    container_name: psql
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
-#    networks:
-#      - mutual-marker-front_some-net
+    networks:
+      - mutual_marker_network
+    depends_on:
+      - mutual-marker-back
 
-#networks:
-#  mutual-marker-front_some-net:
-#    external: true
+
+
+volumes:
+  pgdata:
+    external: false
+  minio:
+    external: false
+
+networks:
+  mutual_marker_network:

@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -24,10 +22,10 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 public class Room {
     @Id
-    @SequenceGenerator(name = "roomSeq", sequenceName = "roomSeq")
+    @SequenceGenerator(name = "roomSeq", sequenceName = "roomSeq", allocationSize = 1)
     @GeneratedValue(generator = "roomSeq")
     Long id;
     @NotNull
@@ -42,6 +40,9 @@ public class Room {
     @JsonIgnore
     @Builder.Default
     Boolean deleted = Boolean.FALSE;
+
+    @ManyToOne
+    RoomGroup roomGroup;
 
 
     @ManyToMany(mappedBy = "rooms")
@@ -67,6 +68,7 @@ public class Room {
         teachers.add(teacher);
         teacher.addRoom(this);
     }
+
 
     public void addStudent(Profile student){
         if(students == null)

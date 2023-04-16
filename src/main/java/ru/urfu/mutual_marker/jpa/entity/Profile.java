@@ -1,11 +1,9 @@
 package ru.urfu.mutual_marker.jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Name;
 import ru.urfu.mutual_marker.jpa.entity.value_type.Role;
 
@@ -25,10 +23,10 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 public class Profile {
     @Id
-    @SequenceGenerator(name = "profileSeq", sequenceName = "profileSeq")
+    @SequenceGenerator(name = "profileSeq", sequenceName = "profileSeq", allocationSize = 1)
     @GeneratedValue(generator = "profileSeq")
     Long id;
     @Email
@@ -69,6 +67,12 @@ public class Profile {
     @ToString.Exclude
     Set<Room> rooms = new HashSet<>();
 
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    @JsonIgnore
+    @Builder.Default
+    @ToString.Exclude
+    Set<MarkStepFeedback> markStepFeedbacks = new HashSet<>();
+
     public void addAttachment(Attachment attachment){
         if(attachments == null)
             attachments = new HashSet<>();
@@ -81,6 +85,13 @@ public class Profile {
         rooms.add(room);
     }
 
+    public void addMarkStepFeedback(MarkStepFeedback markStepFeedback){
+        if (markStepFeedbacks == null){
+            markStepFeedbacks = new HashSet<>();
+        }
+        markStepFeedbacks.add(markStepFeedback);
+    }
+
     public void removeAttachment(long attachmentId){
         if(attachments == null)
             return;
@@ -91,6 +102,13 @@ public class Profile {
         if(rooms == null)
             return;
         this.rooms.stream().filter(a -> a.getId() == roomId).findFirst().ifPresent(room -> this.rooms.remove(room));
+    }
+
+    public void removeMarkStepFeedback(long markStepFeedbackId){
+        if (markStepFeedbacks == null){
+            return;
+        }
+        this.markStepFeedbacks.removeIf(markStepFeedback -> markStepFeedback.getId() == markStepFeedbackId);
     }
 
     @Override

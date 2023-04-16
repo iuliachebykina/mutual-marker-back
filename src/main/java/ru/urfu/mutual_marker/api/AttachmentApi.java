@@ -13,7 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.urfu.mutual_marker.service.AttachmentService;
+import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 
 import java.util.List;
 

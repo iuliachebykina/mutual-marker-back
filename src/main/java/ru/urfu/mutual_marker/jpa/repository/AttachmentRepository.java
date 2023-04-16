@@ -10,9 +10,9 @@ import java.util.Set;
 public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
 
     @Query(value = "select a from Attachment a where a.fileName in ?1")
-    Set<Attachment> findAllByFileNames(Iterable<String> filenames);
+    Set<Attachment> findAllByFileNamesAndDeletedIsFalse(Iterable<String> filenames);
 
-    Optional<Attachment> findByFileName(String filename);
+    Optional<Attachment> findByFileNameAndDeletedIsFalse(String filename);
 
     void deleteByFileName(String filename);
 }

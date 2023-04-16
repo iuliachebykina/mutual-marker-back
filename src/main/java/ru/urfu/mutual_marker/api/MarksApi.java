@@ -47,13 +47,13 @@ public class MarksApi {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markSteps")
-    public ResponseEntity<List<MarkStep>> addMarkStepsForProject(@RequestBody List<AddMarkStepDto> addMarkStepDtoList){
+    public ResponseEntity<List<MarkStep>> addMarkStepsForTask(@RequestBody List<AddMarkStepDto> addMarkStepDtoList){
         return new ResponseEntity<>(markStepService.addMarkSteps(addMarkStepDtoList), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markStepExisting")
-    public ResponseEntity<MarkStep> addMarkStepForExistingProject(@RequestBody AddMarkStepDto addMarkStepDto){
+    public ResponseEntity<MarkStep> addMarkStepForExistingTask(@RequestBody AddMarkStepDto addMarkStepDto){
         return new ResponseEntity<>(markStepService.addMarkStep(addMarkStepDto), HttpStatus.OK);
     }
 
@@ -89,7 +89,7 @@ public class MarksApi {
     @Operation(summary = "Оценка работы преподавателем")
     @PostMapping("/mark/teacher")
     public ResponseEntity<Object> addTeacherMark(@RequestBody AddTeacherMarkDto addTeacherMarkDto){
-        return new ResponseEntity<>(markService.addStudentMark(addTeacherMarkDto), HttpStatus.OK);
+        return new ResponseEntity<>(markService.addTeacherMark(addTeacherMarkDto), HttpStatus.OK);
     }
 
     @GetMapping(value = "/calculateFinalMark/{projectId}/{profileId}", params = {"precision"})

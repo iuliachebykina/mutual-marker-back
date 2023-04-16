@@ -3,7 +3,6 @@ package ru.urfu.mutual_marker.jpa.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -15,11 +14,11 @@ import javax.persistence.*;
 @Table(schema = "mutual_marker")
 @Getter
 @Setter
-@Where(clause="deleted=false")
+
 @ToString
 public class MarkStepValue {
     @Id
-    @SequenceGenerator(name = "markStepValueSeq", sequenceName = "markStepValueSeq")
+    @SequenceGenerator(name = "markStepValueSeq", sequenceName = "markStepValueSeq", allocationSize = 1)
     @GeneratedValue(generator = "markStepValueSeq")
     Long id;
 

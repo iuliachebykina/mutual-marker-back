@@ -1,8 +1,9 @@
-package ru.urfu.mutual_marker.service;
+package ru.urfu.mutual_marker.service.attachment;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,7 +18,6 @@ import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
-import ru.urfu.mutual_marker.service.file.FileStorageService;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
+@Slf4j
 public class AttachmentService {
 
     private final String FILENAME_PATTERN = "^.*\\.";
@@ -41,7 +42,11 @@ public class AttachmentService {
     @Transactional
     public List<String> uploadAttachments(UserDetails principal, List<MultipartFile> files) {
 
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
+        if (profile.isEmpty()){
+            log.error("[AttachmentService] Ошибка при загрузке вложений - не найден профиль с email {}", principal.getUsername());
+            throw new NotFoundException("Не удалось найти профиль");
+        }
         var filenames = new ArrayList<String>();
         for (var file : files) {
             var filename = generateFilename(Objects.requireNonNull(file.getOriginalFilename()));
@@ -59,7 +64,7 @@ public class AttachmentService {
 
     @Transactional
     public Project appendExistingAttachmentsToProject(Set<String> filenames, Project project) {
-        Set<Attachment> attachments = attachmentRepository.findAllByFileNames(filenames);
+        Set<Attachment> attachments = attachmentRepository.findAllByFileNamesAndDeletedIsFalse(filenames);
 
         for (Attachment attachment : attachments){
             project.addAttachment(attachment);
@@ -70,16 +75,16 @@ public class AttachmentService {
     @Transactional
     public void unpinAttachment(UserDetails principal, Long projectId, String filename) {
 
-        Profile profile = profileRepository.findByEmail(principal.getUsername()).orElseThrow(() -> new NotFoundException("User not found"));
-        Project project = projectRepository.findByStudentAndId(profile, projectId).orElseThrow(() -> new NotFoundException("Project not found"));
-        Attachment attach = attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File not found"));
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername()).orElseThrow(() -> new NotFoundException("User not found"));
+        Project project = projectRepository.findByStudentAndIdAndDeletedIsFalse(profile, projectId).orElseThrow(() -> new NotFoundException("Project not found"));
+        Attachment attach = attachmentRepository.findByFileNameAndDeletedIsFalse(filename).orElseThrow(() -> new NotFoundException("File not found"));
         attach.getProjects().removeIf(prj -> Objects.equals(prj.getId(), projectId));
         project.getAttachments().removeIf(attachment -> attachment.getFileName().equals(filename));
     }
 
     @Transactional
     public Task appendExistingAttachmentsToTask(Set<String> filenames, Task task){
-        Set<Attachment> attachments = attachmentRepository.findAllByFileNames(filenames);
+        Set<Attachment> attachments = attachmentRepository.findAllByFileNamesAndDeletedIsFalse(filenames);
 
         for (Attachment attachment : attachments){
             task.addAttachment(attachment);
@@ -90,7 +95,7 @@ public class AttachmentService {
 
     @Transactional
     public void deleteAttachment(UserDetails principal, String filename) {
-        Optional<Attachment> attachment = attachmentRepository.findByFileName(filename);
+        Optional<Attachment> attachment = attachmentRepository.findByFileNameAndDeletedIsFalse(filename);
         if(attachment.isEmpty() || !attachment.get().getStudent().getEmail().equals(principal.getUsername())){
             return;
         }
@@ -100,7 +105,7 @@ public class AttachmentService {
     }
 
     public ResponseEntity downloadFile(String filename) {
-        var attachment = attachmentRepository.findByFileName(filename).orElseThrow(() -> new NotFoundException("File was not found."));
+        var attachment = attachmentRepository.findByFileNameAndDeletedIsFalse(filename).orElseThrow(() -> new NotFoundException("File was not found."));
         var file = fileStorageService.load(filename);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
@@ -111,7 +116,7 @@ public class AttachmentService {
     @Transactional
     public Project appendNewAttachmentsToProject(UserDetails principal, List<MultipartFile> files, Long projectId) {
 
-        var profile = profileRepository.findByEmail(principal.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername());
         var project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project was not found."));
 
         if (!project.getStudent().equals(profile.get())) {
@@ -137,7 +142,7 @@ public class AttachmentService {
 
     @Transactional
     public Task apppendNewAttachmentsToTask(UserDetails principal, List<MultipartFile> files, Long taskId){
-        Profile profile = profileRepository.findByEmail(principal.getUsername()).orElse(null);
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(principal.getUsername()).orElse(null);
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found."));
 
         for (var file : files) {

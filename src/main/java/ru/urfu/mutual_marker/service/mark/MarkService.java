@@ -6,19 +6,19 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
-import ru.urfu.mutual_marker.dto.mark.AddMarkDto;
-import ru.urfu.mutual_marker.dto.mark.AddTeacherMarkDto;
-import ru.urfu.mutual_marker.dto.mark.MarkDto;
-import ru.urfu.mutual_marker.dto.mark.ProjectFinalMarkDto;
+import ru.urfu.mutual_marker.common.TaskMapper;
+import ru.urfu.mutual_marker.dto.mark.*;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
-import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
+import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
-import ru.urfu.mutual_marker.service.ProfileService;
-import ru.urfu.mutual_marker.service.ProjectService;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
+import ru.urfu.mutual_marker.service.project.ProjectService;
+import ru.urfu.mutual_marker.service.room.RoomService;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -34,11 +34,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MarkService {
     MarkRepository markRepository;
+    RoomService roomService;
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
     MarkMapper markMapper;
     MarkCalculator markCalculator;
+    MarkStepFeedbackService markStepFeedbackService;
+    TaskRepository taskRepository;
+    TaskMapper taskMapper;
 
 
     public Mark addStudentMark(AddMarkDto addMarkDto){
@@ -53,17 +57,17 @@ public class MarkService {
     Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         try {
-            Double res = addMarkDto.getMarkStepValues().stream().mapToInt(m -> m).average().orElse(Double.NaN);
-            if (res.equals(Double.NaN)){
-                log.error("Failed to process components to calculate final mark");
-                throw new MarkServiceException("Failed to process markComponents");
-            }
+            Integer res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepFeedbackDto::getValue).sum();
+//            if (res.equals(Double.NaN)){
+//                log.error("Failed to process components to calculate final mark");
+//                throw new MarkServiceException("Failed to process markComponents");
+//            }
             BigDecimal truncation = new BigDecimal(res);
             truncation = truncation.setScale(0, RoundingMode.HALF_UP);
             Profile owner = profileService.findById(addMarkDto.getProfileId());
             Project project = projectService.findProjectById(addMarkDto.getProjectId());
             if(project.getTask().getCloseDate().isBefore(LocalDateTime.now()) && !isTeacherMark){
-                return null;
+                throw new MarkServiceException("Task is overdue");
             }
             mark = Mark
                     .builder()
@@ -76,20 +80,6 @@ public class MarkService {
                     .markValue(truncation.intValue())
                     .build();
 
-//            NumberOfGraded numberOfGraded = owner.getNumberOfGradedSet().stream()
-//                    .filter(n -> Objects.equals(n.getProfile().getId(), owner.getId())).findFirst()
-//                    .orElse(null);
-//            if (numberOfGraded == null){
-////                throw new MarkServiceException(String.format("Failed to get number of graded for student with id %s when processing final mark",
-////                        owner.getId()));
-//                numberOfGraded = NumberOfGraded.builder()
-//                        .task(project.getTask())
-//                        .profile(owner)
-//                        .graded(0).build();
-//            }
-//            numberOfGraded.setGraded(numberOfGraded.getGraded() + 1);
-//            numberOfGradedRepository.save(numberOfGraded);
-
         } catch (EntityNotFoundException e){
             log.error("Failed to find project with id {}", addMarkDto.getProjectId());
             throw new MarkServiceException(String.format("Failed to find project with id %s", addMarkDto.getProjectId()));
@@ -97,7 +87,9 @@ public class MarkService {
             log.error("Failed to find student with id {}", addMarkDto.getProfileId());
             throw new MarkServiceException(String.format("Failed to find student with id %s", addMarkDto.getProfileId()));
         }
-        return markRepository.save(mark);
+        Mark result = markRepository.save(mark);
+        markStepFeedbackService.addMarkStepFeedbacksForMark(addMarkDto, result);
+        return result;
     }
 
     @Transactional

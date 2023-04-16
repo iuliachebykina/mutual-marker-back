@@ -18,4 +18,5 @@ public class StatisticsDto {
     String fullName;
     String mark;
     Long projectId;
+    Boolean anomalyDetected;
 }

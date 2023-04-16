@@ -23,6 +23,7 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.statistics.StatisticsServiceException;
 import ru.urfu.mutual_marker.service.mark.MarkService;
+import ru.urfu.mutual_marker.service.statistics.anomaly.AnomalyDiscoveryService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,6 +38,8 @@ public class ExcelStatisticsService {
     final TaskRepository taskRepository;
     final ResourceLoader resourceLoader;
 
+    final AnomalyDiscoveryService anomalyDiscoveryService;
+
     public ResponseEntity<Resource> statisticsForProject(Long taskId) {
         try (XSSFWorkbook workbook = new XSSFWorkbook(resourceLoader.getResource("classpath:/statistics-template.xlsx").getInputStream())) {
             Task task = taskRepository.findById(taskId).orElse(null);
@@ -46,16 +49,16 @@ public class ExcelStatisticsService {
 
             Set<Project> allTaskProjects = task.getProjects();
 
+            CellStyle statsStyle = workbook.createCellStyle();
+            XSSFFont statsFont = workbook.createFont();
+            statsFont.setFontName("Times New Roman");
+            statsFont.setFontHeightInPoints((short) 14);
+            statsStyle.setFont(statsFont);
+            Sheet sheet = workbook.createSheet(task.getTitle());
+
             int i = 1;
             for (Project project : allTaskProjects) {
                 Profile student = project.getStudent();
-
-                CellStyle statsStyle = workbook.createCellStyle();
-                XSSFFont statsFont = workbook.createFont();
-                statsFont.setFontName("Times New Roman");
-                statsFont.setFontHeightInPoints((short) 14);
-                statsStyle.setFont(statsFont);
-                Sheet sheet = workbook.getSheet(task.getTitle());
 
                 Row stats = sheet.createRow(i);
 
@@ -85,6 +88,12 @@ public class ExcelStatisticsService {
                 } catch (Exception e) {
                     log.error("Error while filling excel for project. Project: {}", project);
                     mark.setBlank();
+                }
+                Boolean detectedAnomaly = anomalyDiscoveryService.kruskalWallisDetectAnomaly(project);
+                Cell anomalyDetectedFlag = stats.createCell(4);
+                if (detectedAnomaly){
+                    anomalyDetectedFlag.setCellStyle(statsStyle);
+                    anomalyDetectedFlag.setCellValue("Замечена аномалия оценивания!");
                 }
                 i++;
             }

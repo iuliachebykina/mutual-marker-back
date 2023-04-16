@@ -10,8 +10,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Room;
-import ru.urfu.mutual_marker.service.ProfileService;
-import ru.urfu.mutual_marker.service.RoomService;
+import ru.urfu.mutual_marker.service.profile.ProfileService;
+import ru.urfu.mutual_marker.service.room.RoomService;
 
 @Service
 @Data

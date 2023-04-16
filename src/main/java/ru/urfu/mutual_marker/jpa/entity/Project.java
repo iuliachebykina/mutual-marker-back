@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -22,10 +21,10 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(schema = "mutual_marker")
-@Where(clause="deleted=false")
+
 public class Project {
     @Id
-    @SequenceGenerator(name = "projectSeq", sequenceName = "projectSeq")
+    @SequenceGenerator(name = "projectSeq", sequenceName = "projectSeq", allocationSize = 1)
     @GeneratedValue(generator = "projectSeq")
     Long id;
     @ManyToOne

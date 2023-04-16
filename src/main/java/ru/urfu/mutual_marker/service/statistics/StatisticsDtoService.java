@@ -10,6 +10,7 @@ import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.mark.MarkService;
+import ru.urfu.mutual_marker.service.statistics.anomaly.AnomalyDiscoveryService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class StatisticsDtoService {
     final MarkService markService;
     final TaskRepository taskRepository;
+    final AnomalyDiscoveryService anomalyDiscoveryService;
 
     public List<StatisticsDto> getStatistics(Long taskId){
         Task task = taskRepository.findById(taskId).orElse(null);
@@ -39,12 +41,14 @@ public class StatisticsDtoService {
                 log.error("Error while processing statistics for project with id {}", project.getId());
                 continue;
             }
+            Boolean anomalyDetected = anomalyDiscoveryService.kruskalWallisDetectAnomaly(project);
             StatisticsDto dto = StatisticsDto.builder()
                     .fullName(initialsString)
                     .group(student.getStudentGroup())
                     .mark(calculatedMark.toString())
                     .project(project.getTitle())
                     .projectId(project.getId())
+                    .anomalyDetected(anomalyDetected)
                     .build();
             res.add(dto);
         }
