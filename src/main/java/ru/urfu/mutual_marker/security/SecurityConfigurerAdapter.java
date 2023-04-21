@@ -69,7 +69,13 @@ public class SecurityConfigurerAdapter {
                 .and()
                 .authorizeHttpRequests(
                         authz -> authz
-                                .antMatchers("/api/login", "/api/token", "/swagger-ui/*", "api/registration/*", "/api-docs",  "/api-docs/*").permitAll()
+                                .antMatchers(
+                                        "/api/login",
+                                        "/api/token",
+                                        "/swagger-ui/*",
+                                        "/api/registration/*",
+                                        "/api-docs",
+                                        "/api-docs/*").permitAll()
                                 .anyRequest().authenticated()
                                 .and()
                                 .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
