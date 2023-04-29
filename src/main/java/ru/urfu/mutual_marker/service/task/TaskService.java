@@ -140,6 +140,7 @@ public class TaskService {
         var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
         task.setRoom(room.get());
+        task.setCloseDate(request.getCloseDate().withHour(24).withMinute(59).withSecond(59));
         List<ru.urfu.mutual_marker.jpa.entity.MarkStep> markSteps = markStepService.toEntity(request.getMarkSteps(), task);
         markStepRepository.saveAll(markSteps);
         double maxGrade = 0d;
