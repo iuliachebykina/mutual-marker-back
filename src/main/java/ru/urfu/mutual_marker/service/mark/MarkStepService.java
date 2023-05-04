@@ -12,6 +12,7 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
+import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
 import ru.urfu.mutual_marker.service.exception.mark.MarkStepServiceException;
 
 import javax.transaction.Transactional;
@@ -29,6 +30,7 @@ public class MarkStepService { //TODO add error handling for repository methods
     MarkStepRepository markStepRepository;
     TaskRepository taskRepository;
     ProfileRepository profileRepository;
+    MarkStepValueRepository markStepValueRepository;
 
     @Transactional
     public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
@@ -107,6 +109,7 @@ public class MarkStepService { //TODO add error handling for repository methods
                                     .deleted(false)
                                     .build())
                             .collect(Collectors.toSet());
+                    markStepValueRepository.saveAll(markStepValueSet);
                     markStep.setValues(markStepValueSet);
                     markStep.addTask(task);
                     return markStep;
