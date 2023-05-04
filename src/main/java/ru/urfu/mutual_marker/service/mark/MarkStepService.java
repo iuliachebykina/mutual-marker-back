@@ -102,17 +102,17 @@ public class MarkStepService { //TODO add error handling for repository methods
                                             .description(s.getDescription())
                             .deleted(false)
                                                     .build();
-                    markStepRepository.save(markStep);
+                    MarkStep save = markStepRepository.save(markStep);
                     Set<MarkStepValue> markStepValueSet = s.getValues().stream().map(v -> MarkStepValue.builder()
-                                    .markStep(markStep)
+                                    .markStep(save)
                                     .value(v)
                                     .deleted(false)
                                     .build())
                             .collect(Collectors.toSet());
                     markStepValueRepository.saveAll(markStepValueSet);
-                    markStep.setValues(markStepValueSet);
-                    markStep.addTask(task);
-                    return markStep;
+                    save.setValues(markStepValueSet);
+                    save.addTask(task);
+                    return save;
 
                 })
                 .collect(Collectors.toList());
