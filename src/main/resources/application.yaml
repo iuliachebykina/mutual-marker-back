@@ -26,7 +26,7 @@ spring:
     allow-circular-references: true
   minio:
     bucket: ${MINIO_BUCKET:file-storage}
-    url: ${MINIO_URL:http://127.0.0.1:9000}
+    url: ${MINIO_URL:http://5.181.253.200:9000}
     access-key: ${MINIO_ACCESS_KEY:user}
     secret-key: ${MINIO_SECRET_KEY:password}
 

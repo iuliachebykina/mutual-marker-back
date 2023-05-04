@@ -22,12 +22,14 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.exception.ProjectExistingException;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -120,6 +122,12 @@ public class ProjectService {
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
+
+        Optional<Project> existingProject = projectRepository.findByStudentAndTask_IdAndDeletedIsFalse(profile.get(), taskId);
+        if(existingProject.isPresent()){
+            throw new ProjectExistingException(String.format("Project for student (%s) and task (%s) already exists", username, taskId));
+        }
+
         var task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found"));
         if(task.getCloseDate().toLocalDate().isBefore(LocalDateTime.now().toLocalDate())){
             return ProjectCreationResultDto.builder()
