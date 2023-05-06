@@ -52,7 +52,7 @@ public class MarkStep {
     @JsonIgnore
     Set<Task> tasks = new HashSet<>();
 
-    @OneToMany(mappedBy = "markStep")
+    @OneToMany(mappedBy = "markStep", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     Set<MarkStepValue> values = new HashSet<>();
