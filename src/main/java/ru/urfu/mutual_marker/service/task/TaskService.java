@@ -33,6 +33,7 @@ import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.transaction.Transactional;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -142,7 +143,8 @@ public class TaskService {
         task.setRoom(room.get());
         task.setCloseDate(request.getCloseDate().withHour(23).withMinute(59).withSecond(59));
         List<ru.urfu.mutual_marker.jpa.entity.MarkStep> markSteps = markStepService.toEntity(request.getMarkSteps(), task);
-        markStepRepository.saveAll(markSteps);
+        markSteps = markStepRepository.saveAll(markSteps);
+        task.setMarkSteps(new HashSet<>(markSteps));
         double maxGrade = 0d;
         for (ru.urfu.mutual_marker.jpa.entity.MarkStep ms : task.getMarkSteps()) {
             maxGrade += ms.getValues().stream().map(MarkStepValue::getValue).max(Integer::compareTo)
