@@ -28,7 +28,7 @@ public class MarkStepFeedbackService {
     final ProfileRepository profileRepository;
 
     @Transactional
-    public void addMarkStepFeedbacksForMark(AddMarkDto addMarkDto, Mark mark){
+    public void addMarkStepFeedbacksForMark(String reviewerEmail, AddMarkDto addMarkDto, Mark mark){
         if (addMarkDto.getMarkStepFeedbackDtos().isEmpty()){
             return;
         }
@@ -36,7 +36,7 @@ public class MarkStepFeedbackService {
         addMarkDto.getMarkStepFeedbackDtos().forEach(ms -> {
             MarkStep markStep = markStepRepository.findById(ms.getMarkStepId())
                     .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти MarkStep с id %s", ms.getMarkStepId())));
-            Profile owner = profileRepository.findById(ms.getReviewerId())
+            Profile owner = profileRepository.getByEmailAndDeletedIsFalse(reviewerEmail)
                     .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти Profile с id %s", ms.getReviewerId())));
             MarkStepFeedback markStepFeedback = MarkStepFeedback
                     .builder()

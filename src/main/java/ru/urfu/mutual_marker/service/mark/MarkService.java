@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
 import ru.urfu.mutual_marker.common.TaskMapper;
@@ -15,6 +16,7 @@ import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.project.ProjectService;
@@ -45,17 +47,18 @@ public class MarkService {
     TaskMapper taskMapper;
 
 
-    public Mark addStudentMark(AddMarkDto addMarkDto){
-        return addMark(addMarkDto, false, null);
+    public Mark addStudentMark(Authentication authentication, AddMarkDto addMarkDto){
+        return addMark(authentication, addMarkDto, false, null);
     }
 
-    public Mark addTeacherMark(AddTeacherMarkDto addTeacherMarkDto){
-        return addMark(addTeacherMarkDto, true, addTeacherMarkDto.getCoefficient());
+    public Mark addTeacherMark(Authentication authentication, AddTeacherMarkDto addTeacherMarkDto){
+        return addMark(authentication, addTeacherMarkDto, true, addTeacherMarkDto.getCoefficient());
     }
 
     @Transactional
-    Mark addMark(AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
+    Mark addMark(Authentication authentication, AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
+        String email = ((JwtAuthentication) authentication).getUsername();
         try {
             Integer res = addMarkDto.getMarkStepFeedbackDtos().stream().mapToInt(MarkStepFeedbackDto::getValue).sum();
 //            if (res.equals(Double.NaN)){
@@ -64,7 +67,7 @@ public class MarkService {
 //            }
             BigDecimal truncation = new BigDecimal(res);
             truncation = truncation.setScale(0, RoundingMode.HALF_UP);
-            Profile owner = profileService.findById(addMarkDto.getProfileId());
+            Profile owner = profileService.getProfileByEmail(email);
             Project project = projectService.findProjectById(addMarkDto.getProjectId());
             if(project.getTask().getCloseDate().isBefore(LocalDateTime.now()) && !isTeacherMark){
                 throw new MarkServiceException("Task is overdue");
@@ -88,7 +91,7 @@ public class MarkService {
             throw new MarkServiceException(String.format("Failed to find student with id %s", addMarkDto.getProfileId()));
         }
         Mark result = markRepository.save(mark);
-        markStepFeedbackService.addMarkStepFeedbacksForMark(addMarkDto, result);
+        markStepFeedbackService.addMarkStepFeedbacksForMark(email, addMarkDto, result);
         return result;
     }
 

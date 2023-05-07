@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.urfu.mutual_marker.dto.mark.AddMarkStepDto;
 import ru.urfu.mutual_marker.dto.mark.AddMarkDto;
@@ -82,14 +83,14 @@ public class MarksApi {
     }
 
     @PostMapping("/mark")
-    public ResponseEntity<Object> addStudentMark(@RequestBody AddMarkDto addMarkDto){
-        return new ResponseEntity<>(markService.addStudentMark(addMarkDto), HttpStatus.OK);
+    public ResponseEntity<Object> addStudentMark(Authentication authentication, @RequestBody AddMarkDto addMarkDto){
+        return new ResponseEntity<>(markService.addStudentMark(authentication, addMarkDto), HttpStatus.OK);
     }
 
     @Operation(summary = "Оценка работы преподавателем")
     @PostMapping("/mark/teacher")
-    public ResponseEntity<Object> addTeacherMark(@RequestBody AddTeacherMarkDto addTeacherMarkDto){
-        return new ResponseEntity<>(markService.addTeacherMark(addTeacherMarkDto), HttpStatus.OK);
+    public ResponseEntity<Object> addTeacherMark(Authentication authentication, @RequestBody AddTeacherMarkDto addTeacherMarkDto){
+        return new ResponseEntity<>(markService.addTeacherMark(authentication, addTeacherMarkDto), HttpStatus.OK);
     }
 
     @GetMapping(value = "/calculateFinalMark/{projectId}/{profileId}", params = {"precision"})
