@@ -59,10 +59,12 @@ public class FileStorageServiceMinioImpl implements FileStorageService {
     public Resource load(String filename){
         Path path = Path.of(filename);
 
-        try (InputStream inputStream = minioService.get(path)) {
-
+        try {
+            //Not using try with resources because of ResourceHttpMessageConverter custom closing
+            //https://stackoverflow.com/questions/48660011/how-to-handle-io-streams-in-spring-mvc
+            InputStream inputStream = minioService.get(path);
             return new InputStreamResource(inputStream);
-        } catch (MinioException | IOException e){
+        } catch (MinioException e){
             log.error("[FileStorageServiceMinioImpl] Ошибка во время получения файла из объектного хранилища", e);
             throw new ObjectStorageException("Ошибка во время получения файла из объектного хранилища", e);
         }
