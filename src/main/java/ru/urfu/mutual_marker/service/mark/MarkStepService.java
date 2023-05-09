@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.dto.mark.AddMarkStepDto;
 import ru.urfu.mutual_marker.jpa.entity.MarkStep;
@@ -13,6 +14,7 @@ import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepValueRepository;
+import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.exception.mark.MarkStepServiceException;
 
 import javax.transaction.Transactional;
@@ -33,10 +35,10 @@ public class MarkStepService { //TODO add error handling for repository methods
     MarkStepValueRepository markStepValueRepository;
 
     @Transactional
-    public MarkStep addMarkStep(AddMarkStepDto addMarkStepDto){
+    public MarkStep addMarkStep(Authentication authentication, AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder()
                 .description(addMarkStepDto.getDescription())
-                .owner(profileRepository.getById(addMarkStepDto.getProfileId()))
+                .owner(profileRepository.getByEmailAndDeletedIsFalse(((JwtAuthentication) authentication).getUsername()).get())
                 .title(addMarkStepDto.getTitle())
                 .build();
         addMarkStepDto.getValues().forEach(value ->
@@ -46,9 +48,9 @@ public class MarkStepService { //TODO add error handling for repository methods
     }
 
     @Transactional
-    public List<MarkStep> addMarkSteps(List<AddMarkStepDto> addMarkStepDtos){
+    public List<MarkStep> addMarkSteps(Authentication authentication, List<AddMarkStepDto> addMarkStepDtos){
         List<MarkStep> toReturn = new ArrayList<>();
-        addMarkStepDtos.forEach(dto -> toReturn.add(addMarkStep(dto)));
+        addMarkStepDtos.forEach(dto -> toReturn.add(addMarkStep(authentication, dto)));
         return toReturn;
     }
 

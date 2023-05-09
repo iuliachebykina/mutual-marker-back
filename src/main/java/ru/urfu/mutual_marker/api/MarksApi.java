@@ -48,14 +48,14 @@ public class MarksApi {
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markSteps")
-    public ResponseEntity<List<MarkStep>> addMarkStepsForTask(@RequestBody List<AddMarkStepDto> addMarkStepDtoList){
-        return new ResponseEntity<>(markStepService.addMarkSteps(addMarkStepDtoList), HttpStatus.OK);
+    public ResponseEntity<List<MarkStep>> addMarkStepsForTask(Authentication authentication, @RequestBody List<AddMarkStepDto> addMarkStepDtoList){
+        return new ResponseEntity<>(markStepService.addMarkSteps(authentication, addMarkStepDtoList), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
     @PostMapping("/markStepExisting")
-    public ResponseEntity<MarkStep> addMarkStepForExistingTask(@RequestBody AddMarkStepDto addMarkStepDto){
-        return new ResponseEntity<>(markStepService.addMarkStep(addMarkStepDto), HttpStatus.OK);
+    public ResponseEntity<MarkStep> addMarkStepForExistingTask(Authentication authentication, @RequestBody AddMarkStepDto addMarkStepDto){
+        return new ResponseEntity<>(markStepService.addMarkStep(authentication, addMarkStepDto), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_TEACHER')")
