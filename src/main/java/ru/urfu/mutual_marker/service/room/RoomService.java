@@ -28,6 +28,7 @@ import ru.urfu.mutual_marker.service.exception.RoomServiceException;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -111,7 +112,7 @@ public class RoomService {
     }
 
     @Transactional
-    public Room addNewRoom(AddRoomDto addRoomDto){
+    public Room addNewRoom(AddRoomDto addRoomDto, String email){
         Room toAdd = new Room();
         toAdd.setTitle(addRoomDto.getTitle());
         if(addRoomDto.getCode() != null
@@ -125,17 +126,22 @@ public class RoomService {
             toAdd.setCode(code);
         }
 
-        if (addRoomDto.getTeacherId() != null) {
+
+        Profile creator = profileService.getProfileByEmail(email);
+        saveTeacherToRoom(toAdd, creator);
+
+        if (addRoomDto.getTeacherId() != null && !Objects.equals(creator.getId(), addRoomDto.getTeacherId())) {
             Profile teacher = profileService.findById(addRoomDto.getTeacherId());
-            toAdd.getTeachers().add(teacher);
-            teacher.addRoom(toAdd);
+            saveTeacherToRoom(toAdd, teacher);
         }
+
         if (addRoomDto.getDescription() != null) {
             toAdd.setDescription(addRoomDto.getDescription());
         }
 
         return roomRepository.save(toAdd);
     }
+
 
     @Transactional
     public Room updateRoom(Room room){
@@ -237,13 +243,18 @@ public class RoomService {
     Room addTeacher(Long teacherId, Room room){
         try{
             Profile teacher = profileService.getById(teacherId);
-            room.addTeacher(teacher);
+            saveTeacherToRoom(room, teacher);
             return roomRepository.save(room);
         } catch (Exception e){
             log.error("Failed to add teacher to room with id {}, error message {}, stacktrace {}",
                     room.getId(), e.getLocalizedMessage(), e.getStackTrace());
             throw new RoomServiceException("Failed to add teacher");
         }
+    }
+
+    private void saveTeacherToRoom(Room room, Profile teacher) {
+        room.addTeacher(teacher);
+        teacher.addRoom(room);
     }
 
     @Transactional

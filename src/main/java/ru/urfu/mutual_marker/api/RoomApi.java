@@ -63,8 +63,8 @@ public class RoomApi {
     @Operation(summary = "Добавление комнаты, доступно преподавателям и админам")
     @PostMapping("/room")
     @PreAuthorize("hasAnyRole('ROLE_TEACHER', 'ROLE_ADMIN')")
-    public ResponseEntity<Room> addRoom(@RequestBody AddRoomDto addRoomDto) {
-        Room room = roomService.addNewRoom(addRoomDto);
+    public ResponseEntity<Room> addRoom(@RequestBody AddRoomDto addRoomDto,  @CurrentSecurityContext(expression = "authentication.principal") String email) {
+        Room room = roomService.addNewRoom(addRoomDto, email);
         if(room == null){
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
