@@ -20,12 +20,10 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.anyLong;
 
-@SpringBootTest
 @ContextConfiguration(classes = {
         MarkCalculator.class
 })
-@ExtendWith(MockitoExtension.class)
-@ExtendWith(SpringExtension.class)
+@ExtendWith({MockitoExtension.class, SpringExtension.class})
 public class MarkCalculatorTest {
 
     @Autowired
