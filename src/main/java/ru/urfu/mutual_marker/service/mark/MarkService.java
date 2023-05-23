@@ -7,20 +7,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ru.urfu.mutual_marker.common.MarkMapper;
-import ru.urfu.mutual_marker.common.TaskMapper;
 import ru.urfu.mutual_marker.dto.mark.*;
 import ru.urfu.mutual_marker.jpa.entity.Mark;
 import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.entity.Project;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
-import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
 import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 import ru.urfu.mutual_marker.service.project.ProjectService;
-import ru.urfu.mutual_marker.service.room.RoomService;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
@@ -36,15 +33,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MarkService {
     MarkRepository markRepository;
-    RoomService roomService;
     ProjectRepository projectRepository;
     ProfileService profileService;
     ProjectService projectService;
     MarkMapper markMapper;
     MarkCalculator markCalculator;
     MarkStepFeedbackService markStepFeedbackService;
-    TaskRepository taskRepository;
-    TaskMapper taskMapper;
 
 
     public Mark addStudentMark(Authentication authentication, AddMarkDto addMarkDto){
@@ -128,9 +122,15 @@ public class MarkService {
         return toDelete;
     }
 
+
+    public Double calculateMarkForProject(Long projectId, int precision){
+        Project project = projectService.findProjectById(projectId);
+        return calculateMarkForProject(project, precision);
+    }
+
     @Transactional
-    public Double calculateMarkForProject(Long projectId, Long studentId, int precision){
-        return markCalculator.calculateMarkForProject(projectId, studentId, precision);
+    public Double calculateMarkForProject(Project project, int precision){
+        return markCalculator.calculateMarkForProject(project, precision);
     }
 
     @Transactional
@@ -145,7 +145,7 @@ public class MarkService {
             try {
                 return ProjectFinalMarkDto
                         .builder()
-                        .finalMark(calculateMarkForProject(project.getId(), project.getStudent().getId(), 2))
+                        .finalMark(calculateMarkForProject(project, 2))
                         .projectTitle(project.getTitle())
                         .profileId(project.getStudent().getId())
                         .projectId(project.getId())

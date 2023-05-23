@@ -23,4 +23,9 @@ public class ProjectInfo {
 
     @Schema(title = "Вложения")
     Set<String> attachments;
+
+    @Schema(title = "Оценка")
+    Double finalMark;
+
+
 }

@@ -79,7 +79,7 @@ public class ExcelStatisticsService {
                 mark.setCellStyle(statsStyle);
                 Double calculatedMark;
                 try {
-                    calculatedMark = markService.calculateMarkForProject(project.getId(), student.getId(), 2);
+                    calculatedMark = markService.calculateMarkForProject(project, 2);
                     if (calculatedMark.isNaN()) {
                         mark.setBlank();
                     } else {

@@ -9,9 +9,8 @@ import ru.urfu.mutual_marker.jpa.entity.*;
 import ru.urfu.mutual_marker.jpa.repository.ProjectRepository;
 import ru.urfu.mutual_marker.jpa.repository.mark.MarkRepository;
 import ru.urfu.mutual_marker.security.exception.UserNotExistingException;
-import ru.urfu.mutual_marker.service.project.ProjectService;
-import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
+import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
@@ -28,7 +27,6 @@ import java.util.stream.Collectors;
 public class MarkCalculator {
 
     ProjectRepository projectRepository;
-    ProjectService projectService;
     MarkRepository markRepository;
 
     public Double calculateMarkForProjectByTask(Long taskId, Long student, int precision) {
@@ -42,27 +40,47 @@ public class MarkCalculator {
                 throw new MarkServiceException(String.format("Failed to find task for project with id %s", project.getId()));
             }
             if (task.getCloseDate().isAfter(LocalDateTime.now())){
-                return calculateBeforeCloseDate(project, task, student, precision);
+                return calculateBeforeCloseDate(project, task, precision);
             }
-            return calculateAfterCloseDate(project, task, student, precision);
+            return calculateAfterCloseDate(project, task, precision);
         }
         return Double.NaN;
     }
 
-    @Transactional
-    public Double calculateMarkForProject(Long projectId, Long studentId, int precision){
+    public Double calculateMarkForProject(Project project){
 
         try {
-            Project project = projectService.findProjectById(projectId);
             Task task = project.getTask();
             if (task == null){
-                log.error("Failed to calculate mark, not task found for project with id {}", projectId);
-                throw new MarkServiceException(String.format("Failed to find task for project with id %s", projectId));
+                log.error("Failed to calculate mark, not task found for project with id {}", project.getId());
+                throw new MarkServiceException(String.format("Failed to find task for project with id %s", project.getId()));
             }
             if (task.getCloseDate().isAfter(LocalDateTime.now())){
-                return calculateBeforeCloseDate(project, task, studentId, precision);
+                return calculateBeforeCloseDate(project, task, 2);
             }
-            return calculateAfterCloseDate(project, task, studentId, precision);
+            return calculateAfterCloseDate(project, task, 2);
+
+        } catch (NotFoundException e){
+            log.error("Failed to calculate mark, project not found");
+            throw new MarkServiceException(e.getLocalizedMessage());
+        } catch (UserNotExistingException e){
+            log.error("Failed to calculate mark, user not found");
+            throw new MarkServiceException(e.getLocalizedMessage());
+        }
+    }
+    @Transactional
+    public Double calculateMarkForProject(Project project, int precision){
+
+        try {
+            Task task = project.getTask();
+            if (task == null){
+                log.error("Failed to calculate mark, not task found for project with id {}", project.getId());
+                throw new MarkServiceException(String.format("Failed to find task for project with id %s", project.getId()));
+            }
+            if (task.getCloseDate().isAfter(LocalDateTime.now())){
+                return calculateBeforeCloseDate(project, task, precision);
+            }
+            return calculateAfterCloseDate(project, task, precision);
 
         } catch (NotFoundException e){
             log.error("Failed to calculate mark, project not found");
@@ -73,19 +91,19 @@ public class MarkCalculator {
         }
     }
 
-    public double calculateBeforeCloseDate(Project project, Task task, Long studentId, int precision){
-        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(studentId, task.getId());
+    public double calculateBeforeCloseDate(Project project, Task task, int precision){
+        long numberOfMarkedByStudent = markRepository.countAllByOwnerIdAndProjectTaskId(project.getStudent().getId(), task.getId());
         if (numberOfMarkedByStudent >= task.getMinNumberOfGraded()){
             return calculateAndScaleToHundred(project, precision);
         }
-        log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
+        log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", project.getStudent().getId(), task.getId());
         return Double.NaN;
     }
 
-    public double calculateAfterCloseDate(Project project, Task task, Long studentId, int precision){
+    public double calculateAfterCloseDate(Project project, Task task, int precision){
         if (task.getCloseDate().isAfter(project.getCompletionDate())){
             if (project.getMarks().size() < task.getMinNumberOfGraded()) {
-                log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", studentId, task.getId());
+                log.debug("Number of marked works for student with id {} in task with id {} is not enough to calculate mark", project.getStudent().getId(), task.getId());
                 return Double.NaN;
             } else{
                 return calculateAndScaleToHundred(project, precision);

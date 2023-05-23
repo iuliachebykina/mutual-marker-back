@@ -18,8 +18,6 @@ import ru.urfu.mutual_marker.service.project.ProjectService;
 
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.anyLong;
-
 @SpringBootTest
 @ContextConfiguration(classes = {
         MarkCalculator.class
@@ -46,7 +44,7 @@ public class MarkCalculatorTest {
         Project dummy = Project.builder().build();
         Task task = Task.builder().id(1L).minNumberOfGraded(5).build();
 
-        Double actual = markCalculator.calculateBeforeCloseDate(dummy, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(dummy, task, 2);
 
         Assertions.assertEquals(Double.NaN, actual);
     }
@@ -72,7 +70,7 @@ public class MarkCalculatorTest {
         markStep1.setTasks(Set.of(task));
         markStep2.setTasks(Set.of(task));
 
-        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 2);
 
         Assertions.assertEquals(75, actual);
     }
@@ -98,7 +96,7 @@ public class MarkCalculatorTest {
         markStep1.setTasks(Set.of(task));
         markStep2.setTasks(Set.of(task));
 
-        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 2);
 
         Assertions.assertEquals(25, actual);
     }
@@ -124,7 +122,7 @@ public class MarkCalculatorTest {
         markStep1.setTasks(Set.of(task));
         markStep2.setTasks(Set.of(task));
 
-        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 2);
 
         Assertions.assertEquals(40, actual);
     }

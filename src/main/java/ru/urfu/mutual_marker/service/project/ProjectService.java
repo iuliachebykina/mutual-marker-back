@@ -24,6 +24,7 @@ import ru.urfu.mutual_marker.service.attachment.AttachmentService;
 import ru.urfu.mutual_marker.service.exception.NotFoundException;
 import ru.urfu.mutual_marker.service.exception.ProjectExistingException;
 import ru.urfu.mutual_marker.service.exception.mark.MarkServiceException;
+import ru.urfu.mutual_marker.service.mark.MarkCalculator;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -45,12 +46,15 @@ public class ProjectService {
     AttachmentService attachmentService;
     ProjectMapper projectMapper;
     ProfileMapper profileMapper;
+    MarkCalculator markCalculator;
 
-    public ProjectInfo getProject(Long projectId) {
+    public ProjectInfo getProjectForStudent(Long projectId) {
 
         var project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new NotFoundException("Project was not found"));;
-        return projectMapper.entityToInfo(project);
+        ProjectInfo projectInfo = projectMapper.entityToInfo(project);
+        projectInfo.setStudent(null);
+        return projectInfo;
     }
 
     @SneakyThrows
@@ -183,16 +187,29 @@ public class ProjectService {
         List<Project> allByTask_id = findAllProjectsByTaskId(taskId);
         List<ProjectInfo> projectInfos = new ArrayList<>();
         for (Project project : allByTask_id) {
-            ProjectInfo projectInfo = projectMapper.entityToInfo(project);
-            StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(project.getStudent());
-            projectInfo.setStudent(studentInfo);
+            ProjectInfo projectInfo = projectToProjectInfo(project);
             projectInfos.add(projectInfo);
         }
         return projectInfos;
     }
 
+    private ProjectInfo projectToProjectInfo(Project project) {
+        ProjectInfo projectInfo = projectMapper.entityToInfo(project);
+        StudentInfo studentInfo = profileMapper.profileEntityToStudentDto(project.getStudent());
+        projectInfo.setStudent(studentInfo);
+        Double mark = markCalculator.calculateMarkForProject(project);
+        projectInfo.setFinalMark(mark);
+        return projectInfo;
+    }
+
 
     public ProjectInfo appendNewAttachmentsToExistingProject(String username, List<MultipartFile> files, Long projectId){
         return projectMapper.entityToInfo(attachmentService.appendNewAttachmentsToProject(username, files, projectId));
+    }
+
+    public ProjectInfo getProject(Long projectId) {
+        var project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new NotFoundException("Project was not found"));
+        return projectToProjectInfo(project);
     }
 }

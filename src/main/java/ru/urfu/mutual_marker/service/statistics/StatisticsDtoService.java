@@ -36,7 +36,7 @@ public class StatisticsDtoService {
             String initialsString = student.getName().toString();
             Double calculatedMark;
             try {
-                calculatedMark = markService.calculateMarkForProject(project.getId(), student.getId(), 2);
+                calculatedMark = markService.calculateMarkForProject(project, 2);
             } catch (Exception e){
                 log.error("Error while processing statistics for project with id {}", project.getId());
                 continue;

@@ -97,7 +97,7 @@ public class MarksApi {
     public ResponseEntity<Object> calculateMarkForProject(@PathVariable Long projectId,
                                                           @PathVariable Long profileId,
                                                           @RequestParam("precision") Integer precision){
-        return new ResponseEntity<>(markService.calculateMarkForProject(projectId, profileId, precision), HttpStatus.OK);
+        return new ResponseEntity<>(markService.calculateMarkForProject(projectId, precision), HttpStatus.OK);
     }
 
     @GetMapping("/task/{taskId}")

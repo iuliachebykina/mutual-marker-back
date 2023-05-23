@@ -50,6 +50,13 @@ public class ProjectApi {
     @Operation(summary = "Возвращение проекта по id", description = "Возвращает проект по id")
     @GetMapping(value = "/task/project/{project_id}")
     public ProjectInfo getProject(@PathVariable("project_id") Long projectId) {
+        return projectService.getProjectForStudent(projectId);
+    }
+
+    @Operation(summary = "Возвращение проекта по id для преподавателя", description = "Возвращает проект по id")
+    @GetMapping(value = "/task/project/{project_id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TEACHER')")
+    public ProjectInfo getProjectInfoForTeacher(@PathVariable("project_id") Long projectId) {
         return projectService.getProject(projectId);
     }
 
