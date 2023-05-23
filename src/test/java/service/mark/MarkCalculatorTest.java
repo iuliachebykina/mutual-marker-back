@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -46,7 +45,7 @@ public class MarkCalculatorTest {
         Project dummy = Project.builder().build();
         Task task = Task.builder().id(1L).minNumberOfGraded(5).build();
 
-        Double actual = markCalculator.calculateBeforeCloseDate(dummy, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(dummy, task, 2);
 
         Assertions.assertEquals(Double.NaN, actual);
     }
@@ -184,7 +183,7 @@ public class MarkCalculatorTest {
         Mockito.when(markRepository.countAllByOwnerIdAndProjectTaskId(Mockito.any(Long.class), Mockito.any(Long.class))).thenReturn(Long.valueOf(5));
         Mockito.when(projectService.findProjectById(anyLong())).thenReturn(project);
 
-        Double actual = markCalculator.calculateMarkForProject(1L, 1L, 2);
+        Double actual = markCalculator.calculateMarkForProject(project, 2);
 
         Assertions.assertEquals(75, actual);
     }
@@ -210,7 +209,7 @@ public class MarkCalculatorTest {
         markStep1.setTasks(Set.of(task));
         markStep2.setTasks(Set.of(task));
 
-        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 1L, 2);
+        Double actual = markCalculator.calculateBeforeCloseDate(project, task, 2);
 
         Assertions.assertEquals(25, actual);
     }
