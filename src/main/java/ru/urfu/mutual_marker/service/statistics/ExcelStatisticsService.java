@@ -23,10 +23,12 @@ import ru.urfu.mutual_marker.jpa.entity.Task;
 import ru.urfu.mutual_marker.jpa.repository.TaskRepository;
 import ru.urfu.mutual_marker.service.exception.statistics.StatisticsServiceException;
 import ru.urfu.mutual_marker.service.mark.MarkService;
+import ru.urfu.mutual_marker.service.project.ProjectService;
 import ru.urfu.mutual_marker.service.statistics.anomaly.AnomalyDiscoveryService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -37,27 +39,37 @@ public class ExcelStatisticsService {
     final MarkService markService;
     final TaskRepository taskRepository;
     final ResourceLoader resourceLoader;
+    final ProjectService projectService;
 
     final AnomalyDiscoveryService anomalyDiscoveryService;
 
-    public ResponseEntity<Resource> statisticsForProject(Long taskId) {
-        try (XSSFWorkbook workbook = new XSSFWorkbook(resourceLoader.getResource("classpath:/statistics-template.xlsx").getInputStream())) {
-            Task task = taskRepository.findById(taskId).orElse(null);
-            if (task == null) {
-                throw new IllegalArgumentException("Task with given id not found");
-            }
+    public ResponseEntity<Resource> statisticsForProject(Long projectId){
+        Project project = projectService.findProjectById(projectId);
+        return getStatisticsFile(project.getTitle(), Set.of(project));
+    }
 
-            Set<Project> allTaskProjects = task.getProjects();
+    public ResponseEntity<Resource> statisticsForTask(Long taskId) {
+        Task task = taskRepository.findById(taskId).orElse(null);
+        if (task == null) {
+            throw new IllegalArgumentException("Task with given id not found");
+        }
+
+        return getStatisticsFile(task.getTitle(), task.getProjects());
+    }
+
+    public ResponseEntity<Resource> getStatisticsFile(String title, Set<Project> projects){
+        try (XSSFWorkbook workbook = new XSSFWorkbook(resourceLoader.getResource("classpath:/statistics-template.xlsx").getInputStream())) {
+
 
             CellStyle statsStyle = workbook.createCellStyle();
             XSSFFont statsFont = workbook.createFont();
             statsFont.setFontName("Times New Roman");
             statsFont.setFontHeightInPoints((short) 14);
             statsStyle.setFont(statsFont);
-            Sheet sheet = workbook.createSheet(task.getTitle());
+            Sheet sheet = workbook.createSheet(title);
 
             int i = 1;
-            for (Project project : allTaskProjects) {
+            for (Project project : projects) {
                 Profile student = project.getStudent();
 
                 Row stats = sheet.createRow(i);
@@ -114,7 +126,7 @@ public class ExcelStatisticsService {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             workbook.write(baos);
 
-            String filename = String.format("Отчет по заданию \"%s\".xlsx", task.getTitle());
+            String filename = String.format("Отчет по заданию \"%s\".xlsx", title);
             ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
 
 

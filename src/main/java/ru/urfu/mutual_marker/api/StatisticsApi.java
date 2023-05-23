@@ -29,7 +29,14 @@ public class StatisticsApi {
     @GetMapping("/excel")
     @PreAuthorize("hasAnyRole('ROLE_TEACHER', 'ROLE_ADMIN')")
     public ResponseEntity<?> getExcelStatistics(@RequestParam("taskId") Long taskId) {
-        return excelStatisticsService.statisticsForProject(taskId);
+        return excelStatisticsService.statisticsForTask(taskId);
+    }
+
+    @Operation(summary = "Получение статистики Excel файлом")
+    @GetMapping("/excelProject")
+    @PreAuthorize("hasAnyRole('ROLE_TEACHER', 'ROLE_ADMIN')")
+    public ResponseEntity<?> getExcelStatisticsForProject(@RequestParam("projectId") Long projectId) {
+        return excelStatisticsService.statisticsForProject(projectId);
     }
 
     @Operation(summary = "Получение статистики в виде DTO для отображения на интерфейсе")
