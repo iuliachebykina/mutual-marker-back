@@ -26,6 +26,7 @@ import ru.urfu.mutual_marker.service.mark.MarkService;
 import ru.urfu.mutual_marker.service.project.ProjectService;
 import ru.urfu.mutual_marker.service.statistics.anomaly.AnomalyDiscoveryService;
 
+import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -43,11 +44,13 @@ public class ExcelStatisticsService {
 
     final AnomalyDiscoveryService anomalyDiscoveryService;
 
+    @Transactional
     public ResponseEntity<Resource> statisticsForProject(Long projectId){
         Project project = projectService.findProjectById(projectId);
         return getStatisticsFile(project.getTitle(), Set.of(project));
     }
 
+    @Transactional
     public ResponseEntity<Resource> statisticsForTask(Long taskId) {
         Task task = taskRepository.findById(taskId).orElse(null);
         if (task == null) {
