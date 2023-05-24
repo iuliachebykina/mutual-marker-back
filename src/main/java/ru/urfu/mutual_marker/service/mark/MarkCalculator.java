@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -143,7 +144,8 @@ public class MarkCalculator {
         BigDecimal maxMark = BigDecimal.valueOf(project.getTask().getMarkSteps()
                 .stream()
                 .map(MarkStep::getValues)
-                .flatMapToInt(values -> values.stream().mapToInt(MarkStepValue::getValue))
+                .map(values -> values.stream().mapToInt(MarkStepValue::getValue).max().getAsInt())
+                .mapToInt(Integer::intValue)
                 .sum());
         BigDecimal result = calculateResult.compareTo(BigDecimal.ZERO) != 0
                 ? calculateResult.divide(maxMark, precision, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
