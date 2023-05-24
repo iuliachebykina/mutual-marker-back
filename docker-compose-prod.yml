@@ -1,0 +1,44 @@
+version: '3.8'
+services:
+  mutual-marker-back:
+    container_name: mutual-marker-back
+    build:
+      context: .
+    image: mutual-marker-back:latest
+    ports:
+      - "8090:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      FILE_STORAGE: ${FILE_STORAGE}
+      MINIO_URL: ${MINIO_URL}
+      MINIO_BUCKET: ${MINIO_BUCKET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MAX_FILE_SIZE: 20MB
+      MAX_REQUEST_SIZE: 20MB
+      FILE-SIZE-THRESHOLD: 2KB
+      JWT_REFRESH: ${JWT_REFRESH}
+      JWT_ACCESS: ${JWT_ACCESS}
+    networks:
+      - mutual_marker_network
+
+  mutual-marker-front:
+    container_name: mutual-marker-front
+    build:
+      context: ../mutual-marker-front/.
+    image: mutual-marker-front:latest
+    ports:
+      - "80:80"
+    networks:
+      - mutual_marker_network
+    depends_on:
+      - mutual-marker-back
+
+
+networks:
+  mutual_marker_network:
+
+
