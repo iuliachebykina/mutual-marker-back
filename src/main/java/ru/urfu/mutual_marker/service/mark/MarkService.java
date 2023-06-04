@@ -50,7 +50,7 @@ public class MarkService {
     }
 
     @Transactional
-    Mark addMark(Authentication authentication, AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
+    public Mark addMark(Authentication authentication, AddMarkDto addMarkDto, Boolean isTeacherMark, Double coefficient){
         Mark mark;
         String email = ((JwtAuthentication) authentication).getUsername();
         try {
