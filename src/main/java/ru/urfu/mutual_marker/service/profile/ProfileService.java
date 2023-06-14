@@ -40,7 +40,7 @@ public class ProfileService {
 
     @Transactional
     public Profile getProfileByEmail(String email, Role role) {
-        Optional<Profile> profile = profileRepository.findByEmailAndDeletedIsFalse(email);
+        Optional<Profile> profile = profileRepository.findByEmailAndDeletedIsFalse(email.toLowerCase(Locale.ROOT));
         profile.ifPresent(value -> checkRole(value.getRole(), role));
         return profile.orElseThrow(() -> {
             throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
@@ -99,7 +99,7 @@ public class ProfileService {
 
     @Transactional
     public Profile getProfileByEmail(String email) {
-        return profileRepository.findByEmailAndDeletedIsFalse(email).orElseThrow(() -> {
+        return profileRepository.findByEmailAndDeletedIsFalse(email.toLowerCase(Locale.ROOT)).orElseThrow(() -> {
             log.error("Not found profile with email: {}", email);
             throw new UserNotExistingException(String.format("Not found profile with email: %s", email));
 
@@ -135,7 +135,7 @@ public class ProfileService {
 
     @Transactional
     public Profile saveProfile(RegistrationInfo registrationInfo, Role role) {
-        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(registrationInfo.getEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(registrationInfo.getEmail().toLowerCase(Locale.ROOT));
         if (opt.isPresent()) {
             log.error("Failed to register new user. User with email: {} already existing", registrationInfo.getEmail());
             throw new UserExistingException(String.format("User with email: %s already existing", registrationInfo.getEmail()));
@@ -158,7 +158,7 @@ public class ProfileService {
 
     @Transactional
     public void deleteProfile(String email) {
-        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email);
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email.toLowerCase(Locale.ROOT));
         if (opt.isEmpty()) {
             log.error("Filed to delete profile. Profile with email: {} does not existing", email);
             throw new UserNotExistingException(String.format("User with email: %s does not existing", email));
@@ -177,7 +177,7 @@ public class ProfileService {
 
     @Transactional
     public void updatePassword(ChangePassword changePassword) {
-        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changePassword.getEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changePassword.getEmail().toLowerCase(Locale.ROOT));
         if (opt.isEmpty()) {
             log.error("User with email: {} does not existing", changePassword.getEmail());
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changePassword.getEmail()));
@@ -194,12 +194,12 @@ public class ProfileService {
 
     @Transactional
     public void updateEmail(ChangeEmail changeEmail) {
-        if (profileRepository.getByEmailAndDeletedIsFalse(changeEmail.getNewEmail()).isPresent()) {
+        if (profileRepository.getByEmailAndDeletedIsFalse(changeEmail.getNewEmail().toLowerCase(Locale.ROOT)).isPresent()) {
             log.error("User with email: {} already existing", changeEmail.getNewEmail());
             throw new UserExistingException(String.format("User with email: %s already existing", changeEmail.getNewEmail()));
         }
 
-        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changeEmail.getOldEmail());
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(changeEmail.getOldEmail().toLowerCase(Locale.ROOT));
         if (opt.isEmpty()) {
             log.error("User with email: {} does not existing", changeEmail.getOldEmail());
             throw new UserNotExistingException(String.format("User with email: %s does not existing", changeEmail.getOldEmail()));
@@ -212,7 +212,7 @@ public class ProfileService {
 
     @Transactional
     public Profile updateProfile(Profile updatedProfile, String email) {
-        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email);
+        Optional<Profile> opt = profileRepository.findByEmailAndDeletedIsFalse(email.toLowerCase(Locale.ROOT));
         if (opt.isEmpty()) {
             log.error("User with id: {} does not existing", updatedProfile.getId());
             throw new UserNotExistingException(String.format("User with id: %s does not existing", updatedProfile.getId()));
@@ -222,9 +222,9 @@ public class ProfileService {
             log.warn("In this method not allowed update password. Look at the method updatePassword");
             updatedProfile.setPassword(oldProfile.getPassword());
         }
-        if (updatedProfile.getEmail() != null && !updatedProfile.getEmail().equals(oldProfile.getEmail())) {
+        if (updatedProfile.getEmail() != null && !updatedProfile.getEmail().equalsIgnoreCase(oldProfile.getEmail())) {
             log.warn("In this method not allowed update email. Look at the method updateEmail");
-            updatedProfile.setEmail(oldProfile.getEmail());
+            updatedProfile.setEmail(oldProfile.getEmail().toLowerCase(Locale.ROOT));
         }
         Profile newProfile = profileMapper.updateProfile(updatedProfile, oldProfile);
         profileRepository.save(newProfile);
