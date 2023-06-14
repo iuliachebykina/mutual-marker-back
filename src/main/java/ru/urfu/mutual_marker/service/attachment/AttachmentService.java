@@ -41,7 +41,7 @@ public class AttachmentService {
     @Transactional
     public List<String> uploadAttachments(String username, List<MultipartFile> files) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if (profile.isEmpty()){
             log.error("[AttachmentService] Ошибка при загрузке вложений - не найден профиль с email {}", username);
             throw new NotFoundException("Не удалось найти профиль");
@@ -74,7 +74,7 @@ public class AttachmentService {
     @Transactional
     public void unpinAttachment(String username, Long projectId, String filename) {
 
-        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username).orElseThrow(() -> new NotFoundException("User not found"));
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT)).orElseThrow(() -> new NotFoundException("User not found"));
         Project project = projectRepository.findByStudentAndIdAndDeletedIsFalse(profile, projectId).orElseThrow(() -> new NotFoundException("Project not found"));
         Attachment attach = attachmentRepository.findByFileNameAndDeletedIsFalse(filename).orElseThrow(() -> new NotFoundException("File not found"));
         attach.getProjects().removeIf(prj -> Objects.equals(prj.getId(), projectId));
@@ -115,7 +115,7 @@ public class AttachmentService {
     @Transactional
     public Project appendNewAttachmentsToProject(String username, List<MultipartFile> files, Long projectId) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         var project = projectRepository.findById(projectId).orElseThrow(() -> new NotFoundException("Project was not found."));
 
         if (!project.getStudent().equals(profile.get())) {
@@ -141,7 +141,7 @@ public class AttachmentService {
 
     @Transactional
     public Task apppendNewAttachmentsToTask(String username, List<MultipartFile> files, Long taskId){
-        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username).orElse(null);
+        Profile profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT)).orElse(null);
         Task task = taskRepository.findById(taskId).orElseThrow(() -> new NotFoundException("Task was not found."));
 
         for (var file : files) {

@@ -18,10 +18,7 @@ import ru.urfu.mutual_marker.security.jwt.JwtAuthentication;
 import ru.urfu.mutual_marker.service.exception.mark.MarkStepServiceException;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,7 +35,7 @@ public class MarkStepService { //TODO add error handling for repository methods
     public MarkStep addMarkStep(Authentication authentication, AddMarkStepDto addMarkStepDto){
         MarkStep toAdd = MarkStep.builder()
                 .description(addMarkStepDto.getDescription())
-                .owner(profileRepository.getByEmailAndDeletedIsFalse(((JwtAuthentication) authentication).getUsername()).get())
+                .owner(profileRepository.getByEmailAndDeletedIsFalse(((JwtAuthentication) authentication).getUsername().toLowerCase(Locale.ROOT)).get())
                 .title(addMarkStepDto.getTitle())
                 .build();
         addMarkStepDto.getValues().forEach(value ->

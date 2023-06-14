@@ -32,10 +32,7 @@ import ru.urfu.mutual_marker.service.mark.MarkStepService;
 import ru.urfu.mutual_marker.service.profile.ProfileService;
 
 import javax.transaction.Transactional;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +60,7 @@ public class TaskService {
 
         var tasks = taskRepository.findAllByRoom_IdAndDeletedIsFalse(roomId, pageable);
         JwtAuthentication authentication = (JwtAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(authentication.getUsername());
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(authentication.getUsername().toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", authentication.getUsername()));
         }
@@ -74,7 +71,7 @@ public class TaskService {
     }
 
     public List<TaskInfo> findCompletedTasks(Long roomId, Pageable pageable, String username) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
@@ -83,7 +80,7 @@ public class TaskService {
     }
 
     public List<TaskInfo> findUncompletedTasks(Long roomId, Pageable pageable, String username) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
@@ -138,7 +135,7 @@ public class TaskService {
             throw new NotFoundException("Room is not found");
         }
 
-        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
+        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner().toLowerCase(Locale.ROOT)).orElse(null);
         var task = taskMapper.creationRequestToEntity(request, owner);
         task.setRoom(room.get());
         task.setCloseDate(request.getCloseDate().withHour(23).withMinute(59).withSecond(59));
@@ -184,7 +181,7 @@ public class TaskService {
         if (task.isEmpty()) {
             throw new IllegalArgumentException("Task was not found");
         }
-        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner()).orElse(null);
+        var owner = profileRepository.findByEmailAndDeletedIsFalse(request.getOwner().toLowerCase(Locale.ROOT)).orElse(null);
 
         Task save = taskRepository.save(taskMapper.creationRequestToExistingEntity(task.get(), request, owner));
         return taskMapper.entityToInfo(save);

@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,7 @@ public class ProjectService {
 
         var task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new NotFoundException("Task was not found"));
-        var student = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var student = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
 
         if(task.getCloseDate().isBefore(LocalDateTime.now())){
             throw new MarkServiceException("Task is overdue");
@@ -96,7 +97,7 @@ public class ProjectService {
     @Transactional
     public ProjectCreationResultDto updateProject(String username, ProjectUpdateInfo updateInfo) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
@@ -122,7 +123,7 @@ public class ProjectService {
     public ProjectCreationResultDto createProject(String username, ProjectCreationInfo creationInfo,
                                                   Long taskId,
                                                   Boolean appendAttachments) {
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }
@@ -160,7 +161,7 @@ public class ProjectService {
 
     public ProjectInfo getSelfProject(String username, Long taskId) {
 
-        var profile = profileRepository.findByEmailAndDeletedIsFalse(username);
+        var profile = profileRepository.findByEmailAndDeletedIsFalse(username.toLowerCase(Locale.ROOT));
         if(profile.isEmpty()){
             throw new UserNotExistingException(String.format("Profile with email: %s does not existing", username));
         }

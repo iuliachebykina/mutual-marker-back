@@ -11,6 +11,7 @@ import ru.urfu.mutual_marker.jpa.entity.Profile;
 import ru.urfu.mutual_marker.jpa.repository.ProfileRepository;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Optional;
 
 @Component
@@ -38,7 +39,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     private boolean findUserInDb(String name, String password) {
-        Optional<Profile> byEmail = profileRepository.findByEmailAndDeletedIsFalse(name);
+        Optional<Profile> byEmail = profileRepository.findByEmailAndDeletedIsFalse(name.toLowerCase(Locale.ROOT));
         if(byEmail.isEmpty())
             return false;
         Profile profile = byEmail.get();

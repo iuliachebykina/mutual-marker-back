@@ -17,6 +17,7 @@ import ru.urfu.mutual_marker.jpa.repository.mark.MarkStepRepository;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class MarkStepFeedbackService {
         addMarkDto.getMarkStepFeedbackDtos().forEach(ms -> {
             MarkStep markStep = markStepRepository.findById(ms.getMarkStepId())
                     .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти MarkStep с id %s", ms.getMarkStepId())));
-            Profile owner = profileRepository.getByEmailAndDeletedIsFalse(reviewerEmail)
+            Profile owner = profileRepository.getByEmailAndDeletedIsFalse(reviewerEmail.toLowerCase(Locale.ROOT))
                     .orElseThrow(() -> new RuntimeException(String.format("[MarkStepFeedbackService] Не удалось найти Profile с id %s", ms.getReviewerId())));
             MarkStepFeedback markStepFeedback = MarkStepFeedback
                     .builder()
